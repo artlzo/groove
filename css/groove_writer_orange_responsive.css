@@ -1,0 +1,240 @@
+/*
+  GrooveScribe responsive overrides
+  Purpose: keep legacy layout intact while improving responsiveness and spacing.
+  Loaded after groove_writer_orange.css to minimize risk.
+*/
+
+:root {
+  --left-nav-width: 120px;
+  --top-nav-height: 48px;
+  --midi-height: 48px;
+  --page-bg: #393939;
+  --panel-bg: #ffffff;
+  --text-size-base: 14px;
+  --line-height-base: 1.4;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 24px;
+  --spacing-6: 32px;
+}
+
+body {
+  font-size: var(--text-size-base);
+  line-height: var(--line-height-base);
+  background-color: var(--page-bg);
+}
+
+#GrooveWriter {
+  min-height: 100vh;
+}
+
+#LeftHandNav {
+  width: var(--left-nav-width);
+}
+
+#TopNav,
+#midiPlayer {
+  width: 100% !important;
+  left: 0 !important;
+  margin-left: 0 !important;
+  padding-left: var(--left-nav-width);
+  box-sizing: border-box;
+}
+
+#midiPlayer {
+  padding-left: var(--left-nav-width);
+}
+
+#midiPlayer {
+  top: var(--top-nav-height);
+  height: var(--midi-height);
+}
+
+/* Remove left gap inside the player controls row */
+.playerControlsRow {
+  padding-left: 0;
+}
+
+#RightHandContent {
+  left: var(--left-nav-width);
+  width: calc(100% - var(--left-nav-width));
+  top: calc(var(--top-nav-height) + var(--midi-height));
+  height: calc(100vh - var(--top-nav-height) - var(--midi-height));
+}
+
+/* Make top nav flexible without changing DOM structure */
+#TopNav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-2);
+  height: auto;
+  min-height: var(--top-nav-height);
+  padding: 0;
+}
+
+#logoTextUpperLeft {
+  padding: 0;
+  margin: 0;
+}
+
+#logoTextUpperLeft img {
+  display: block;
+}
+
+#upperLeft {
+  margin-left: 0;
+}
+
+#upperLeft,
+#upperRight {
+  display: inline-flex;
+  align-items: center;
+  white-space: normal;
+  margin: 0;
+}
+
+#upperRight {
+  justify-content: flex-end;
+  margin-right: 24px;
+}
+
+/* Improve button hit areas */
+.metronomeButton,
+.rightButtons,
+.left-button-content,
+.pageBottomButton {
+  min-height: 36px;
+}
+
+.metronomeButton,
+.rightButtons {
+  padding: 4px 6px;
+  margin: 0 4px;
+}
+
+.left-button-content {
+  padding: 4px 6px;
+}
+
+/* Improve section spacing and readability */
+#sheetMusicTextFields,
+#musicalInput,
+#bottomButtonRow {
+  padding: var(--spacing-2) var(--spacing-3);
+}
+
+#musicalInput {
+  background: var(--panel-bg);
+  border-bottom: 1px solid #bbb;
+}
+
+#sheetMusicDiv {
+  background: var(--panel-bg);
+}
+
+/* Slightly reduce heavy text weight in labels */
+#metronomeLabel,
+#timeSubLabel,
+.left-button-content {
+  font-weight: 400;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  .metronomeButton,
+  .rightButtons {
+    padding: 3px 5px;
+    margin: 0 3px;
+  }
+
+  #upperRight {
+    margin-right: 16px;
+  }
+}
+
+@media (max-width: 1024px) {
+  :root {
+    --left-nav-width: 96px;
+    --top-nav-height: 96px;
+  }
+
+  #TopNav {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+    column-gap: var(--spacing-2);
+    row-gap: var(--spacing-1);
+    align-items: center;
+    padding: 0;
+  }
+
+  #logoTextUpperLeft {
+    padding: 0;
+    margin: 0;
+    grid-column: 1;
+    grid-row: 1;
+    align-self: center;
+  }
+
+  #upperLeft {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  #upperRight {
+    grid-column: 2;
+    grid-row: 2;
+    justify-content: flex-start;
+    margin-right: 0;
+  }
+
+  #logoTextUpperLeft img {
+    height: 26px;
+  }
+
+  #upperRight,
+  #upperLeft {
+    flex: initial;
+  }
+}
+
+@media (max-width: 900px) {
+  :root {
+    --left-nav-width: 80px;
+    --top-nav-height: 112px;
+  }
+
+  #upperLeft,
+  #upperRight {
+    row-gap: var(--spacing-2);
+  }
+
+  #metronomeLabel {
+    margin-left: 6px;
+  }
+}
+
+@media only screen and (orientation: portrait) {
+  #musicalInput {
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+@media print {
+  #TopNav,
+  #midiPlayer,
+  #LeftHandNav {
+    display: none;
+  }
+
+  #RightHandContent {
+    left: 0;
+    width: 100%;
+    top: 0;
+    height: auto;
+  }
+}
