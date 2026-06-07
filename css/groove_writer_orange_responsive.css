@@ -36,15 +36,11 @@ body {
 
 #TopNav,
 #midiPlayer {
-  width: 100% !important;
-  left: 0 !important;
+  left: var(--left-nav-width) !important;
+  width: calc(100% - var(--left-nav-width)) !important;
   margin-left: 0 !important;
-  padding-left: var(--left-nav-width);
+  padding-left: 0;
   box-sizing: border-box;
-}
-
-#midiPlayer {
-  padding-left: var(--left-nav-width);
 }
 
 #midiPlayer {
@@ -67,12 +63,12 @@ body {
 /* Make top nav flexible without changing DOM structure */
 #TopNav {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   align-items: center;
   gap: var(--spacing-2);
-  height: auto;
+  height: var(--top-nav-height);
   min-height: var(--top-nav-height);
-  padding: 0;
+  padding: 0 var(--spacing-3);
 }
 
 #logoTextUpperLeft {
@@ -98,7 +94,8 @@ body {
 
 #upperRight {
   justify-content: flex-end;
-  margin-right: 24px;
+  margin-left: auto;
+  margin-right: 16px;
 }
 
 /* Improve button hit areas */
@@ -158,41 +155,31 @@ body {
 @media (max-width: 1024px) {
   :root {
     --left-nav-width: 96px;
-    --top-nav-height: 96px;
+    --top-nav-height: 48px;
   }
 
   #TopNav {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto auto;
-    column-gap: var(--spacing-2);
-    row-gap: var(--spacing-1);
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    padding: 0;
+    gap: var(--spacing-1) var(--spacing-2);
+    height: auto;
+    min-height: var(--top-nav-height);
+    padding: var(--spacing-2) var(--spacing-3) var(--spacing-2) var(--left-nav-width);
   }
 
   #logoTextUpperLeft {
-    padding: 0;
-    margin: 0;
-    grid-column: 1;
-    grid-row: 1;
-    align-self: center;
+    display: none;
   }
 
   #upperLeft {
-    grid-column: 2;
-    grid-row: 1;
+    flex: 1 1 auto;
   }
 
   #upperRight {
-    grid-column: 2;
-    grid-row: 2;
-    justify-content: flex-start;
+    flex: 0 0 auto;
+    justify-content: flex-end;
     margin-right: 0;
-  }
-
-  #logoTextUpperLeft img {
-    height: 26px;
   }
 
   #upperRight,
@@ -204,7 +191,7 @@ body {
 @media (max-width: 900px) {
   :root {
     --left-nav-width: 80px;
-    --top-nav-height: 112px;
+    --top-nav-height: 48px;
   }
 
   #upperLeft,

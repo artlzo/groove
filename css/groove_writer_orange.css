@@ -60,38 +60,33 @@
 	}
 	#TopNav {
 		position: fixed;
-		/position: relative;
-		#top: 111px;
 		top: 0px;
-		left: 0px;
+		left: 120px;
 		z-index: 998;
-		width: calc(100% - 72px);
-		margin-left: 119px;
-		height: 48px;  /* total 48 */
+		width: calc(100% - 120px);
+		height: 48px;
 		border-bottom: 1px solid #000;
 		background: var(--header-bg-color);
 		background: linear-gradient(to right, var(--header-bg-start-color), var(--header-bg-end-color));
-		display: block;
+		display: flex;
+		align-items: center;
 	}
 	#midiPlayer {  /* more #midiPlayer css in groove_display.css */
 		background: #000;
-		width: calc(100% - 72px);
+		width: calc(100% - 120px);
 		height: 48px;
 		position: fixed;
-		#top: 160px;
 		top: 49px;
-		/position: relative;
 		left: 120px;
 		z-index: 999;
 		border-bottom: 1px solid #000;
 	}
 	#RightHandContent {
 		position: relative;
-		#top: 209px;
 		top: 98px;
 		left: 120px;
 		height: calc(100% - 98px);
-		width: calc(100% - 72px);
+		width: calc(100% - 120px);
 		overflow-y: auto;
 	}
 	#logoTextUpperLeft {
@@ -102,18 +97,16 @@
 		height: 30px;
 	}
 	#upperLeft  {
-		margin-top: 12px;
-		display: inline-block;
+		display: flex;
+		align-items: center;
 		white-space: nowrap;
-		vertical-align: top;
+		flex: 1;
 	}
 	#upperRight {
-		margin-top: 12px;
-		display: inline-block;
-		float: right;
-		margin-right: 60px;
+		display: flex;
+		align-items: center;
 		white-space: nowrap;
-		vertical-align: top;
+		margin-right: 16px;
 	}
 
 	#divisionButtonContainer {
