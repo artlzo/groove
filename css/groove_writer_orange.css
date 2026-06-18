@@ -1088,20 +1088,12 @@
 	}
 	#stickingsButton {
 	}
-	#stickingsButton:before  {
-		font-family: FontAwesome;
-		font-size: 2em;
-		letter-spacing: -3px;
-		content: "\f065";
-		line-height: 32px;
+	#stickingsButton:before {
+		content: none;
 	}
-	#stickingsButton.ClickToHide:before {
-		font-family: FontAwesome;
-		font-size: 2em;
-		letter-spacing: -3px;
-		content: "\f066";
-		line-height: 32px;
-	}
+	#stickingsButton .icon-sticking-compress { display: none !important; }
+	#stickingsButton.ClickToHide .icon-sticking-expand { display: none !important; }
+	#stickingsButton.ClickToHide .icon-sticking-compress { display: inline !important; }
 	#printButton {
 	}
 	#downloadButton {
@@ -1187,6 +1179,8 @@
 	}
 	.bottomButtonIcon {
 		display:block;
+		font-size: 2em;
+		text-align: center;
 	}
 	.bottomButtonLabel {
 		margin-top: 8px;
@@ -1194,20 +1188,6 @@
 	}
 	.edit-block {
 		display: none;
-	}
-	/*  3 circles make up the tom icon.  Position them */
-	#icon-tom1 {
-		font-size: 16px;
-		margin-top: 16px;
-	}
-	#icon-tom2 {
-		font-size: 14px;
-		margin-left: -5px;
-		vertical-align: top;
-	}
-	#icon-tom3 {
-		font-size: 20px;
-		margin-top: 11px;
 	}
 	@media print {
 		/* keep at bottom so it overrides the styles above */

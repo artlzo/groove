@@ -25,10 +25,11 @@
 		<meta property="og:image" content="https://mikeslessons.com/groove/images/GScribe_Logo_on_orange.png">
 
 		<link rel="stylesheet" type="text/css" href="font-awesome/4.7.0/css/font-awesome.min.css">
+		<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 		<link rel="stylesheet" type="text/css" href="css/share-button.min.css">
-	    <link rel="stylesheet" type="text/css" href="css/groove_writer_orange.css">
-		<link rel="stylesheet" type="text/css" href="css/groove_display_orange.css">
-		<link rel="stylesheet" type="text/css" href="css/groove_writer_orange_responsive.css">
+	    <link rel="stylesheet" type="text/css" href="css/groove_writer_orange.css?v=2">
+		<link rel="stylesheet" type="text/css" href="css/groove_display_orange.css?v=2">
+		<link rel="stylesheet" type="text/css" href="css/groove_writer_orange_responsive.css?v=2">
 		<link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap' rel='stylesheet'>
 
 		<!--   Other peoples JS libraries    -->
@@ -104,7 +105,7 @@
 						}
 					</script>
 
-					<span class="left-button edit-block" id="undoButton" onclick="myGrooveWriter.undoCommand();"><span class="left-button-content"><i class="fa fa-undo"></i>&nbsp;&nbsp;Undo</span></span>
+					<span class="left-button edit-block" id="undoButton" onclick="myGrooveWriter.undoCommand();"><span class="left-button-content"><i class="ph ph-arrow-counter-clockwise"></i>&nbsp;&nbsp;Undo</span></span>
 				</span>
 
 			</div>
@@ -121,9 +122,9 @@
 					</span>
 				</span>
 				<span id="upperRight">
-					<span class="rightButtons grooveDB_hidden" id="permutationAnchor" onclick="myGrooveWriter.permutationAnchorClick(event);"><i class="fa fa-bars"></i> Permutations</span>
-					<span class="rightButtons" id="groovesAnchor" onclick="myGrooveWriter.groovesAnchorClick(event);"><i class="fa fa-bars"></i> Grooves</span>
-					<span class="rightButtons" id="helpAnchor" onclick="myGrooveWriter.helpAnchorClick(event);"><i class="fa fa-bars"></i> Help</span>
+					<span class="rightButtons grooveDB_hidden" id="permutationAnchor" onclick="myGrooveWriter.permutationAnchorClick(event);"><i class="ph ph-shuffle"></i> Permutations</span>
+					<span class="rightButtons" id="groovesAnchor" onclick="myGrooveWriter.groovesAnchorClick(event);"><i class="ph ph-music-notes"></i> Grooves</span>
+					<span class="rightButtons" id="helpAnchor" onclick="myGrooveWriter.helpAnchorClick(event);"><i class="ph ph-question"></i> Help</span>
 				</span>
 			</div>
 			<div id="midiPlayer" class="fullWidthEle"><!-- space for the midiplayer to be attached by the javascript --></div>
@@ -159,7 +160,7 @@
 					<span class="sheetMusicTextField"><b>Title:</b> <input class="sheetMusicInputField" id="tuneTitle" onchange="myGrooveWriter.refresh_ABC();" type="text"></span>
 					<span class="sheetMusicTextField"><b>Author:</b> <input class="sheetMusicInputField" id="tuneAuthor" onchange="myGrooveWriter.refresh_ABC();"  type="text"></span>
 					<span class="sheetMusicTextField"><b>Comment:</b> <input class="sheetMusicInputField" id="tuneComments" onchange="myGrooveWriter.refresh_ABC();"  type="text"></span>
-					<span id='KeyButton'><input type="checkbox" class="hiddenCheckbox" id="showLegend" onclick="myGrooveWriter.refresh_ABC();"><label id="LegendLabel" for="showLegend"><i class="fa fa-key"></i></label></span>
+					<span id='KeyButton'><input type="checkbox" class="hiddenCheckbox" id="showLegend" onclick="myGrooveWriter.refresh_ABC();"><label id="LegendLabel" for="showLegend"><i class="ph ph-key"></i></label></span>
 				</div>
 
 				<div id="musicalInput" class="fullWidthEle edit-block">
@@ -178,12 +179,12 @@
 
 
 				<div id="bottomButtonRow" class="fullWidthEle">
-					<span class="pageBottomButton edit-block" id="clearAllNotesButton" onclick="event.preventDefault(); myGrooveWriter.clearAllNotes();"><span class="bottomButtonIcon"><i class="fa fa-trash fa-2x"></i></span><span class="bottomButtonLabel">Clear All</span></span>
-					<span class="pageBottomButton edit-block" id="showHideTomsButton" onclick="event.preventDefault(); myGrooveWriter.showHideToms(false, false);"><span class="bottomButtonIcon"><i id="icon-tom1" class="fa fa-circle"></i><i id="icon-tom2" class="fa fa-circle-o"></i><i id="icon-tom3" class="fa fa-circle-o"></i></span><span class="bottomButtonLabel">Show Toms</span></span>
-					<span class=" grooveDB_hidden pageBottomButton" id="stickingsButton" onclick="myGrooveWriter.stickingsAnchorClick();"><span class="bottomButtonLabel">Sticking</span></span>
-					<span class=" grooveDB_hidden pageBottomButton" id="downloadButton" onclick="myGrooveWriter.DownloadAnchorClick();"><span class="bottomButtonIcon"><i class="fa fa-download fa-2x"></i></span><span class="bottomButtonLabel">Download</span></span>
-					<span class=" grooveDB_hidden pageBottomButton" id="printButton" onclick="myGrooveWriter.printMusic();"><span class="bottomButtonIcon"><i class="fa fa-print fa-2x"></i></span><span class="bottomButtonLabel">Print</span></span>
-					<span class=" grooveDB_hidden pageBottomButton" id="shareSaveButton" onclick="event.preventDefault(); myGrooveWriter.show_FullURLPopup();"><span class="bottomButtonIcon"><i class="fa fa-share fa-2x"></i></span><span class="bottomButtonLabel">SHARE</span></span>
+					<span class="pageBottomButton edit-block" id="clearAllNotesButton" onclick="event.preventDefault(); myGrooveWriter.clearAllNotes();"><span class="bottomButtonIcon"><i class="ph-bold ph-trash"></i></span><span class="bottomButtonLabel">Clear All</span></span>
+					<span class="pageBottomButton edit-block" id="showHideTomsButton" onclick="event.preventDefault(); myGrooveWriter.showHideToms(false, false);"><span class="bottomButtonIcon"><i class="ph-bold ph-circles-three"></i></span><span class="bottomButtonLabel">Show Toms</span></span>
+					<span class=" grooveDB_hidden pageBottomButton" id="stickingsButton" onclick="myGrooveWriter.stickingsAnchorClick();"><span class="bottomButtonIcon"><i class="ph-bold ph-arrows-out icon-sticking-expand"></i><i class="ph-bold ph-arrows-in icon-sticking-compress"></i></span><span class="bottomButtonLabel">Sticking</span></span>
+					<span class=" grooveDB_hidden pageBottomButton" id="downloadButton" onclick="myGrooveWriter.DownloadAnchorClick();"><span class="bottomButtonIcon"><i class="ph-bold ph-download-simple"></i></span><span class="bottomButtonLabel">Download</span></span>
+					<span class=" grooveDB_hidden pageBottomButton" id="printButton" onclick="myGrooveWriter.printMusic();"><span class="bottomButtonIcon"><i class="ph-bold ph-printer"></i></span><span class="bottomButtonLabel">Print</span></span>
+					<span class=" grooveDB_hidden pageBottomButton" id="shareSaveButton" onclick="event.preventDefault(); myGrooveWriter.show_FullURLPopup();"><span class="bottomButtonIcon"><i class="ph-bold ph-share-network"></i></span><span class="bottomButtonLabel">SHARE</span></span>
 				</div>
 
 				<div id="midiTextOutput">
@@ -443,7 +444,7 @@
 
 		<!-- this is used by the share/save button, and is hidden by default -->
 		<div id="fullURLPopup">
-			<span id="fullURLPopupCloseButton" onclick="myGrooveWriter.close_FullURLPopup();"><i class="fa fa-lg fa-times-circle"></i></span>
+			<span id="fullURLPopupCloseButton" onclick="myGrooveWriter.close_FullURLPopup();"><i class="ph ph-x-circle"></i></span>
 			<div id="fullURLPopupTitle">Share Your Groove</div>
 			<div id="fullURLPopupSubTitle">Use this URL to share or save this groove</div>
 			<div id="fullURLPopupSubSubTitle">(You can also bookmark this page)</div>
@@ -454,7 +455,7 @@
 			<div id="fullURLPopupTextFieldContainer"><input type="text" id="fullURLPopupTextField"></div>
 			<br>
 			<div id="shareButtonContainer">
-				<button id="fullURLPopupCopyButton" onclick="myGrooveWriter.copyShareURLToClipboard();">&nbsp;<i class="fa fa-copy"></i> &nbsp;COPY&nbsp;</button>
+				<button id="fullURLPopupCopyButton" onclick="myGrooveWriter.copyShareURLToClipboard();">&nbsp;<i class="ph ph-copy"></i> &nbsp;COPY&nbsp;</button>
 				&nbsp; &nbsp; &nbsp;
 				<share-button id="shareButton"></share-button>
 			</div>
