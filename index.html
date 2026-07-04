@@ -5,6 +5,7 @@
 	<!-- Art's copy-->
 
     <head>
+		<meta charset="utf-8">
 		<title>Groove Scribe</title>
 
 		<meta name="apple-mobile-web-app-capable" content="yes">
@@ -27,9 +28,9 @@
 		<link rel="stylesheet" type="text/css" href="font-awesome/4.7.0/css/font-awesome.min.css">
 		<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 		<link rel="stylesheet" type="text/css" href="css/share-button.min.css">
-	    <link rel="stylesheet" type="text/css" href="css/groove_writer_orange.css?v=2">
-		<link rel="stylesheet" type="text/css" href="css/groove_display_orange.css?v=2">
-		<link rel="stylesheet" type="text/css" href="css/groove_writer_orange_responsive.css?v=2">
+	    <link rel="stylesheet" type="text/css" href="css/groove_writer_orange.css?v=4">
+		<link rel="stylesheet" type="text/css" href="css/groove_display_orange.css?v=4">
+		<link rel="stylesheet" type="text/css" href="css/groove_writer_orange_responsive.css?v=4">
 		<link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap' rel='stylesheet'>
 
 		<!--   Other peoples JS libraries    -->
@@ -60,9 +61,11 @@
 		<!-- jsmidgen for generating a midi file -->
 		<script src="./js/jsmidgen.js" type="text/javascript"></script>
 		<!--   our custom JS  -->
-		<script src="js/groove_writer.js"></script>
-		<script src="js/groove_utils.js"></script>
-		<script src="js/grooves.js"></script>
+		<script src="js/groove_writer.js?v=4"></script>
+		<script src="js/groove_utils.js?v=4"></script>
+		<script src="js/grooves.js?v=4"></script>
+		<!--   new grouped sidebar UI (controller/mirror over the legacy controls)  -->
+		<script src="js/ui_sidebar.js?v=4"></script>
 
 		<script type="text/javascript">
 			/*jslint browser:true evil:true on:true */
@@ -84,18 +87,67 @@
 		<div class="nonPrintable">
 			<div id="LeftHandNav">
 				<span id="divisionButtonContainer">
-					<span id="logoInSubdivision" class="left-button-content"><img src="images/GScribe_Logo_lone_g.svg"></span>
-					<span class="left-button edit-block" id="timeLabel" onclick="myGrooveWriter.timeSigPopupOpen();"><span class="left-button-content"><span><span id="timeSigLabel" class="buttonFraction"><sup>4</sup>/<sub>4</sub></span><span id="timeSubLabel">TIME</span></span></span></span>
-					<span class="left-button subdivision edit-block" id="subdivision_8ths"  onclick="myGrooveWriter.changeDivision(8);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>8</sub></span>NOTES</span></span></span>
-					<span class="left-button subdivision edit-block" id="subdivision_16ths" onclick="myGrooveWriter.changeDivision(16);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>16</sub></span>NOTES</span></span></span>
-					<span class="left-button subdivision edit-block" id="subdivision_32ths" onclick="myGrooveWriter.changeDivision(32);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>32</sub></span>NOTES</span></span></span>
-					<span class="left-button subdivision edit-block" id="subdivision_12ths" onclick="myGrooveWriter.changeDivision(12);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>8</sub></span>TRIPLETS</span></span></span>
-					<span class="left-button subdivision edit-block" id="subdivision_24ths" onclick="myGrooveWriter.changeDivision(24);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>16</sub></span>TRIPLETS</span></span></span>
-					<span class="left-button subdivision edit-block" id="subdivision_48ths" onclick="myGrooveWriter.changeDivision(48);"><span class="left-button-content"><span>MIXED<br>Division</span></span></span>
+					<!-- NEW grouped sidebar panels — drive the hidden legacy controls below -->
+					<div class="gs-panel">
+						<div class="gs-panel-label">Time Signature</div>
+						<div class="gs-timesig">
+							<span class="gs-timesig-caption">Beats</span>
+							<span class="gs-field">
+								<select id="gsBeatsSelect" aria-label="Beats per measure">
+									<option>2</option><option>3</option><option>4</option><option>5</option>
+									<option>6</option><option>7</option><option>8</option><option>9</option>
+									<option>10</option><option>11</option><option>12</option><option>13</option>
+									<option>14</option><option>15</option>
+								</select>
+							</span>
+							<span class="gs-timesig-slash">/</span>
+							<span class="gs-field gs-field--muted">
+								<select id="gsDenomSelect" aria-label="Note value">
+									<option>4</option><option>8</option><option>16</option>
+								</select>
+							</span>
+						</div>
+					</div>
+
+					<div class="gs-panel">
+						<div class="gs-panel-label">Subdivision</div>
+						<div class="gs-segment" id="gsNoteValueSeg">
+							<button type="button" class="gs-seg-btn" data-value="8">1/8</button>
+							<button type="button" class="gs-seg-btn" data-value="16">1/16</button>
+							<button type="button" class="gs-seg-btn" data-value="32">1/32</button>
+						</div>
+						<div class="gs-segment" id="gsFeelSeg">
+							<button type="button" class="gs-seg-btn" data-feel="straight">Straight</button>
+							<button type="button" class="gs-seg-btn" data-feel="triplets">Triplets</button>
+							<button type="button" class="gs-seg-btn" data-feel="mixed">Mixed</button>
+						</div>
+					</div>
+
+					<div class="gs-panel">
+						<div class="gs-panel-label">Metronome</div>
+						<div class="gs-segment" id="gsMetronomeSeg">
+							<button type="button" class="gs-seg-btn" data-freq="0">Off</button>
+							<button type="button" class="gs-seg-btn" data-freq="4">4th</button>
+							<button type="button" class="gs-seg-btn" data-freq="8">8th</button>
+							<button type="button" class="gs-seg-btn" data-freq="16">16th</button>
+						</div>
+						<button type="button" class="gs-link-btn grooveDB_hidden" id="metronomeOptionsAnchor" onclick="myGrooveWriter.metronomeOptionsAnchorClick(event);">Options…</button>
+					</div>
+
+					<!-- Legacy controls kept hidden: the engine reads/writes their state; the panels above mirror them -->
+					<span class="gs-legacy-hidden">
+						<span class="left-button edit-block" id="timeLabel" onclick="myGrooveWriter.timeSigPopupOpen();"><span class="left-button-content"><span><span id="timeSigLabel" class="buttonFraction"><sup>4</sup>/<sub>4</sub></span><span id="timeSubLabel">TIME</span></span></span></span>
+						<span class="left-button subdivision edit-block" id="subdivision_8ths"  onclick="myGrooveWriter.changeDivision(8);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>8</sub></span>NOTES</span></span></span>
+						<span class="left-button subdivision edit-block" id="subdivision_16ths" onclick="myGrooveWriter.changeDivision(16);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>16</sub></span>NOTES</span></span></span>
+						<span class="left-button subdivision edit-block" id="subdivision_32ths" onclick="myGrooveWriter.changeDivision(32);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>32</sub></span>NOTES</span></span></span>
+						<span class="left-button subdivision edit-block" id="subdivision_12ths" onclick="myGrooveWriter.changeDivision(12);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>8</sub></span>TRIPLETS</span></span></span>
+						<span class="left-button subdivision edit-block" id="subdivision_24ths" onclick="myGrooveWriter.changeDivision(24);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>16</sub></span>TRIPLETS</span></span></span>
+						<span class="left-button subdivision edit-block" id="subdivision_48ths" onclick="myGrooveWriter.changeDivision(48);"><span class="left-button-content"><span>MIXED<br>Division</span></span></span>
+					</span>
 
 					<script>
 						if (!myGrooveWriter.myGrooveUtils.grooveDBAuthoring) {
-							document.write('<span class="left-button" onclick="myGrooveWriter.swapViewEditMode();"><span class="left-button-content"><span id="view-edit-switch" >Switch to EDIT mode</span></span></span>');
+							document.write('<span class="left-button" onclick="myGrooveWriter.swapViewEditMode();"><span class="left-button-content"><span id="view-edit-switch" >Switch to Edit mode</span></span></span>');
 						}
 					</script>
 
@@ -110,7 +162,6 @@
 
 			</div>
 			<div id="TopNav" class="fullWidthEle">
-				<span id="logoTextUpperLeft"><img src="images/GScribe_Logo_word_stack.svg"></span>
 				<span id="upperLeft">
 					<span id="metronomeContainer">
 						<span id="metronomeLabel">METRONOME:</span>
@@ -118,7 +169,6 @@
 						<span class="metronomeButton" id="metronome4ths" onclick="myGrooveWriter.setMetronomeFrequency(4);">4th</span>
 						<span class="metronomeButton" id="metronome8ths" onclick="myGrooveWriter.setMetronomeFrequency(8);">8th</span>
 						<span class="metronomeButton" id="metronome16ths" onclick="myGrooveWriter.setMetronomeFrequency(16);">16th</span>
-						<span class="metronomeButton Options grooveDB_hidden" id="metronomeOptionsAnchor" onclick="myGrooveWriter.metronomeOptionsAnchorClick(event);">Options</span>
 					</span>
 				</span>
 				<span id="upperRight">
