@@ -1,10 +1,8 @@
 # README #
 
-Readme for Groove Scribe
-
 ### What is this repository for? ###
 
-* Groove Scribe is an HTML application for drummers.    Groove Scribe is a point and click authoring system to create drum sheet music as well as a practice tool for learning and practicing grooves and exercises.
+* Groove is based of Groove Scribe - an HTML application for drummers.    Groove Scribe is a point and click authoring system to create drum sheet music as well as a practice tool for learning and practicing grooves and exercises.
 
 ### How do I use it ###
 
@@ -24,20 +22,4 @@ Readme for Groove Scribe
 * Deployment instructions
 Deploy the files to an HTTP server.
 
-### Contribution guidelines ###
 
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* File issues in github please:   https://github.com/montulli/GrooveScribe/issues
-* lou at montulli dot org is the admin and author.   He cannot answer every email, so please use good judgement before emailing.
-
-To edit this Readme:
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### See also ###
-
-* [SOURCE_CODE_README.md](SOURCE_CODE_README.md)
