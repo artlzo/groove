@@ -5,7 +5,7 @@
 */
 
 :root {
-  --left-nav-width: 120px;
+  --left-nav-width: 232px;
   --top-nav-height: 48px;
   --midi-height: 48px;
   --page-bg: #393939;
@@ -69,15 +69,6 @@ body {
   height: var(--top-nav-height);
   min-height: var(--top-nav-height);
   padding: 0 var(--spacing-3);
-}
-
-#logoTextUpperLeft {
-  padding: 0;
-  margin: 0;
-}
-
-#logoTextUpperLeft img {
-  display: block;
 }
 
 #upperLeft {
@@ -154,7 +145,7 @@ body {
 
 @media (max-width: 1024px) {
   :root {
-    --left-nav-width: 96px;
+    --left-nav-width: 216px;
     --top-nav-height: 48px;
   }
 
@@ -166,10 +157,6 @@ body {
     height: auto;
     min-height: var(--top-nav-height);
     padding: var(--spacing-2) var(--spacing-3) var(--spacing-2) var(--left-nav-width);
-  }
-
-  #logoTextUpperLeft {
-    display: none;
   }
 
   #upperLeft {
@@ -190,7 +177,7 @@ body {
 
 @media (max-width: 900px) {
   :root {
-    --left-nav-width: 80px;
+    --left-nav-width: 200px;
     --top-nav-height: 48px;
   }
 
@@ -209,6 +196,197 @@ body {
     white-space: normal;
     text-align: center;
   }
+}
+
+/* ==========================================================================
+   Grouped sidebar redesign (Time Signature + Subdivision)
+   Light panels driven by js/ui_sidebar.js. Legacy controls are kept in the
+   DOM but hidden; these panels mirror and drive them.
+   ========================================================================== */
+
+:root {
+  --gs-side-bg: #ffffff;
+  --gs-side-line: #e7e7e4;
+  --gs-track: #f0f0ee;
+  --gs-text: #1f1f1f;
+  --gs-muted: #8a8a86;
+  --gs-active: #1a1a1a;
+  --gs-radius: 10px;
+}
+
+/* Light sidebar shell */
+#LeftHandNav {
+  background: var(--gs-side-bg);
+  border-right: 1px solid var(--gs-side-line);
+}
+
+#divisionButtonContainer {
+  display: block;
+  padding: 16px 14px;
+}
+
+/* Hide the legacy controls that now live behind the new panels */
+.gs-legacy-hidden {
+  display: none !important;
+}
+
+/* Panels ------------------------------------------------------------------ */
+.gs-panel {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--gs-side-line);
+  text-align: left;
+}
+.gs-panel:first-child {
+  padding-top: 0;
+}
+
+.gs-panel-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--gs-muted);
+  margin-bottom: 10px;
+}
+
+/* The old top-nav metronome row is now driven from the sidebar panel */
+#metronomeContainer {
+  display: none;
+}
+
+/* Text link button (e.g. metronome "Options…") */
+.gs-link-btn {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 2px 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  color: var(--gs-muted);
+  cursor: pointer;
+}
+.gs-link-btn:hover {
+  color: var(--gs-text);
+  text-decoration: underline;
+}
+
+/* Time signature ---------------------------------------------------------- */
+.gs-timesig {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.gs-timesig-caption {
+  font-size: 14px;
+  color: var(--gs-muted);
+}
+
+.gs-timesig-slash {
+  color: var(--gs-muted);
+  font-size: 15px;
+}
+
+.gs-field {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--gs-side-line);
+  border-radius: 8px;
+  background: #fff;
+  transition: border-color 0.12s ease, box-shadow 0.12s ease;
+}
+.gs-field:focus-within {
+  border-color: #c9c9c5;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.04);
+}
+.gs-field select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--gs-text);
+  padding: 8px 10px;
+  cursor: pointer;
+  outline: none;
+}
+.gs-field--muted {
+  flex: 1;
+  background: transparent;
+  border-color: transparent;
+}
+.gs-field--muted select {
+  color: var(--gs-muted);
+  font-weight: 500;
+}
+
+/* Segmented controls ------------------------------------------------------ */
+.gs-segment {
+  display: flex;
+  gap: 3px;
+  padding: 3px;
+  background: var(--gs-track);
+  border-radius: var(--gs-radius);
+  margin-bottom: 8px;
+}
+.gs-segment:last-child {
+  margin-bottom: 0;
+}
+
+.gs-seg-btn {
+  flex: 1;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--gs-text);
+  padding: 7px 4px;
+  border-radius: 7px;
+  cursor: pointer;
+  transition: background 0.12s ease, color 0.12s ease, box-shadow 0.12s ease;
+}
+.gs-seg-btn:hover:not(.is-active):not(.is-disabled) {
+  background: rgba(0, 0, 0, 0.04);
+}
+.gs-seg-btn.is-active {
+  background: var(--gs-active);
+  color: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.18);
+}
+.gs-seg-btn.is-disabled {
+  color: #c4c4c0;
+  cursor: not-allowed;
+}
+.gs-segment.is-inert {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+/* Leftover legacy buttons that remain visible (undo, view/edit switch) ---- */
+#divisionButtonContainer > .left-button {
+  display: block;
+  color: var(--gs-text);
+  cursor: pointer;
+}
+#divisionButtonContainer > .left-button .left-button-content {
+  height: auto;
+  min-height: 0;
+  border-bottom: 0;
+  justify-content: flex-start;
+  padding: 10px 2px;
+  font-size: 13px;
+  color: var(--gs-text);
+}
+#divisionButtonContainer > .left-button:hover {
+  background: transparent;
+  transform: none;
+}
+#divisionButtonContainer > .left-button:hover .left-button-content {
+  color: var(--gs-muted);
 }
 
 @media print {

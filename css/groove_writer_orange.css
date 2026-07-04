@@ -89,13 +89,6 @@
 		width: calc(100% - 120px);
 		overflow-y: auto;
 	}
-	#logoTextUpperLeft {
-		padding: 9px 10px 6px 16px;
-		display: inline-block;
-	}
-	#logoTextUpperLeft img {
-		height: 30px;
-	}
 	#upperLeft  {
 		display: flex;
 		align-items: center;
@@ -153,12 +146,6 @@
 		/background: #68c2ff;
 	}
 
-	#logoInSubdivision {
-		background-color: #000;
-	}
-	#logoInSubdivision img {
-		height: 40px;
-	}
 	.left-button {
 		display: block;
 		color: #999999;

@@ -3309,7 +3309,7 @@ function GrooveWriter() {
 			showHideCSS_ClassDisplay(".edit-block", true, true, "block"); // show
 
 			if(view_edit_button)
-				view_edit_button.innerHTML = "Switch to VIEW mode";
+				view_edit_button.innerHTML = "Switch to View mode";
 			root.myGrooveUtils.viewMode = false;
 
 			if(!dontUpdateURL)
@@ -3319,7 +3319,7 @@ function GrooveWriter() {
 			showHideCSS_ClassDisplay(".edit-block", true, false, "block"); // hide
 
 			if(view_edit_button)
-				view_edit_button.innerHTML = "Switch to EDIT mode";
+				view_edit_button.innerHTML = "Switch to Edit mode";
 			root.myGrooveUtils.viewMode = true;
 			if(!dontUpdateURL)
 				root.updateCurrentURL();
