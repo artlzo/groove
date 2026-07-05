@@ -298,6 +298,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
       <button class="act" id="shareBtn">Copy Link</button>
       <button class="act" id="printBtn">Print</button>
       <button class="act" id="dlBtn">Download SVG</button>
+      <button class="act" id="midiBtn">Export MIDI</button>
     </div>
   </div>
 
@@ -366,6 +367,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 
 <!-- GrooveScribe engine: notation rendering (abc2svg + groove_utils) -->
 <script src="../../js/abc2svg-1.js"></script>
+<script src="../../js/jsmidgen.js"></script>
 <script src="../../js/groove_utils.js"></script>
 <script src="https://artifactcdn.diabrowser.engineering/ajax/libs/tone/Tone.min.js"></script>
 <script>
@@ -855,6 +857,7 @@ function wireControls(){
   document.getElementById('shareBtn').addEventListener('click',copyLink);
   document.getElementById('printBtn').addEventListener('click',()=>window.print());
   document.getElementById('dlBtn').addEventListener('click',downloadSVG);
+  document.getElementById('midiBtn').addEventListener('click',exportMIDI);
   document.getElementById('copyPngBtn').addEventListener('click',copyPNG);
 
   document.querySelectorAll('.s-tog').forEach(btn=>{
@@ -931,6 +934,17 @@ function downloadSVG(){
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=(document.getElementById('titleIn').value||'groove')+'.svg';
   a.click();URL.revokeObjectURL(a.href);
+}
+
+// Standard MIDI file via the GrooveScribe engine (general MIDI drum map)
+function exportMIDI(){
+  try{
+    const gd=GU.getGrooveDataFromUrlString(stateToGrooveUrl());
+    const url=GU.create_MIDIURLFromGrooveData(gd,'general_MIDI');
+    const a=document.createElement('a');a.href=url;
+    a.download=(document.getElementById('titleIn').value||'groove')+'.mid';
+    a.click();
+  }catch(e){ console.error('MIDI export failed:',e); }
 }
 
 function copyPNG(){
