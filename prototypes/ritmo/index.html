@@ -128,6 +128,34 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 /* time sig in toolbar */
 .tb-ts{height:36px;padding:0 6px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23ccc'/%3E%3C/svg%3E") right 6px center/8px no-repeat;font-family:inherit;font-weight:700;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:20px;min-width:56px}
 
+/* toolbar popover controls */
+.tb-ctrl{position:relative;display:flex;align-items:center}
+.tb-txt{height:36px;padding:0 10px;border:none;background:transparent;border-radius:8px;font-family:inherit;font-weight:600;font-size:12px;color:var(--sec);cursor:pointer;display:flex;align-items:center;transition:background .12s}
+.tb-txt b{color:var(--pri);font-weight:700}
+.tb-txt:hover,.tb-txt.on{background:var(--bg-c)}
+.tb-btn.lit{color:var(--pri);background:var(--bg-c)}
+.pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);min-width:190px;background:#fff;border:1px solid var(--brd);border-radius:12px;box-shadow:0 10px 34px rgba(0,0,0,.14);padding:14px;display:none;z-index:60}
+.pop.open{display:block}
+.pop-cap{display:block;font-size:10px;font-weight:600;color:var(--mut);margin-bottom:8px}
+.pop-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px}
+.pop-step{width:30px;height:30px;border:1px solid var(--brd);border-radius:6px;background:#fff;font-size:15px;color:var(--sec);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.pop-step:hover{background:var(--bg-c);color:var(--pri)}
+.pop-bpm-v{width:52px;text-align:center;font-size:17px;font-weight:700;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
+.pop-bpm-v::-webkit-inner-spin-button,.pop-bpm-v::-webkit-outer-spin-button{-webkit-appearance:none}
+.pop-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin-bottom:6px}
+.pop-ts-row{display:flex;align-items:flex-end;gap:8px}
+.pop-field{display:flex;flex-direction:column;gap:5px}
+.pop-field .pop-cap{margin-bottom:0}
+.pop-field .sel{width:72px}
+.pop-slash{color:var(--mut);font-size:15px;padding-bottom:7px}
+.pop-row-between{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pop-row-between .pop-cap{margin-bottom:0}
+.seg{display:flex;gap:3px;padding:3px;background:var(--bg-c);border-radius:8px;margin-bottom:6px}
+.seg:last-child{margin-bottom:0}
+.seg-b{flex:1;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .1s}
+.seg-b:hover:not(.on){background:rgba(0,0,0,.05)}
+.seg-b.on{background:var(--pri);color:#fff}
+
 /* ─── MAIN ─── */
 .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 120px;overflow:auto;min-width:0}
 
@@ -239,45 +267,16 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
     </div>
   </div>
 
-  <!-- SCORE -->
+  <!-- SCORE (tempo, time sig, subdivision, metronome now live in the toolbar) -->
   <div class="sb-s">
     <button class="s-tog shut" data-sec="score"><span class="s-lbl">Score</span><svg class="s-chev" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg></button>
     <div class="s-bod shut" id="sec-score">
-      <div class="sel-row">
-        <span class="sel-lbl">Division</span>
-        <select class="sel" id="divSel">
-          <option value="8">8th Notes</option>
-          <option value="16" selected>16th Notes</option>
-          <option value="32">32nd Notes</option>
-          <option value="12">8th Triplets</option>
-          <option value="24">16th Triplets</option>
-          <option value="48">32nd Triplets</option>
-        </select>
-      </div>
       <div class="sel-row">
         <span class="sel-lbl">Measures</span>
         <select class="sel" id="measSel">
           <option value="1" selected>1</option><option value="2">2</option>
           <option value="3">3</option><option value="4">4</option>
         </select>
-      </div>
-      <div class="ctrl-row" style="margin-top:10px">
-        <span class="ctrl-lbl">Swing</span>
-        <div class="ctrl-trk"><input type="range" class="rng" id="swingR" min="0" max="100" value="0"></div>
-        <span class="ctrl-val" id="swingV">0%</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- METRONOME -->
-  <div class="sb-s">
-    <button class="s-tog shut" data-sec="met"><span class="s-lbl">Metronome</span><svg class="s-chev" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg></button>
-    <div class="s-bod shut" id="sec-met">
-      <div class="rg" id="metRg">
-        <button class="rg-b on" data-v="off">Off</button>
-        <button class="rg-b" data-v="4">4th</button>
-        <button class="rg-b" data-v="8">8th</button>
-        <button class="rg-b" data-v="16">16th</button>
       </div>
     </div>
   </div>
@@ -330,20 +329,65 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
     <svg viewBox="0 0 20 20" id="playIco"><polygon points="5,2 17,10 5,18"/></svg>
   </button>
   <div class="tb-sep"></div>
-  <!-- BPM -->
-  <div class="tb-bpm">
-    <button class="tb-b" id="bpmDn">&minus;</button>
-    <input type="number" class="tb-bpm-v" id="bpmV" value="80" min="40" max="240">
-    <button class="tb-b" id="bpmUp">+</button>
+  <!-- BPM + Swing -->
+  <div class="tb-ctrl">
+    <button class="tb-txt" data-pop="bpm" title="Tempo & Swing"><b id="bpmDisp">80</b>&nbsp;BPM</button>
+    <div class="pop" id="pop-bpm">
+      <div class="pop-row">
+        <button class="pop-step" id="bpmDn" type="button">&minus;</button>
+        <input type="number" class="pop-bpm-v" id="bpmV" value="80" min="40" max="240">
+        <button class="pop-step" id="bpmUp" type="button">+</button>
+      </div>
+      <div class="pop-lbl"><span>Swing</span><span id="swingV">0%</span></div>
+      <input type="range" class="rng" id="swingR" min="0" max="100" value="0">
+    </div>
   </div>
   <div class="tb-sep"></div>
-  <!-- Time Sig -->
-  <select class="tb-ts" id="timeSigSel" title="Time Signature">
-    <option value="2-4">2/4</option><option value="3-4">3/4</option>
-    <option value="4-4" selected>4/4</option><option value="5-4">5/4</option>
-    <option value="6-4">6/4</option><option value="7-4">7/4</option>
-    <option value="6-8">6/8</option><option value="7-8">7/8</option>
-  </select>
+  <!-- Time signature -->
+  <div class="tb-ctrl">
+    <button class="tb-txt" data-pop="ts" title="Time Signature"><b id="tsDisp">4/4</b></button>
+    <div class="pop" id="pop-ts">
+      <div class="pop-ts-row">
+        <label class="pop-field"><span class="pop-cap">Beats</span>
+          <select class="sel" id="tsNumSel"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></label>
+        <span class="pop-slash">/</span>
+        <label class="pop-field"><span class="pop-cap">Value</span>
+          <select class="sel" id="tsDenSel"><option selected>4</option><option>8</option><option>16</option></select></label>
+      </div>
+    </div>
+  </div>
+  <div class="tb-sep"></div>
+  <!-- Subdivision -->
+  <div class="tb-ctrl">
+    <button class="tb-txt" data-pop="subdiv" title="Subdivision"><b id="subdivDisp">1/16</b></button>
+    <div class="pop" id="pop-subdiv">
+      <span class="pop-cap">Subdivision</span>
+      <div class="seg" id="segNote">
+        <button class="seg-b" type="button" data-val="8">1/8</button>
+        <button class="seg-b" type="button" data-val="16">1/16</button>
+        <button class="seg-b" type="button" data-val="32">1/32</button>
+      </div>
+      <div class="seg" id="segFeel">
+        <button class="seg-b" type="button" data-feel="straight">Straight</button>
+        <button class="seg-b" type="button" data-feel="triplet">Triplets</button>
+      </div>
+    </div>
+  </div>
+  <!-- Metronome -->
+  <div class="tb-ctrl">
+    <button class="tb-btn" data-pop="met" id="metBtn" title="Metronome">
+      <svg viewBox="0 0 20 20"><path d="M6.5 17h7l-2-13h-3z"/><path d="M4.5 17h11"/><path d="M10 14l4.5-4"/></svg>
+    </button>
+    <div class="pop" id="pop-met">
+      <div class="pop-row-between"><span class="pop-cap">Metronome</span>
+        <label class="tog"><input type="checkbox" id="metTog"><span class="tog-s"></span></label></div>
+      <div class="seg" id="segMetRate">
+        <button class="seg-b" type="button" data-rate="4">4th</button>
+        <button class="seg-b" type="button" data-rate="8">8th</button>
+        <button class="seg-b" type="button" data-rate="16">16th</button>
+      </div>
+    </div>
+  </div>
   <div class="tb-sep"></div>
   <!-- Undo -->
   <button class="tb-btn" id="undoBtn" title="Undo">
@@ -798,7 +842,7 @@ function buildGrid(){
 
 function charFor(inst,v){if(!v)return'';const t=NT[inst].find(n=>n.id===v);return t?t.ch:''}
 function updateCell(cell,inst,v){cell.classList.toggle('on',!!v);cell.textContent=charFor(inst,v);if(v){cell.dataset.t=v;cell.dataset.inst=inst}else delete cell.dataset.t}
-function syncAll(){buildGrid();renderNotation();recreateSeq()}
+function syncAll(){buildGrid();renderNotation();recreateSeq();syncControls()}
 
 function showCtx(e,inst,step){
   const m=document.getElementById('ctx');m.innerHTML='';
@@ -841,14 +885,17 @@ function wireControls(){
     S.swing=+this.value;document.getElementById('swingV').textContent=S.swing+'%';
     if(audioReady){Tone.getTransport().swing=S.swing/100;Tone.getTransport().swingSubdivision='8n'}
   });
-  document.getElementById('timeSigSel').addEventListener('change',function(){
-    const[n,d]=this.value.split('-').map(Number);pushUndo();S.tsNum=n;S.tsDen=d;resizePattern();syncAll();
-  });
-  document.getElementById('divSel').addEventListener('change',function(){pushUndo();S.div=+this.value;resizePattern();syncAll()});
   document.getElementById('measSel').addEventListener('change',function(){pushUndo();S.measures=+this.value;resizePattern();syncAll()});
-  document.querySelectorAll('#metRg .rg-b').forEach(b=>{
-    b.addEventListener('click',()=>{S.met=b.dataset.v;document.querySelectorAll('#metRg .rg-b').forEach(x=>x.classList.toggle('on',x===b))});
-  });
+  // time signature popover
+  document.getElementById('tsNumSel').addEventListener('change',function(){pushUndo();S.tsNum=+this.value;resizePattern();syncAll()});
+  document.getElementById('tsDenSel').addEventListener('change',function(){pushUndo();S.tsDen=+this.value;resizePattern();syncAll()});
+  // subdivision popover (note value × feel -> engine division)
+  document.querySelectorAll('#segNote .seg-b').forEach(b=>b.addEventListener('click',()=>{applyDivision(divFor(+b.dataset.val,valFeelFor(S.div)[1]))}));
+  document.querySelectorAll('#segFeel .seg-b').forEach(b=>b.addEventListener('click',()=>{applyDivision(divFor(valFeelFor(S.div)[0],b.dataset.feel))}));
+  // metronome popover
+  document.getElementById('metTog').addEventListener('change',function(){S.met=this.checked?metLastRate:'off';syncControls()});
+  document.querySelectorAll('#segMetRate .seg-b').forEach(b=>b.addEventListener('click',()=>{metLastRate=b.dataset.rate;S.met=b.dataset.rate;syncControls()}));
+  wirePopovers();
   document.getElementById('stickTog').addEventListener('change',function(){S.showStick=this.checked;syncAll()});
   document.getElementById('tomsTog').addEventListener('change',function(){S.showToms=this.checked;syncAll()});
   document.getElementById('undoBtn').addEventListener('click',undo);
@@ -891,7 +938,57 @@ function wireControls(){
   });
 }
 
-function setBpm(v){S.bpm=Math.max(40,Math.min(240,v||80));document.getElementById('bpmV').value=S.bpm;if(audioReady)Tone.getTransport().bpm.value=S.bpm}
+function setBpm(v){
+  S.bpm=Math.max(40,Math.min(240,v||80));
+  const bv=document.getElementById('bpmV'); if(bv)bv.value=S.bpm;
+  const bd=document.getElementById('bpmDisp'); if(bd)bd.textContent=S.bpm;
+  if(audioReady)Tone.getTransport().bpm.value=S.bpm;
+}
+
+/* ═══ TOOLBAR POPOVER CONTROLS ═══ */
+let metLastRate='4';
+function divFor(val,feel){ return feel==='triplet' ? ({8:12,16:24,32:48})[val] : val; }
+function valFeelFor(div){ return ({8:[8,'straight'],16:[16,'straight'],32:[32,'straight'],12:[8,'triplet'],24:[16,'triplet'],48:[32,'triplet']})[div] || [16,'straight']; }
+function applyDivision(div){ if(!div||div===S.div) return; pushUndo();S.div=div;resizePattern();syncAll(); }
+function subdivLabel(){ const vf=valFeelFor(S.div); return '1/'+vf[0]+(vf[1]==='triplet'?'T':''); }
+
+function syncControls(){
+  const set=(id,fn)=>{const el=document.getElementById(id);if(el)fn(el);};
+  set('bpmDisp',el=>el.textContent=S.bpm);
+  set('bpmV',el=>el.value=S.bpm);
+  set('tsDisp',el=>el.textContent=S.tsNum+'/'+S.tsDen);
+  set('tsNumSel',el=>el.value=S.tsNum);
+  set('tsDenSel',el=>el.value=S.tsDen);
+  set('subdivDisp',el=>el.textContent=subdivLabel());
+  const vf=valFeelFor(S.div);
+  document.querySelectorAll('#segNote .seg-b').forEach(b=>b.classList.toggle('on',+b.dataset.val===vf[0]));
+  document.querySelectorAll('#segFeel .seg-b').forEach(b=>b.classList.toggle('on',b.dataset.feel===vf[1]));
+  const on=S.met!=='off';
+  set('metTog',el=>el.checked=on);
+  set('metBtn',el=>el.classList.toggle('lit',on));
+  document.querySelectorAll('#segMetRate .seg-b').forEach(b=>b.classList.toggle('on',on&&b.dataset.rate===S.met));
+  set('swingV',el=>el.textContent=S.swing+'%');
+  set('swingR',el=>el.value=S.swing);
+}
+
+function closePops(except){
+  ['bpm','ts','subdiv','met'].forEach(id=>{const p=document.getElementById('pop-'+id);if(p&&id!==except)p.classList.remove('open');});
+  document.querySelectorAll('[data-pop]').forEach(b=>{if(b.dataset.pop!==except)b.classList.remove('on');});
+}
+function wirePopovers(){
+  document.querySelectorAll('[data-pop]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const id=btn.dataset.pop,pop=document.getElementById('pop-'+id);
+      const willOpen=!pop.classList.contains('open');
+      closePops(willOpen?id:null);
+      pop.classList.toggle('open',willOpen);
+      btn.classList.toggle('on',willOpen);
+    });
+  });
+  document.querySelectorAll('.pop').forEach(p=>p.addEventListener('click',e=>e.stopPropagation()));
+  document.addEventListener('click',()=>closePops(null));
+}
 
 function buildLibrary(){
   const body=document.getElementById('sec-library');body.innerHTML='';
@@ -906,8 +1003,8 @@ function buildLibrary(){
 
 function loadLib(data){
   pushUndo();
-  if(data.ts){const[n,d]=data.ts.split('-').map(Number);S.tsNum=n;S.tsDen=d;document.getElementById('timeSigSel').value=data.ts}
-  if(data.div){S.div=data.div;document.getElementById('divSel').value=data.div}
+  if(data.ts){const[n,d]=data.ts.split('-').map(Number);S.tsNum=n;S.tsDen=d;}
+  if(data.div){S.div=data.div;}
   if(data.bpm) setBpm(data.bpm);
   S.measures=1;document.getElementById('measSel').value=1;
   resizePattern();
