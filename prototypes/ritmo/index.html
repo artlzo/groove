@@ -248,6 +248,10 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
         <select class="sel" id="divSel">
           <option value="8">8th Notes</option>
           <option value="16" selected>16th Notes</option>
+          <option value="32">32nd Notes</option>
+          <option value="12">8th Triplets</option>
+          <option value="24">16th Triplets</option>
+          <option value="48">32nd Triplets</option>
         </select>
       </div>
       <div class="sel-row">
@@ -407,8 +411,18 @@ function stateToGrooveUrl(){
   return u;
 }
 function notationWidth(){const w=(document.getElementById('notWrap')||{}).clientWidth||820;return Math.max(500,Math.min(1100,w));}
-function spb(){return S.div===16?4:2}
-function spm(){return S.tsNum*spb()}
+// Tone.js subdivision per GrooveScribe division (straight + triplet)
+const TONE_SUB={8:'8n',16:'16n',32:'32n',12:'8t',24:'16t',48:'32t'};
+function spm(){return GU.calc_notes_per_measure(S.div,S.tsNum,S.tsDen)}  // steps per measure (engine-accurate, incl. triplets)
+function spb(){return spm()/S.tsNum}                                      // steps per beat
+function subLabelsFor(n){
+  if(n===2) return ['','&'];
+  if(n===4) return ['','e','&','a'];
+  if(n===3) return ['','·','·'];              // 8th triplet
+  if(n===6) return ['','·','·','·','·','·'];  // 16th triplet
+  if(n===8) return ['','·','e','·','&','·','a','·']; // 32nd
+  const a=new Array(n).fill('·'); a[0]=''; return a;
+}
 function numSteps(){return spm()*S.measures}
 function A(n){return new Array(n).fill(0)}
 function makeEmpty(){const n=numSteps();return{sticking:A(n),hihat:A(n),tom1:A(n),snare:A(n),tom2:A(n),kick:A(n)}}
@@ -499,7 +513,7 @@ function recreateSeq(){
     trigMet(step,time);
     if(Tone.Draw&&Tone.Draw.schedule) Tone.Draw.schedule(()=>onStep(step),time);
     else requestAnimationFrame(()=>onStep(step));
-  },steps,S.div===16?'16n':'8n');
+  },steps,TONE_SUB[S.div]||'16n');
   seq.loop=true;
   if(was){seq.start(0);Tone.getTransport().start('+0.05');isPlaying=true}
 }
@@ -728,7 +742,7 @@ function buildGrid(){
   const wrap=document.getElementById('gridWrap');
   wrap.innerHTML='';
   const ns=numSteps(),beats=S.tsNum,s2=spb();
-  const subdivLabels=s2===4?['','e','&','a']:['','&'];
+  const subdivLabels=subLabelsFor(s2);
   const lr=document.createElement('div');
   lr.className='g-labels';lr.innerHTML='<div class="g-spacer"></div>';
   const lc=document.createElement('div');lc.className='g-lbl-c';
@@ -760,7 +774,12 @@ function buildGrid(){
           cell.className='cell'+(v?' on':'');cell.dataset.step=step;cell.dataset.inst=inst.id;
           if(v){cell.dataset.t=v;cell.textContent=charFor(inst.id,v)}
           cell.addEventListener('click',()=>{
-            pushUndo();const cur=S.pattern[inst.id][step],cyc=CYCLE[inst.id],idx=cyc.indexOf(cur),nxt=cyc[(idx+1)%cyc.length];
+            pushUndo();const cur=S.pattern[inst.id][step];
+            // Only the snare cycles through articulations on click (GrooveScribe behavior);
+            // every other voice just toggles on/off. Right-click still offers all articulations.
+            let nxt;
+            if(inst.id==='snare'){const cyc=CYCLE.snare,idx=cyc.indexOf(cur);nxt=cyc[(idx+1)%cyc.length];}
+            else{nxt=cur?0:CYCLE[inst.id][1];}
             S.pattern[inst.id][step]=nxt;updateCell(cell,inst.id,nxt);
             cell.style.transform='scale(0.88)';setTimeout(()=>cell.style.transform='',100);
             renderNotation();
