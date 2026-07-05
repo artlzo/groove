@@ -443,84 +443,48 @@ const LIB={
 
 /* ═══ AUDIO ═══ */
 let audioReady=false,isPlaying=false,currentStep=-1;
-let syn={},seq;
+let players=null,seq;
+
+// Real GrooveScribe drum samples (per articulation) played through Ritmo's sequencer
+const SAMPLE_BASE='../../soundfont/NewDrumSamples/OGG/';
+const SAMPLE_FILES={
+  hh_x:'Hi Hat Normal.ogg', hh_X:'Hi Hat Accent.ogg', hh_o:'Hi Hat Open.ogg',
+  hh_cr:'Crash.ogg', hh_rd:'Ride.ogg', hh_rb:'Bell.ogg',
+  sn_o:'Snare Normal.ogg', sn_O:'Snare Accent.ogg', sn_g:'Snare Ghost.ogg',
+  sn_x:'Snare Cross Stick.ogg', sn_z:'Buzz.ogg',
+  kk_o:'Kick.ogg', kk_f:'Hi Hat Foot.ogg',
+  t1_o:'Rack Tom.ogg', t2_o:'Floor Tom.ogg',
+  met_hi:'metronome1Count.ogg', met_lo:'metronomeClick.ogg'
+};
 
 function initAudio(){
   if(audioReady) return;
   const master=new Tone.Compressor(-18,4).toDestination();
-  const mVol=new Tone.Volume(-1).connect(master);
-
-  syn.kick=new Tone.MembraneSynth({pitchDecay:.03,octaves:2,oscillator:{type:'sine'},envelope:{attack:.005,decay:.3,sustain:0,release:.25}}).connect(mVol);
-  syn.kick.volume.value=0;
-  const kickFilt=new Tone.Filter({frequency:3500,type:'bandpass',Q:1.5}).connect(mVol);
-  syn.kickClick=new Tone.NoiseSynth({noise:{type:'white'},envelope:{attack:.0005,decay:.02,sustain:0,release:.008}}).connect(kickFilt);
-  syn.kickClick.volume.value=-12;
-
-  const snFilt=new Tone.Filter({frequency:4000,type:'highpass'}).connect(mVol);
-  syn.snNoise=new Tone.NoiseSynth({noise:{type:'white'},envelope:{attack:.0005,decay:.15,sustain:0,release:.04}}).connect(snFilt);
-  syn.snNoise.volume.value=-6;
-  syn.snBody=new Tone.MembraneSynth({pitchDecay:.008,octaves:1.5,oscillator:{type:'triangle'},envelope:{attack:.0005,decay:.1,sustain:0,release:.08}}).connect(mVol);
-  syn.snBody.volume.value=-8;
-
-  const hhFilt=new Tone.Filter(8000,'highpass').connect(mVol);
-  syn.hhC=new Tone.NoiseSynth({noise:{type:'white'},envelope:{attack:.0005,decay:.045,sustain:0,release:.01}}).connect(hhFilt);
-  syn.hhC.volume.value=-12;
-  syn.hhO=new Tone.NoiseSynth({noise:{type:'white'},envelope:{attack:.001,decay:.32,sustain:.03,release:.1}}).connect(hhFilt);
-  syn.hhO.volume.value=-14;
-
-  const crFilt=new Tone.Filter(3500,'highpass').connect(mVol);
-  syn.crash=new Tone.NoiseSynth({noise:{type:'white'},envelope:{attack:.002,decay:1.6,sustain:.08,release:.5}}).connect(crFilt);
-  syn.crash.volume.value=-16;
-
-  const rdFilt=new Tone.Filter(5000,'highpass').connect(mVol);
-  syn.ride=new Tone.NoiseSynth({noise:{type:'white'},envelope:{attack:.001,decay:.25,sustain:.01,release:.04}}).connect(rdFilt);
-  syn.ride.volume.value=-14;
-
-  syn.bell=new Tone.MetalSynth({frequency:800,envelope:{attack:.001,decay:.18,release:.03},harmonicity:5.1,modulationIndex:16,resonance:6000,octaves:0.5}).connect(mVol);
-  syn.bell.volume.value=-16;
-
-  syn.tom1=new Tone.MembraneSynth({pitchDecay:.03,octaves:1.8,oscillator:{type:'sine'},envelope:{attack:.003,decay:.22,sustain:0,release:.2}}).connect(mVol);
-  syn.tom1.volume.value=-2;
-  syn.tom2=new Tone.MembraneSynth({pitchDecay:.035,octaves:1.8,oscillator:{type:'sine'},envelope:{attack:.003,decay:.28,sustain:0,release:.25}}).connect(mVol);
-  syn.tom2.volume.value=-2;
-
-  syn.met=new Tone.Synth({oscillator:{type:'sine'},envelope:{attack:.001,decay:.04,sustain:0,release:.01}}).connect(mVol);
-  syn.met.volume.value=-8;
-
-  const xsFilt=new Tone.Filter({frequency:2800,type:'bandpass',Q:2.5}).connect(mVol);
-  syn.xstick=new Tone.NoiseSynth({noise:{type:'pink'},envelope:{attack:.0003,decay:.035,sustain:0,release:.012}}).connect(xsFilt);
-  syn.xstick.volume.value=-4;
-
+  const urls={};
+  Object.keys(SAMPLE_FILES).forEach(k=>{urls[k]=SAMPLE_BASE+encodeURIComponent(SAMPLE_FILES[k])});
+  players=new Tone.Players(urls).connect(master);
   audioReady=true;
   Tone.getTransport().bpm.value=S.bpm;
 }
 
+function play(key,time){ if(players&&players.loaded&&players.has(key)) players.player(key).start(time); }
+
 function trig(inst,type,time){
   if(!type) return;
-  if(inst==='hihat'){
-    if(type==='o') syn.hhO.triggerAttackRelease('8n',time);
-    else if(type==='X') syn.hhC.triggerAttackRelease('16n',time,1);
-    else if(type==='cr') syn.crash.triggerAttackRelease('4n',time);
-    else if(type==='rd') syn.ride.triggerAttackRelease('8n',time);
-    else if(type==='rb') syn.bell.triggerAttackRelease('16n',time);
-    else syn.hhC.triggerAttackRelease('16n',time,.6);
-  } else if(inst==='snare'){
-    const v=type==='g'?.18:type==='O'?1:.5;
-    if(type==='x') syn.xstick.triggerAttackRelease('32n',time);
-    else{syn.snNoise.triggerAttackRelease('8n',time,v);syn.snBody.triggerAttackRelease('C3','8n',time,v)}
-  } else if(inst==='kick'){
-    if(type==='f') syn.hhC.triggerAttackRelease('16n',time,.2);
-    else{syn.kick.triggerAttackRelease('E1','4n',time);syn.kickClick.triggerAttackRelease('32n',time)}
-  } else if(inst==='tom1') syn.tom1.triggerAttackRelease('A2','4n',time);
-  else if(inst==='tom2') syn.tom2.triggerAttackRelease('E2','4n',time);
+  if(inst==='hihat') play('hh_'+type,time);
+  else if(inst==='snare') play('sn_'+type,time);
+  else if(inst==='kick') play('kk_'+type,time);
+  else if(inst==='tom1') play('t1_o',time);
+  else if(inst==='tom2') play('t2_o',time);
 }
 
 function trigMet(step,time){
   if(S.met==='off') return;
   const s2=spb(),isBeat=step%s2===0,is8=step%(s2/2||1)===0;
-  if(S.met==='4'&&isBeat) syn.met.triggerAttackRelease(step%spm()===0?'A5':'E5','32n',time);
-  else if(S.met==='8'&&is8) syn.met.triggerAttackRelease(isBeat?'A5':'E5','32n',time);
-  else if(S.met==='16') syn.met.triggerAttackRelease(isBeat?'A5':'E5','32n',time);
+  const click=accent=>play(accent?'met_hi':'met_lo',time);
+  if(S.met==='4'&&isBeat) click(true);
+  else if(S.met==='8'&&is8) click(isBeat);
+  else if(S.met==='16') click(isBeat);
 }
 
 function recreateSeq(){
@@ -964,7 +928,7 @@ function copyPNG(){
   img.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(data)));
 }
 
-function init(){initPattern();pushUndo();buildLibrary();wireControls();syncAll()}
+function init(){initPattern();pushUndo();buildLibrary();wireControls();syncAll();try{initAudio()}catch(e){}}
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
 else init();
 
