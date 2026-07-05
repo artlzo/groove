@@ -359,6 +359,9 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
   </button>
 </div>
 
+<!-- GrooveScribe engine: notation rendering (abc2svg + groove_utils) -->
+<script src="../../js/abc2svg-1.js"></script>
+<script src="../../js/groove_utils.js"></script>
 <script src="https://artifactcdn.diabrowser.engineering/ajax/libs/tone/Tone.min.js"></script>
 <script>
 (function(){
@@ -384,6 +387,25 @@ const ROW_OPS={
 
 let S={tsNum:4,tsDen:4,div:16,bpm:80,swing:0,met:'off',measures:1,showStick:false,showToms:true,pattern:{}};
 let hist=[],histIdx=-1;
+
+/* ═══ ENGINE ADAPTER — render notation via GrooveScribe (groove_utils) ═══ */
+const GU=new GrooveUtils();
+// Ritmo note id -> GrooveScribe URL letter (nothing lost)
+const H_MAP={x:'x',X:'X',o:'o',cr:'c',rd:'r',rb:'b'};   // closed/accent/open/crash/ride/bell
+const S_MAP={o:'o',O:'O',g:'g',x:'x',z:'b'};            // normal/accent/ghost/cross-stick/buzz
+const K_MAP={o:'o',f:'x'};                              // kick / hi-hat-foot -> splash
+const T_MAP={o:'o'};
+const STK_MAP={R:'R',L:'L'};
+function encVoice(arr,map){return '|'+arr.map(v=>(v&&map[v])?map[v]:'-').join('')+'|';}
+function stateToGrooveUrl(){
+  const p=S.pattern;
+  let u='?TimeSig='+S.tsNum+'/'+S.tsDen+'&Div='+S.div+'&measures='+S.measures+'&tempo='+S.bpm+'&swing='+S.swing;
+  u+='&H='+encVoice(p.hihat,H_MAP)+'&S='+encVoice(p.snare,S_MAP)+'&K='+encVoice(p.kick,K_MAP);
+  if(S.showToms) u+='&T1='+encVoice(p.tom1,T_MAP)+'&T4='+encVoice(p.tom2,T_MAP);
+  if(S.showStick) u+='&Stickings='+encVoice(p.sticking,STK_MAP);
+  return u;
+}
+function notationWidth(){const w=(document.getElementById('notWrap')||{}).clientWidth||820;return Math.max(500,Math.min(1100,w));}
 function spb(){return S.div===16?4:2}
 function spm(){return S.tsNum*spb()}
 function numSteps(){return spm()*S.measures}
@@ -521,7 +543,7 @@ function onStep(step){
   currentStep=step;
   document.querySelectorAll('.cell.phead').forEach(c=>c.classList.remove('phead'));
   document.querySelectorAll(`.cell[data-step="${step}"]`).forEach(c=>c.classList.add('phead'));
-  renderNotation();
+  // notation playhead handled separately; engine SVG is not re-rendered per step
 }
 
 async function togglePlay(){
@@ -552,6 +574,12 @@ const MEAS_PER_LINE=2;
 const SYS_H=112,SYS_GAP=20,SYS_STOP=56;
 
 function renderNotation(){
+  try{
+    const abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
+    document.getElementById('notArea').innerHTML=GU.renderABCtoSVG(abc).svg;
+  }catch(e){document.getElementById('notArea').innerHTML='<div style="color:#b00;padding:8px;font-size:12px">notation error: '+(e&&e.message||e)+'</div>';}
+  return;
+  /* ---- legacy hand-rolled renderer below (kept, unused) ---- */
   const ns=numSteps(),sw=nStepW(),beats=S.tsNum,s2=spb();
   const sPerM=spm();
   const mpl=Math.min(S.measures,MEAS_PER_LINE);
