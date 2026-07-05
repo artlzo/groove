@@ -134,6 +134,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 /* notation */
 .notation-wrap{position:relative;width:100%;max-width:900px;margin-bottom:16px;overflow-x:auto;overflow-y:hidden}
 .notation-wrap svg{display:block;height:auto;min-width:100%}
+#notArea .abcr.highlighted{fill:rgba(45,140,90,.22)!important;transition:fill .04s}
 
 /* grid */
 .grid-wrap{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;overflow-x:auto;padding-bottom:4px}
@@ -503,11 +504,20 @@ function recreateSeq(){
   if(was){seq.start(0);Tone.getTransport().start('+0.05');isPlaying=true}
 }
 
+function soundsAt(j){
+  const p=S.pattern;
+  return !!(p.hihat[j]||p.snare[j]||p.kick[j]||(S.showToms&&(p.tom1[j]||p.tom2[j])));
+}
 function onStep(step){
   currentStep=step;
   document.querySelectorAll('.cell.phead').forEach(c=>c.classList.remove('phead'));
   document.querySelectorAll(`.cell[data-step="${step}"]`).forEach(c=>c.classList.add('phead'));
-  // notation playhead handled separately; engine SVG is not re-rendered per step
+  // highlight the playing note in the engine notation (abc index = # of sounding steps so far).
+  // on rest steps we leave the previous highlight, so the note "rings" until the next one.
+  if(soundsAt(step)){
+    let idx=-1; for(let j=0;j<=step;j++){ if(soundsAt(j)) idx++; }
+    try{ GU.highlightNoteInABCSVGByIndex(idx); }catch(e){}
+  }
 }
 
 async function togglePlay(){
