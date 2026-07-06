@@ -143,6 +143,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .pop-bpm-v{width:52px;text-align:center;font-size:17px;font-weight:700;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
 .pop-bpm-v::-webkit-inner-spin-button,.pop-bpm-v::-webkit-outer-spin-button{-webkit-appearance:none}
 .pop-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin-bottom:6px}
+.pop-lbl.off{opacity:.38}
+.rng:disabled{opacity:.4;cursor:not-allowed}
 .pop-ts-row{display:flex;align-items:flex-end;gap:8px}
 .pop-field{display:flex;flex-direction:column;gap:5px}
 .pop-field .pop-cap{margin-bottom:0}
@@ -338,7 +340,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
         <input type="number" class="pop-bpm-v" id="bpmV" value="80" min="40" max="240">
         <button class="pop-step" id="bpmUp" type="button">+</button>
       </div>
-      <div class="pop-lbl"><span>Swing</span><span id="swingV">0%</span></div>
+      <div class="pop-lbl" id="swingRow"><span>Swing</span><span id="swingV">0%</span></div>
       <input type="range" class="rng" id="swingR" min="0" max="100" value="0">
     </div>
   </div>
@@ -882,8 +884,8 @@ function wireControls(){
   document.getElementById('bpmDn').addEventListener('click',()=>setBpm(S.bpm-1));
   document.getElementById('bpmV').addEventListener('change',function(){setBpm(+this.value)});
   document.getElementById('swingR').addEventListener('input',function(){
-    S.swing=+this.value;document.getElementById('swingV').textContent=S.swing+'%';
-    if(audioReady){Tone.getTransport().swing=S.swing/100;Tone.getTransport().swingSubdivision='8n'}
+    S.swing=+this.value;document.getElementById('swingV').textContent=isTriplet()?'N/A':S.swing+'%';
+    applySwing();
   });
   document.getElementById('measSel').addEventListener('change',function(){pushUndo();S.measures=+this.value;resizePattern();syncAll()});
   // time signature popover
@@ -951,6 +953,8 @@ function divFor(val,feel){ return feel==='triplet' ? ({8:12,16:24,32:48})[val] :
 function valFeelFor(div){ return ({8:[8,'straight'],16:[16,'straight'],32:[32,'straight'],12:[8,'triplet'],24:[16,'triplet'],48:[32,'triplet']})[div] || [16,'straight']; }
 function applyDivision(div){ if(!div||div===S.div) return; pushUndo();S.div=div;resizePattern();syncAll(); }
 function subdivLabel(){ const vf=valFeelFor(S.div); return '1/'+vf[0]+(vf[1]==='triplet'?'T':''); }
+function isTriplet(){ return valFeelFor(S.div)[1]==='triplet'; }  // swing is a straight-feel shift; disabled for triplets (matches engine)
+function applySwing(){ if(audioReady){ Tone.getTransport().swing=isTriplet()?0:(S.swing/100); Tone.getTransport().swingSubdivision='8n'; } }
 
 function syncControls(){
   const set=(id,fn)=>{const el=document.getElementById(id);if(el)fn(el);};
@@ -967,8 +971,11 @@ function syncControls(){
   set('metTog',el=>el.checked=on);
   set('metBtn',el=>el.classList.toggle('lit',on));
   document.querySelectorAll('#segMetRate .seg-b').forEach(b=>b.classList.toggle('on',on&&b.dataset.rate===S.met));
-  set('swingV',el=>el.textContent=S.swing+'%');
-  set('swingR',el=>el.value=S.swing);
+  const trip=isTriplet();
+  set('swingV',el=>el.textContent=trip?'N/A':S.swing+'%');
+  set('swingR',el=>{el.value=S.swing;el.disabled=trip;});
+  set('swingRow',el=>el.classList.toggle('off',trip));
+  applySwing();
 }
 
 function closePops(except){
