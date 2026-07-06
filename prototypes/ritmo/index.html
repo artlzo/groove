@@ -152,8 +152,9 @@ body.view-mode .grid-outer{display:none}
 .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 140px;overflow:auto;min-width:0}
 
 /* notation */
-.notation-wrap{position:relative;width:100%;max-width:1200px;margin-bottom:16px;overflow-x:auto;overflow-y:hidden;text-align:center}
-.notation-wrap svg{display:inline-block;height:auto;max-width:100%}
+.notation-wrap{position:relative;width:100%;max-width:1200px;margin-bottom:16px;overflow-x:auto;overflow-y:hidden}
+/* abc2svg emits one <svg> per staff line — stack them (side by side puts a clef mid-line) */
+.notation-wrap svg{display:block;margin:0 auto;height:auto;max-width:100%}
 #notArea .abcr.highlighted{fill:rgba(45,140,90,.22)!important;transition:fill .04s}
 
 /* grid */
@@ -430,15 +431,13 @@ function stateToGrooveUrl(){
   if(author) u+='&Author='+encodeURIComponent(author);
   return u;
 }
-// Keep note spacing ~constant regardless of measure count so the notation stays
-// compact and readable (2 short measures sit side-by-side on one line, which is
-// the common case for pasting beside lyrics). The engine sets
-// %%pagewidth = renderWidth*0.75 and fits all measures on a single line, so we
-// scale the requested width with the number of measures instead of a fixed cap.
-// Calibrated: ~13px/note of pagewidth reads well; +40 for the clef/time-sig.
+// Size the page for ONE staff line: joinMeasureLines puts up to measuresPerLine()
+// measures per line, so the widest line has min(measures, mpl) measures. The
+// engine sets %%pagewidth = renderWidth*0.75; ~13px/note keeps spacing readable.
 function notationWidth(){
-  const pageW=40+S.measures*spm()*13;
-  return Math.max(400,Math.min(3000,pageW/0.75)); // 3000 = engine's own max; past that abc2svg wraps (clef per line is correct)
+  const measuresOnLine=Math.min(S.measures,measuresPerLine());
+  const pageW=40+measuresOnLine*spm()*13;
+  return Math.max(400,Math.min(3000,pageW/0.75));
 }
 // Tone.js subdivision per GrooveScribe division (straight + triplet)
 const TONE_SUB={8:'8n',16:'16n',32:'32n',12:'8t',24:'16t',48:'32t'};
@@ -615,9 +614,34 @@ const ALL_VOICES=['hihat','tom1','snare','tom2','kick'];
 const MEAS_PER_LINE=2;
 const SYS_H=112,SYS_GAP=20,SYS_STOP=56;
 
+// createABCFromGrooveData ends EVERY measure with "|\n" — a hard line break, so
+// abc2svg gives each measure its own staff line. The legacy app instead joins
+// measures with an ABC continuation ("\\\n") and only breaks every
+// numberOfMeasuresPerLine (2, or 1 for 32nds+). Mirror that here by rewriting
+// the measure-line endings inside each voice block. (groove_writer.js:2890)
+function measuresPerLine(){return spm()>=32?1:2}
+function joinMeasureLines(abc,mpl){
+  if(mpl<=1) return abc;
+  const lines=abc.split('\n');
+  let k=-1; // music-line index within the current voice block
+  const isMusic=l=>/\|\s*$/.test(l)&&!/^[%A-Za-z]:/.test(l)&&l.charAt(0)!=='%';
+  for(let i=0;i<lines.length;i++){
+    if(/^V:/.test(lines[i])){k=-1;continue}
+    if(!isMusic(lines[i])) continue;
+    k++;
+    // continue this line onto the next unless it ends the group of mpl,
+    // ends the tune (||), or is the block's last music line
+    if(k%mpl===mpl-1) continue;
+    if(/\|\|\s*$/.test(lines[i])) continue;
+    let j=i+1; while(j<lines.length&&!isMusic(lines[j])&&!/^V:/.test(lines[j]))j++;
+    if(j<lines.length&&isMusic(lines[j])) lines[i]=lines[i].replace(/\s*$/,'')+'\\';
+  }
+  return lines.join('\n');
+}
 function renderNotation(){
   try{
-    const abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
+    let abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
+    abc=joinMeasureLines(abc,measuresPerLine());
     document.getElementById('notArea').innerHTML=GU.renderABCtoSVG(abc).svg;
   }catch(e){document.getElementById('notArea').innerHTML='<div style="color:#b00;padding:8px;font-size:12px">notation error: '+(e&&e.message||e)+'</div>';}
   return;
