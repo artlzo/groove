@@ -157,6 +157,28 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .seg-b{flex:1;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .1s}
 .seg-b:hover:not(.on){background:rgba(0,0,0,.05)}
 .seg-b.on{background:var(--pri);color:#fff}
+/* stacked popover action list */
+.pop-acts{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.pop-act{width:100%;text-align:left;padding:6px 8px;border:none;background:transparent;border-radius:6px;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);cursor:pointer;transition:background .1s}
+.pop-act:hover{background:var(--bg-c);color:var(--pri)}
+.pop-div{height:1px;background:var(--brd-lt);margin:10px 0 2px}
+
+/* ─── VIEW / EDIT MODE SWITCH (floating, top-center) ─── */
+.mode-switch{position:fixed;top:16px;left:calc(268px + (100vw - 268px)/2);transform:translateX(-50%);display:flex;gap:3px;background:#fff;border:1px solid var(--brd);border-radius:10px;padding:3px;box-shadow:0 2px 14px rgba(0,0,0,.07);z-index:55;transition:left .25s ease}
+.mode-b{border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .12s}
+.mode-b:hover:not(.on){background:var(--bg-c);color:var(--pri)}
+.mode-b.on{background:var(--pri);color:#fff}
+body.view-mode .grid-wrap{display:none}
+
+/* ─── MEASURE CONTROL STRIP ─── */
+.g-meas-ctrl{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.g-meas-lbl{font-size:10px;font-weight:600;color:var(--mut);margin-right:2px}
+.g-meas-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 6px 0 10px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff;font-size:11px;font-weight:600;color:var(--sec)}
+.g-meas-x{width:16px;height:16px;border:none;background:transparent;border-radius:4px;cursor:pointer;color:var(--fnt);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;padding:0;transition:all .1s}
+.g-meas-x:hover{background:var(--bg-c);color:var(--pri)}
+.g-meas-x:disabled{opacity:.3;cursor:not-allowed}
+.g-meas-add{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 12px;border:1px dashed var(--brd);border-radius:var(--rs);background:transparent;font-family:inherit;font-size:11px;font-weight:600;color:var(--mut);cursor:pointer;transition:all .12s}
+.g-meas-add:hover{border-color:#ccc;color:var(--sec);background:var(--bg-c)}
 
 /* ─── MAIN ─── */
 .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 120px;overflow:auto;min-width:0}
@@ -218,6 +240,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 
 @media(max-width:900px){
   .mob-hdr{display:flex}
+  .mode-switch{top:58px;left:50%!important}
   .sb{position:fixed;top:0;left:-274px;height:100%;z-index:200;transition:left .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.06)}
   .sb.open{left:0}
   .main{padding:56px 16px 62px;overflow:auto;justify-content:flex-start;align-items:flex-start}
@@ -269,28 +292,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
     </div>
   </div>
 
-  <!-- SCORE (tempo, time sig, subdivision, metronome now live in the toolbar) -->
-  <div class="sb-s">
-    <button class="s-tog shut" data-sec="score"><span class="s-lbl">Score</span><svg class="s-chev" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg></button>
-    <div class="s-bod shut" id="sec-score">
-      <div class="sel-row">
-        <span class="sel-lbl">Measures</span>
-        <select class="sel" id="measSel">
-          <option value="1" selected>1</option><option value="2">2</option>
-          <option value="3">3</option><option value="4">4</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- VOICES -->
-  <div class="sb-s">
-    <button class="s-tog shut" data-sec="voices"><span class="s-lbl">Voices</span><svg class="s-chev" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg></button>
-    <div class="s-bod shut" id="sec-voices">
-      <div class="tog-row"><span>Stickings</span><label class="tog"><input type="checkbox" id="stickTog"><span class="tog-s"></span></label></div>
-      <div class="tog-row"><span>Toms</span><label class="tog"><input type="checkbox" id="tomsTog" checked><span class="tog-s"></span></label></div>
-    </div>
-  </div>
+  <!-- Score (measures) now handled by point-and-click strip above the grid;
+       Voices (stickings / toms) now live in the toolbar. -->
 
   <!-- EXPORT -->
   <div class="sb-s">
@@ -322,6 +325,12 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
   <div class="notation-wrap" id="notWrap"><div id="notArea"></div></div>
   <div class="grid-wrap" id="gridWrap"></div>
 </main>
+</div>
+
+<!-- VIEW / EDIT MODE SWITCH -->
+<div class="mode-switch" id="modeSwitch">
+  <button class="mode-b on" type="button" data-mode="edit">Edit</button>
+  <button class="mode-b" type="button" data-mode="view">View</button>
 </div>
 
 <!-- BOTTOM TOOLBAR -->
@@ -391,14 +400,37 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
     </div>
   </div>
   <div class="tb-sep"></div>
-  <!-- Undo -->
-  <button class="tb-btn" id="undoBtn" title="Undo">
-    <svg viewBox="0 0 20 20"><path d="M8 4L3 9l5 5"/><path d="M3 9h10a4 4 0 010 8H9"/></svg>
-  </button>
-  <!-- Redo -->
-  <button class="tb-btn" id="redoBtn" title="Redo">
-    <svg viewBox="0 0 20 20"><path d="M12 4l5 5-5 5"/><path d="M17 9H7a4 4 0 000 8h4"/></svg>
-  </button>
+  <!-- Stickings -->
+  <div class="tb-ctrl">
+    <button class="tb-btn" data-pop="stick" id="stickBtn" title="Stickings">
+      <svg viewBox="0 0 20 20"><path d="M6 15V6a1.5 1.5 0 013 0v9"/><path d="M11 15V6a1.5 1.5 0 013 0v9"/></svg>
+    </button>
+    <div class="pop" id="pop-stick">
+      <div class="pop-row-between"><span class="pop-cap">Stickings</span>
+        <label class="tog"><input type="checkbox" id="stickTog"><span class="tog-s"></span></label></div>
+      <div class="pop-acts">
+        <button class="pop-act" type="button" data-sk="alt">Alternate R / L</button>
+        <button class="pop-act" type="button" data-sk="R">All R</button>
+        <button class="pop-act" type="button" data-sk="L">All L</button>
+        <button class="pop-act" type="button" data-sk="rev">Reverse R ↔ L</button>
+        <div class="pop-div"></div>
+        <button class="pop-act" type="button" data-sk="off">Clear</button>
+      </div>
+    </div>
+  </div>
+  <!-- Toms -->
+  <div class="tb-ctrl">
+    <button class="tb-btn" data-pop="toms" id="tomsBtn" title="Toms">
+      <svg viewBox="0 0 20 20"><circle cx="6.5" cy="11" r="3.5"/><circle cx="13.5" cy="11" r="3.5"/></svg>
+    </button>
+    <div class="pop" id="pop-toms">
+      <div class="pop-row-between"><span class="pop-cap">Toms</span>
+        <label class="tog"><input type="checkbox" id="tomsTog" checked><span class="tog-s"></span></label></div>
+      <div class="pop-acts">
+        <button class="pop-act" type="button" data-tm="clear">Clear toms</button>
+      </div>
+    </div>
+  </div>
   <div class="tb-sep"></div>
   <!-- Clear -->
   <button class="tb-btn" id="clearBtn" title="Clear All">
@@ -456,6 +488,11 @@ function stateToGrooveUrl(){
   u+='&H='+encVoice(p.hihat,H_MAP)+'&S='+encVoice(p.snare,S_MAP)+'&K='+encVoice(p.kick,K_MAP);
   if(S.showToms) u+='&T1='+encVoice(p.tom1,T_MAP)+'&T4='+encVoice(p.tom2,T_MAP);
   if(S.showStick) u+='&Stickings='+encVoice(p.sticking,STK_MAP);
+  // Score details -> engine renders Title (T:) and Author (C:) onto the sheet
+  const title=(document.getElementById('titleIn').value||'').trim();
+  const author=(document.getElementById('authorIn').value||'').trim();
+  if(title) u+='&Title='+encodeURIComponent(title);
+  if(author) u+='&Author='+encodeURIComponent(author);
   return u;
 }
 function notationWidth(){const w=(document.getElementById('notWrap')||{}).clientWidth||820;return Math.max(500,Math.min(1100,w));}
@@ -496,6 +533,31 @@ function resizePattern(){
     if(arr.length<n){const first=arr.slice(0,s);while(S.pattern[inst.id].length<n){const idx=S.pattern[inst.id].length%s;S.pattern[inst.id].push(first[idx]||0)}}
     else if(arr.length>n) S.pattern[inst.id]=arr.slice(0,n);
   });
+}
+// Point-and-click measure editing (no upper limit)
+function addMeasure(){
+  pushUndo();
+  const s=spm(),lastStart=(S.measures-1)*s;
+  INSTS.forEach(inst=>{const arr=S.pattern[inst.id],seg=arr.slice(lastStart,lastStart+s);for(let i=0;i<s;i++)arr.push(seg[i]||0)});
+  S.measures++;syncAll();
+}
+function removeMeasure(m){
+  if(S.measures<=1) return;
+  pushUndo();
+  const s=spm();
+  INSTS.forEach(inst=>{S.pattern[inst.id].splice(m*s,s)});
+  S.measures--;syncAll();
+}
+// Sticking presets (Alternate / All R / All L / Reverse / Clear). Any op auto-enables stickings.
+function applySticking(op){
+  pushUndo();
+  const n=numSteps(),arr=S.pattern.sticking;
+  if(op==='rev'){for(let i=0;i<n;i++){if(arr[i]==='R')arr[i]='L';else if(arr[i]==='L')arr[i]='R';}}
+  else if(op==='off'){for(let i=0;i<n;i++)arr[i]=0;}
+  else if(op==='alt'){for(let i=0;i<n;i++)arr[i]=i%2===0?'R':'L';}
+  else{for(let i=0;i<n;i++)arr[i]=op;} // 'R' or 'L'
+  if(op!=='off'){S.showStick=true;const t=document.getElementById('stickTog');if(t)t.checked=true;}
+  syncAll();
 }
 
 const LIB={
@@ -791,6 +853,21 @@ function buildGrid(){
   wrap.innerHTML='';
   const ns=numSteps(),beats=S.tsNum,s2=spb();
   const subdivLabels=subLabelsFor(s2);
+
+  // measure control strip — point-and-click add / remove (unlimited)
+  const mc=document.createElement('div');mc.className='g-meas-ctrl';
+  const ml=document.createElement('span');ml.className='g-meas-lbl';ml.textContent=S.measures===1?'1 measure':S.measures+' measures';mc.appendChild(ml);
+  for(let m=0;m<S.measures;m++){
+    const chip=document.createElement('div');chip.className='g-meas-chip';
+    const num=document.createElement('span');num.textContent=m+1;chip.appendChild(num);
+    const x=document.createElement('button');x.className='g-meas-x';x.type='button';x.innerHTML='&times;';x.title='Remove measure '+(m+1);
+    x.disabled=S.measures<=1;x.addEventListener('click',()=>removeMeasure(m));
+    chip.appendChild(x);mc.appendChild(chip);
+  }
+  const add=document.createElement('button');add.className='g-meas-add';add.type='button';add.innerHTML='&plus;&nbsp;Add measure';
+  add.addEventListener('click',addMeasure);mc.appendChild(add);
+  wrap.appendChild(mc);
+
   const lr=document.createElement('div');
   lr.className='g-labels';lr.innerHTML='<div class="g-spacer"></div>';
   const lc=document.createElement('div');lc.className='g-lbl-c';
@@ -887,7 +964,6 @@ function wireControls(){
     S.swing=+this.value;document.getElementById('swingV').textContent=isTriplet()?'N/A':S.swing+'%';
     applySwing();
   });
-  document.getElementById('measSel').addEventListener('change',function(){pushUndo();S.measures=+this.value;resizePattern();syncAll()});
   // time signature popover
   document.getElementById('tsNumSel').addEventListener('change',function(){pushUndo();S.tsNum=+this.value;resizePattern();syncAll()});
   document.getElementById('tsDenSel').addEventListener('change',function(){pushUndo();S.tsDen=+this.value;resizePattern();syncAll()});
@@ -898,10 +974,17 @@ function wireControls(){
   document.getElementById('metTog').addEventListener('change',function(){S.met=this.checked?metLastRate:'off';syncControls()});
   document.querySelectorAll('#segMetRate .seg-b').forEach(b=>b.addEventListener('click',()=>{metLastRate=b.dataset.rate;S.met=b.dataset.rate;syncControls()}));
   wirePopovers();
+  // Stickings toolbar popover: toggle + presets (incl. reverse)
   document.getElementById('stickTog').addEventListener('change',function(){S.showStick=this.checked;syncAll()});
+  document.querySelectorAll('#pop-stick .pop-act').forEach(b=>b.addEventListener('click',()=>applySticking(b.dataset.sk)));
+  // Toms toolbar popover: toggle + clear
   document.getElementById('tomsTog').addEventListener('change',function(){S.showToms=this.checked;syncAll()});
-  document.getElementById('undoBtn').addEventListener('click',undo);
-  document.getElementById('redoBtn').addEventListener('click',redo);
+  document.querySelector('#pop-toms [data-tm="clear"]').addEventListener('click',()=>{pushUndo();const n=numSteps();S.pattern.tom1=A(n);S.pattern.tom2=A(n);syncAll()});
+  // Score details -> notation
+  document.getElementById('titleIn').addEventListener('input',renderNotation);
+  document.getElementById('authorIn').addEventListener('input',renderNotation);
+  // View / Edit mode switch
+  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
   document.getElementById('clearBtn').addEventListener('click',()=>{pushUndo();S.pattern=makeEmpty();syncAll()});
   document.getElementById('shareBtn').addEventListener('click',copyLink);
   document.getElementById('printBtn').addEventListener('click',()=>window.print());
@@ -914,14 +997,14 @@ function wireControls(){
   });
 
   // sidebar collapse/expand
-  const sbEl=document.getElementById('sb'),tbEl=document.getElementById('toolbar');
+  const sbEl=document.getElementById('sb'),tbEl=document.getElementById('toolbar'),msEl=document.getElementById('modeSwitch');
   document.getElementById('sbCollapse').addEventListener('click',()=>{
     sbEl.classList.add('collapsed');
-    tbEl.style.left='50%';
+    tbEl.style.left='50%';msEl.style.left='50%';
   });
   document.getElementById('sbExpand').addEventListener('click',()=>{
     sbEl.classList.remove('collapsed');
-    tbEl.style.left='';
+    tbEl.style.left='';msEl.style.left='';
   });
 
   document.getElementById('menuBtn').addEventListener('click',()=>{document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show')});
@@ -975,11 +1058,22 @@ function syncControls(){
   set('swingV',el=>el.textContent=trip?'N/A':S.swing+'%');
   set('swingR',el=>{el.value=S.swing;el.disabled=trip;});
   set('swingRow',el=>el.classList.toggle('off',trip));
+  set('stickTog',el=>el.checked=S.showStick);
+  set('tomsTog',el=>el.checked=S.showToms);
+  set('stickBtn',el=>el.classList.toggle('lit',S.showStick));
+  set('tomsBtn',el=>el.classList.toggle('lit',S.showToms));
   applySwing();
 }
 
+let mode='edit';
+function setMode(m){
+  mode=m;
+  document.body.classList.toggle('view-mode',m==='view');
+  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
+}
+
 function closePops(except){
-  ['bpm','ts','subdiv','met'].forEach(id=>{const p=document.getElementById('pop-'+id);if(p&&id!==except)p.classList.remove('open');});
+  ['bpm','ts','subdiv','met','stick','toms'].forEach(id=>{const p=document.getElementById('pop-'+id);if(p&&id!==except)p.classList.remove('open');});
   document.querySelectorAll('[data-pop]').forEach(b=>{if(b.dataset.pop!==except)b.classList.remove('on');});
 }
 function wirePopovers(){
@@ -1013,7 +1107,7 @@ function loadLib(data){
   if(data.ts){const[n,d]=data.ts.split('-').map(Number);S.tsNum=n;S.tsDen=d;}
   if(data.div){S.div=data.div;}
   if(data.bpm) setBpm(data.bpm);
-  S.measures=1;document.getElementById('measSel').value=1;
+  S.measures=1;
   resizePattern();
   const ns=numSteps();
   INSTS.forEach(inst=>{
