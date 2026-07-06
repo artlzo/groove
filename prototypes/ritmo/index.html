@@ -149,7 +149,7 @@ body.view-mode .grid-outer{display:none}
 .g-meas-add .ph{font-size:16px}
 
 /* ─── MAIN ─── */
-.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 120px;overflow:auto;min-width:0}
+.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 140px;overflow:auto;min-width:0}
 
 /* notation */
 .notation-wrap{position:relative;width:100%;max-width:1200px;margin-bottom:16px;overflow-x:auto;overflow-y:hidden;text-align:center}
@@ -201,7 +201,7 @@ body.view-mode .grid-outer{display:none}
 
 @media(max-width:900px){
   .topbar{padding:0 12px}
-  .main{padding:20px 14px 72px;overflow:auto;justify-content:flex-start;align-items:flex-start}
+  .main{padding:20px 14px 100px;overflow:auto;justify-content:flex-start;align-items:flex-start}
   .notation-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .grid-wrap{overflow-x:auto;width:100%;padding-bottom:8px;-webkit-overflow-scrolling:touch}
   .toolbar{
@@ -438,7 +438,7 @@ function stateToGrooveUrl(){
 // Calibrated: ~13px/note of pagewidth reads well; +40 for the clef/time-sig.
 function notationWidth(){
   const pageW=40+S.measures*spm()*13;
-  return Math.max(400,Math.min(2400,pageW/0.75));
+  return Math.max(400,Math.min(3000,pageW/0.75)); // 3000 = engine's own max; past that abc2svg wraps (clef per line is correct)
 }
 // Tone.js subdivision per GrooveScribe division (straight + triplet)
 const TONE_SUB={8:'8n',16:'16n',32:'32n',12:'8t',24:'16t',48:'32t'};
