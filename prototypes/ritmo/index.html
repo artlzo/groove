@@ -112,6 +112,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .tb-btn:hover{background:var(--bg-c);color:var(--pri)}
 .tb-btn:active{transform:scale(.95)}
 .tb-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.tb-btn .ph{font-size:18px;line-height:1;flex-shrink:0}
 .tb-btn.tb-play{background:var(--pri);color:#fff;width:40px}
 .tb-btn.tb-play:hover{background:#444}
 .tb-btn.tb-play.on{background:var(--sec)}
@@ -168,20 +169,22 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .mode-b{border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .12s}
 .mode-b:hover:not(.on){background:var(--bg-c);color:var(--pri)}
 .mode-b.on{background:var(--pri);color:#fff}
-body.view-mode .grid-wrap{display:none}
+body.view-mode .grid-outer{display:none}
 
-/* ─── MEASURE CONTROL STRIP ─── */
-.g-meas-ctrl{display:flex;align-items:center;gap:6px;margin-bottom:10px;flex-wrap:wrap}
-.g-meas-lbl{font-size:10px;font-weight:600;color:var(--mut);margin-right:2px}
-.g-meas-chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 6px 0 10px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff;font-size:11px;font-weight:600;color:var(--sec)}
-.g-meas-x{width:16px;height:16px;border:none;background:transparent;border-radius:4px;cursor:pointer;color:var(--fnt);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;padding:0;transition:all .1s}
+/* ─── MEASURE CONTROLS (per-measure ✕ + ghost ＋) ─── */
+.grid-outer{display:inline-flex;align-items:center;gap:12px;max-width:100%}
+/* per-measure wrapper in the label row, so the ✕ can pin to its top-right */
+.g-lbl-m{display:flex;gap:12px;position:relative}
+.g-meas-x{position:absolute;top:-16px;right:-3px;width:18px;height:18px;border:none;background:transparent;color:var(--fnt);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all .1s;z-index:3}
 .g-meas-x:hover{background:var(--bg-c);color:var(--pri)}
-.g-meas-x:disabled{opacity:.3;cursor:not-allowed}
-.g-meas-add{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 12px;border:1px dashed var(--brd);border-radius:var(--rs);background:transparent;font-family:inherit;font-size:11px;font-weight:600;color:var(--mut);cursor:pointer;transition:all .12s}
-.g-meas-add:hover{border-color:#ccc;color:var(--sec);background:var(--bg-c)}
+.g-meas-x .ph{font-size:13px}
+/* ghost add button, vertically centered to the right of the last measure */
+.g-meas-add{width:32px;height:32px;flex-shrink:0;border:1px dashed var(--brd);border-radius:8px;background:transparent;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.g-meas-add:hover{border-color:#bbb;color:var(--pri);background:var(--bg-c)}
+.g-meas-add .ph{font-size:16px}
 
 /* ─── MAIN ─── */
-.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 120px;overflow:auto;min-width:0}
+.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:68px 24px 120px;overflow:auto;min-width:0}
 
 /* notation */
 .notation-wrap{position:relative;width:100%;max-width:900px;margin-bottom:16px;overflow-x:auto;overflow-y:hidden}
@@ -189,7 +192,7 @@ body.view-mode .grid-wrap{display:none}
 #notArea .abcr.highlighted{fill:rgba(45,140,90,.22)!important;transition:fill .04s}
 
 /* grid */
-.grid-wrap{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;overflow-x:auto;padding-bottom:4px}
+.grid-wrap{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;overflow-x:auto;padding:18px 0 4px}
 .g-labels{display:flex;align-items:flex-end;margin-bottom:4px}
 .g-spacer{width:44px;flex-shrink:0}
 .g-lbl-c{display:flex;gap:12px}
@@ -243,7 +246,7 @@ body.view-mode .grid-wrap{display:none}
   .mode-switch{top:58px;left:50%!important}
   .sb{position:fixed;top:0;left:-274px;height:100%;z-index:200;transition:left .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.06)}
   .sb.open{left:0}
-  .main{padding:56px 16px 62px;overflow:auto;justify-content:flex-start;align-items:flex-start}
+  .main{padding:96px 16px 62px;overflow:auto;justify-content:flex-start;align-items:flex-start}
   .notation-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .grid-wrap{overflow-x:auto;width:100%;padding-bottom:8px;-webkit-overflow-scrolling:touch}
   .toolbar{
@@ -264,6 +267,7 @@ body.view-mode .grid-wrap{display:none}
   .notation-wrap svg{width:100%!important}
 }
 </style>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 </head>
 <body>
 
@@ -323,7 +327,10 @@ body.view-mode .grid-wrap{display:none}
 </div>
 <main class="main">
   <div class="notation-wrap" id="notWrap"><div id="notArea"></div></div>
-  <div class="grid-wrap" id="gridWrap"></div>
+  <div class="grid-outer" id="gridOuter">
+    <div class="grid-wrap" id="gridWrap"></div>
+    <button class="g-meas-add" id="addMeasBtn" type="button" title="Add measure"><i class="ph ph-plus"></i></button>
+  </div>
 </main>
 </div>
 
@@ -337,7 +344,7 @@ body.view-mode .grid-wrap{display:none}
 <div class="toolbar" id="toolbar">
   <!-- Play -->
   <button class="tb-btn tb-play" id="playBtn" title="Play / Pause">
-    <svg viewBox="0 0 20 20" id="playIco"><polygon points="5,2 17,10 5,18"/></svg>
+    <i class="ph-fill ph-play" id="playIco"></i>
   </button>
   <div class="tb-sep"></div>
   <!-- BPM + Swing -->
@@ -387,7 +394,7 @@ body.view-mode .grid-wrap{display:none}
   <!-- Metronome -->
   <div class="tb-ctrl">
     <button class="tb-btn" data-pop="met" id="metBtn" title="Metronome">
-      <svg viewBox="0 0 20 20"><path d="M6.5 17h7l-2-13h-3z"/><path d="M4.5 17h11"/><path d="M10 14l4.5-4"/></svg>
+      <i class="ph ph-metronome"></i>
     </button>
     <div class="pop" id="pop-met">
       <div class="pop-row-between"><span class="pop-cap">Metronome</span>
@@ -403,7 +410,7 @@ body.view-mode .grid-wrap{display:none}
   <!-- Stickings -->
   <div class="tb-ctrl">
     <button class="tb-btn" data-pop="stick" id="stickBtn" title="Stickings">
-      <svg viewBox="0 0 20 20"><path d="M6 15V6a1.5 1.5 0 013 0v9"/><path d="M11 15V6a1.5 1.5 0 013 0v9"/></svg>
+      <i class="ph ph-hand-tap"></i>
     </button>
     <div class="pop" id="pop-stick">
       <div class="pop-row-between"><span class="pop-cap">Stickings</span>
@@ -418,28 +425,17 @@ body.view-mode .grid-wrap{display:none}
       </div>
     </div>
   </div>
-  <!-- Toms -->
-  <div class="tb-ctrl">
-    <button class="tb-btn" data-pop="toms" id="tomsBtn" title="Toms">
-      <svg viewBox="0 0 20 20"><circle cx="6.5" cy="11" r="3.5"/><circle cx="13.5" cy="11" r="3.5"/></svg>
-    </button>
-    <div class="pop" id="pop-toms">
-      <div class="pop-row-between"><span class="pop-cap">Toms</span>
-        <label class="tog"><input type="checkbox" id="tomsTog" checked><span class="tog-s"></span></label></div>
-      <div class="pop-acts">
-        <button class="pop-act" type="button" data-tm="clear">Clear toms</button>
-      </div>
-    </div>
-  </div>
+  <!-- Toms (direct show/hide toggle) -->
+  <button class="tb-btn lit" id="tomsBtn" title="Show / hide toms"><i class="ph ph-circles-three"></i></button>
   <div class="tb-sep"></div>
   <!-- Clear -->
   <button class="tb-btn" id="clearBtn" title="Clear All">
-    <svg viewBox="0 0 20 20"><path d="M6 6h8M8 6V4.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V6M7 6v9.5a1 1 0 001 1h4a1 1 0 001-1V6"/></svg>
+    <i class="ph ph-trash"></i>
   </button>
   <div class="tb-sep"></div>
   <!-- Copy PNG -->
   <button class="tb-btn" id="copyPngBtn" title="Copy as PNG">
-    <svg viewBox="0 0 20 20"><path d="M6 4h5l3 3v7a1 1 0 01-1 1H6a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M11 4v3h3"/><path d="M8 16h6a1 1 0 001-1V8" stroke-dasharray="2 1.5"/></svg>
+    <i class="ph ph-image"></i>
   </button>
 </div>
 
@@ -659,8 +655,8 @@ async function togglePlay(){
 
 function renderPlayBtn(){
   const b=document.getElementById('playBtn'),i=document.getElementById('playIco');
-  if(isPlaying){b.classList.add('on');i.innerHTML='<rect x="4" y="3" width="4.5" height="14" rx="1"/><rect x="11.5" y="3" width="4.5" height="14" rx="1"/>'}
-  else{b.classList.remove('on');i.innerHTML='<polygon points="5,2 17,10 5,18"/>'}
+  if(isPlaying){b.classList.add('on');i.className='ph-fill ph-pause'}
+  else{b.classList.remove('on');i.className='ph-fill ph-play'}
 }
 
 /* ═══ NOTATION — single SVG, stacked systems ═══ */
@@ -854,30 +850,25 @@ function buildGrid(){
   const ns=numSteps(),beats=S.tsNum,s2=spb();
   const subdivLabels=subLabelsFor(s2);
 
-  // measure control strip — point-and-click add / remove (unlimited)
-  const mc=document.createElement('div');mc.className='g-meas-ctrl';
-  const ml=document.createElement('span');ml.className='g-meas-lbl';ml.textContent=S.measures===1?'1 measure':S.measures+' measures';mc.appendChild(ml);
-  for(let m=0;m<S.measures;m++){
-    const chip=document.createElement('div');chip.className='g-meas-chip';
-    const num=document.createElement('span');num.textContent=m+1;chip.appendChild(num);
-    const x=document.createElement('button');x.className='g-meas-x';x.type='button';x.innerHTML='&times;';x.title='Remove measure '+(m+1);
-    x.disabled=S.measures<=1;x.addEventListener('click',()=>removeMeasure(m));
-    chip.appendChild(x);mc.appendChild(chip);
-  }
-  const add=document.createElement('button');add.className='g-meas-add';add.type='button';add.innerHTML='&plus;&nbsp;Add measure';
-  add.addEventListener('click',addMeasure);mc.appendChild(add);
-  wrap.appendChild(mc);
-
   const lr=document.createElement('div');
   lr.className='g-labels';lr.innerHTML='<div class="g-spacer"></div>';
   const lc=document.createElement('div');lc.className='g-lbl-c';
   for(let m=0;m<S.measures;m++){
     if(m>0){const sep=document.createElement('div');sep.className='g-mbar';sep.style.visibility='hidden';lc.appendChild(sep)}
+    const mg=document.createElement('div');mg.className='g-lbl-m';
     for(let b=0;b<beats;b++){
       const g=document.createElement('div');g.className='g-lbl-g';
       for(let sub=0;sub<s2;sub++){const sp=document.createElement('span');sp.className=sub===0?'g-bn':'g-sd';sp.textContent=sub===0?''+(b+1):subdivLabels[sub];g.appendChild(sp)}
-      lc.appendChild(g);
+      mg.appendChild(g);
     }
+    // per-measure remove — only offered when there's more than one measure
+    if(S.measures>1){
+      const x=document.createElement('button');x.className='g-meas-x';x.type='button';
+      x.innerHTML='<i class="ph ph-x"></i>';x.title='Remove measure '+(m+1);
+      x.addEventListener('click',()=>removeMeasure(m));
+      mg.appendChild(x);
+    }
+    lc.appendChild(mg);
   }
   lr.appendChild(lc);wrap.appendChild(lr);
 
@@ -977,12 +968,13 @@ function wireControls(){
   // Stickings toolbar popover: toggle + presets (incl. reverse)
   document.getElementById('stickTog').addEventListener('change',function(){S.showStick=this.checked;syncAll()});
   document.querySelectorAll('#pop-stick .pop-act').forEach(b=>b.addEventListener('click',()=>applySticking(b.dataset.sk)));
-  // Toms toolbar popover: toggle + clear
-  document.getElementById('tomsTog').addEventListener('change',function(){S.showToms=this.checked;syncAll()});
-  document.querySelector('#pop-toms [data-tm="clear"]').addEventListener('click',()=>{pushUndo();const n=numSteps();S.pattern.tom1=A(n);S.pattern.tom2=A(n);syncAll()});
+  // Toms: direct show/hide toggle button
+  document.getElementById('tomsBtn').addEventListener('click',()=>{S.showToms=!S.showToms;syncAll()});
   // Score details -> notation
   document.getElementById('titleIn').addEventListener('input',renderNotation);
   document.getElementById('authorIn').addEventListener('input',renderNotation);
+  // Add-measure ghost button (right of the last measure)
+  document.getElementById('addMeasBtn').addEventListener('click',addMeasure);
   // View / Edit mode switch
   document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
   document.getElementById('clearBtn').addEventListener('click',()=>{pushUndo();S.pattern=makeEmpty();syncAll()});
@@ -1059,7 +1051,6 @@ function syncControls(){
   set('swingR',el=>{el.value=S.swing;el.disabled=trip;});
   set('swingRow',el=>el.classList.toggle('off',trip));
   set('stickTog',el=>el.checked=S.showStick);
-  set('tomsTog',el=>el.checked=S.showToms);
   set('stickBtn',el=>el.classList.toggle('lit',S.showStick));
   set('tomsBtn',el=>el.classList.toggle('lit',S.showToms));
   applySwing();
@@ -1073,7 +1064,7 @@ function setMode(m){
 }
 
 function closePops(except){
-  ['bpm','ts','subdiv','met','stick','toms'].forEach(id=>{const p=document.getElementById('pop-'+id);if(p&&id!==except)p.classList.remove('open');});
+  ['bpm','ts','subdiv','met','stick'].forEach(id=>{const p=document.getElementById('pop-'+id);if(p&&id!==except)p.classList.remove('open');});
   document.querySelectorAll('[data-pop]').forEach(b=>{if(b.dataset.pop!==except)b.classList.remove('on');});
 }
 function wirePopovers(){
