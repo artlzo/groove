@@ -45,9 +45,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 /* select */
 .sel{width:100%;height:32px;padding:0 8px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") right 8px center/10px no-repeat;font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px}
 /* toggle */
-.tog-row{display:flex;align-items:center;justify-content:space-between}
-.tog-row+.tog-row{margin-top:8px}
-.tog-row span{font-size:11px;color:var(--sec)}
 .tog{position:relative;width:34px;height:18px;flex-shrink:0}
 .tog input{opacity:0;width:0;height:0;position:absolute}
 .tog-s{position:absolute;inset:0;background:var(--brd);border-radius:9px;cursor:pointer;transition:background .2s}
@@ -78,23 +75,12 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 }
 .tb-btn:hover{background:var(--bg-c);color:var(--pri)}
 .tb-btn:active{transform:scale(.95)}
-.tb-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
 .tb-btn .ph{font-size:24px;line-height:1;flex-shrink:0}
 .tb-btn.tb-play{background:var(--pri);color:#fff;width:40px}
 .tb-btn.tb-play:hover{background:#444}
 .tb-btn.tb-play.on{background:var(--sec)}
-.tb-btn.tb-play svg{fill:currentColor;stroke:none}
 
-/* bpm in toolbar */
-.tb-bpm{display:flex;align-items:center;height:36px;border:1px solid var(--brd);border-radius:var(--rs);overflow:hidden;background:#fff}
-.tb-bpm .tb-b{width:28px;height:36px;border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--mut);font-family:inherit;font-weight:500;display:flex;align-items:center;justify-content:center;transition:background .12s}
-.tb-bpm .tb-b:hover{background:var(--bg-c);color:var(--pri)}
-.tb-bpm-v{width:36px;text-align:center;font-size:13px;font-weight:500;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
-.tb-bpm-v::-webkit-inner-spin-button,.tb-bpm-v::-webkit-outer-spin-button{-webkit-appearance:none}
-.tb-bpm-lbl{font-size:8px;color:var(--fnt);margin-right:4px;font-weight:500;letter-spacing:.04em}
 
-/* time sig in toolbar */
-.tb-ts{height:36px;padding:0 6px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23ccc'/%3E%3C/svg%3E") right 6px center/8px no-repeat;font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:20px;min-width:56px}
 
 /* toolbar popover controls */
 .tb-ctrl{position:relative;display:flex;align-items:center}
@@ -602,13 +588,7 @@ function renderPlayBtn(){
   else{b.classList.remove('on');i.className='ph-fill ph-play'}
 }
 
-/* ═══ NOTATION — single SVG, stacked systems ═══ */
-const N_LG=10,N_LM=52,N_RM=16,BARGAP=14;
-function nStepW(){return S.div===16?38:56}
-const NOTE_Y={hihat:0,tom1:0.5,snare:2,tom2:2.5,kick:3.5};
-const ALL_VOICES=['hihat','tom1','snare','tom2','kick'];
-const MEAS_PER_LINE=2;
-const SYS_H=112,SYS_GAP=20,SYS_STOP=56;
+/* ═══ NOTATION — engine ABC → SVG ═══ */
 
 // createABCFromGrooveData ends EVERY measure with "|\n" — a hard line break, so
 // abc2svg gives each measure its own staff line. The legacy app instead joins
@@ -640,176 +620,8 @@ function renderNotation(){
     abc=joinMeasureLines(abc,measuresPerLine());
     document.getElementById('notArea').innerHTML=GU.renderABCtoSVG(abc).svg;
   }catch(e){document.getElementById('notArea').innerHTML='<div style="color:#b00;padding:8px;font-size:12px">notation error: '+(e&&e.message||e)+'</div>';}
-  return;
-  /* ---- legacy hand-rolled renderer below (kept, unused) ---- */
-  const ns=numSteps(),sw=nStepW(),beats=S.tsNum,s2=spb();
-  const sPerM=spm();
-  const mpl=Math.min(S.measures,MEAS_PER_LINE);
-  const numLines=Math.ceil(S.measures/mpl);
-  const maxLineW=N_LM+mpl*sPerM*sw+(mpl-1)*BARGAP+N_RM;
-  const totalH=numLines*SYS_H+(numLines-1)*SYS_GAP;
-  const beamRel=32;
-
-  // pre-compute durations globally
-  const totalBeats=beats*S.measures;
-  const dur=new Array(ns).fill(0);
-  for(let b=0;b<totalBeats;b++){
-    const bs=b*s2,be=Math.min(bs+s2,ns);
-    const has=[];
-    for(let i=bs;i<be;i++){
-      let h2=false;
-      ALL_VOICES.forEach(k=>{if(!S.showToms&&(k==='tom1'||k==='tom2'))return;if(S.pattern[k][i])h2=true});
-      has.push(h2);
-    }
-    for(let i=0;i<has.length;i++){
-      if(!has[i]) continue;
-      let d=0;
-      for(let j=i+1;j<has.length;j++){if(has[j]){d=j-i;break}}
-      if(!d) d=has.length-i;
-      dur[bs+i]=d;
-    }
-  }
-
-  let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${maxLineW} ${totalH}" style="display:block;width:100%;height:auto">`;
-
-  for(let line=0;line<numLines;line++){
-    const yOff=line*(SYS_H+SYS_GAP);
-    const stTop=yOff+SYS_STOP;
-    const beamY=yOff+beamRel;
-    const sl=[0,1,2,3,4].map(i=>stTop+i*N_LG);
-    const posY=k=>stTop+NOTE_Y[k]*N_LG;
-
-    const startM=line*mpl,endM=Math.min(startM+mpl,S.measures);
-    const mil=endM-startM;
-    const startStep=startM*sPerM,endStep=startStep+mil*sPerM;
-    const lineW=N_LM+mil*sPerM*sw+(mil-1)*BARGAP+N_RM;
-
-    function lx(gi){
-      const li=gi-startStep,lm=Math.floor(li/sPerM);
-      return N_LM+li*sw+lm*BARGAP+sw/2;
-    }
-
-    // staff
-    sl.forEach(y=>{s+=`<line x1="${N_LM-4}" y1="${y}" x2="${lineW-N_RM}" y2="${y}" stroke="#DDD" stroke-width=".8"/>`});
-
-    // clef
-    s+=`<rect x="12" y="${sl[0]}" width="3.5" height="${sl[4]-sl[0]}" fill="#888" rx="1"/>`;
-    s+=`<rect x="19" y="${sl[0]}" width="3.5" height="${sl[4]-sl[0]}" fill="#888" rx="1"/>`;
-
-    // time sig (first line only)
-    if(line===0){
-      s+=`<text x="35" y="${sl[1]+4}" text-anchor="middle" font-size="18" font-weight="700" fill="#333" font-family="Georgia,serif">${S.tsNum}</text>`;
-      s+=`<text x="35" y="${sl[3]+4}" text-anchor="middle" font-size="18" font-weight="700" fill="#333" font-family="Georgia,serif">${S.tsDen}</text>`;
-    }
-
-    // barlines
-    s+=`<line x1="${N_LM-4}" y1="${sl[0]}" x2="${N_LM-4}" y2="${sl[4]}" stroke="#666" stroke-width="1.5"/>`;
-    for(let m=1;m<mil;m++){
-      const bx=N_LM+m*sPerM*sw+(m-1)*BARGAP+BARGAP/2;
-      s+=`<line x1="${bx}" y1="${sl[0]}" x2="${bx}" y2="${sl[4]}" stroke="#999" stroke-width="1"/>`;
-    }
-    s+=`<line x1="${lineW-N_RM}" y1="${sl[0]}" x2="${lineW-N_RM}" y2="${sl[4]}" stroke="#999" stroke-width="1"/>`;
-    if(line===numLines-1) s+=`<line x1="${lineW-N_RM+3}" y1="${sl[0]}" x2="${lineW-N_RM+3}" y2="${sl[4]}" stroke="#555" stroke-width="2.5"/>`;
-
-    // stickings
-    if(S.showStick){
-      for(let i=startStep;i<endStep;i++){
-        const v=S.pattern.sticking[i];
-        if(v) s+=`<text x="${lx(i)}" y="${yOff+18}" text-anchor="middle" font-size="10" font-weight="600" fill="#aaa" font-family="Inter,sans-serif">${v}</text>`;
-      }
-    }
-
-    // notes, stems, dots
-    for(let i=startStep;i<endStep;i++){
-      const x=lx(i),notes=[];
-      ALL_VOICES.forEach(k=>{
-        if(!S.showToms&&(k==='tom1'||k==='tom2'))return;
-        if(S.pattern[k][i]) notes.push({k,t:S.pattern[k][i],y:posY(k)});
-      });
-      notes.forEach(n=>{s+=drawHead(x,n.y,n.k,n.t)});
-      if(notes.length){
-        const lowest=Math.max(...notes.map(n=>n.y));
-        s+=`<line x1="${x+4}" y1="${lowest}" x2="${x+4}" y2="${beamY}" stroke="#333" stroke-width="1.1"/>`;
-        if(dur[i]===3){
-          const topN=notes.reduce((a,b)=>a.y<b.y?a:b);
-          const onLine=((topN.y-stTop)%N_LG)===0;
-          s+=`<circle cx="${x+7}" cy="${onLine?topN.y-N_LG/2:topN.y}" r="1.5" fill="#333"/>`;
-        }
-      }
-    }
-
-    // beams
-    const lsb=startM*beats,leb=endM*beats;
-    for(let b=lsb;b<leb;b++){
-      const bs=b*s2,be=Math.min(bs+s2,ns);
-      const bn=[];
-      for(let i=bs;i<be;i++){
-        let has=false;
-        ALL_VOICES.forEach(k=>{if(!S.showToms&&(k==='tom1'||k==='tom2'))return;if(S.pattern[k][i])has=true});
-        if(has) bn.push({x:lx(i)+4,dur:dur[i]});
-      }
-      if(bn.length<2) continue;
-      s+=`<line x1="${bn[0].x}" y1="${beamY}" x2="${bn[bn.length-1].x}" y2="${beamY}" stroke="#333" stroke-width="2.5"/>`;
-      if(s2===4){
-        let j=0;
-        while(j<bn.length){
-          if(bn[j].dur===1){
-            let rs=j;while(j<bn.length&&bn[j].dur===1)j++;let re=j-1;
-            if(rs===re){const n=bn[rs],dir=rs===0?1:-1;s+=`<line x1="${n.x}" y1="${beamY+5}" x2="${n.x+dir*8}" y2="${beamY+5}" stroke="#333" stroke-width="2.5"/>`}
-            else s+=`<line x1="${bn[rs].x}" y1="${beamY+5}" x2="${bn[re].x}" y2="${beamY+5}" stroke="#333" stroke-width="2.5"/>`;
-          } else j++;
-        }
-      }
-    }
-
-    // articulations
-    for(let i=startStep;i<endStep;i++){
-      const x=lx(i),notes=[];
-      ALL_VOICES.forEach(k=>{
-        if(!S.showToms&&(k==='tom1'||k==='tom2'))return;
-        if(S.pattern[k][i]) notes.push({k,t:S.pattern[k][i],y:posY(k)});
-      });
-      if(!notes.length) continue;
-      const hasOpen=notes.some(n=>n.k==='hihat'&&n.t==='o');
-      const hasAcc=notes.some(n=>n.t==='X'||n.t==='O');
-      if(!hasOpen&&!hasAcc) continue;
-      if(hasOpen&&hasAcc){
-        s+=`<circle cx="${x}" cy="${beamY-15}" r="3.5" fill="none" stroke="#333" stroke-width="1.3"/>`;
-        s+=`<text x="${x}" y="${beamY-4}" text-anchor="middle" font-size="11" font-weight="700" fill="#333" font-family="Georgia,serif">&gt;</text>`;
-      } else if(hasOpen){
-        s+=`<circle cx="${x}" cy="${beamY-8}" r="3.5" fill="none" stroke="#333" stroke-width="1.3"/>`;
-      } else if(hasAcc){
-        s+=`<text x="${x}" y="${beamY-4}" text-anchor="middle" font-size="11" font-weight="700" fill="#333" font-family="Georgia,serif">&gt;</text>`;
-      }
-    }
-
-    // playhead
-    if(currentStep>=startStep&&currentStep<endStep&&isPlaying){
-      const px=lx(currentStep)-sw/2;
-      s+=`<rect x="${px}" y="${yOff}" width="${sw}" height="${SYS_H}" fill="rgba(0,0,0,.04)" rx="2"/>`;
-    }
-  }
-
-  s+='</svg>';
-  document.getElementById('notArea').innerHTML=s;
 }
 
-function drawHead(x,y,inst,type){
-  let s='';
-  const isX=inst==='hihat'||(type==='x'&&inst==='snare')||(type==='f'&&inst==='kick');
-  if(isX){
-    const sz=3.5;
-    s+=`<line x1="${x-sz}" y1="${y-sz}" x2="${x+sz}" y2="${y+sz}" stroke="#333" stroke-width="1.6"/>`;
-    s+=`<line x1="${x-sz}" y1="${y+sz}" x2="${x+sz}" y2="${y-sz}" stroke="#333" stroke-width="1.6"/>`;
-  } else if(type==='g'){
-    s+=`<ellipse cx="${x}" cy="${y}" rx="3.2" ry="2.2" fill="#333" transform="rotate(-20,${x},${y})"/>`;
-    s+=`<text x="${x-5.5}" y="${y+3.5}" font-size="11" fill="#333" font-family="Georgia,serif">(</text>`;
-    s+=`<text x="${x+2.5}" y="${y+3.5}" font-size="11" fill="#333" font-family="Georgia,serif">)</text>`;
-  } else {
-    s+=`<ellipse cx="${x}" cy="${y}" rx="4" ry="2.8" fill="#333" transform="rotate(-20,${x},${y})"/>`;
-  }
-  return s;
-}
 
 /* ═══ GRID ═══ */
 function buildGrid(){
