@@ -23,8 +23,11 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .topbtn{width:36px;height:36px;border:none;background:transparent;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sec);transition:background .12s,color .12s}
 .topbtn:hover,.topbtn.on{background:var(--bg-c);color:var(--pri)}
 .topbtn .ph{font-size:19px;line-height:1}
-/* top-bar popovers open downward, right-aligned */
-.pop-tr{top:calc(100% + 8px);bottom:auto;left:auto;right:0;transform:none}
+/* top-bar popovers open downward, right-aligned.
+   .pop.pop-tr (not .pop-tr): must outrank the later .pop base rule, whose
+   bottom:calc(100%+12px) would otherwise combine with our top and collapse
+   the box to a squashed pill with the content spilling out. */
+.pop.pop-tr{top:calc(100% + 8px);bottom:auto;left:auto;right:0;transform:none}
 .pop-more{min-width:220px}
 .lib-scroll{max-height:320px;overflow-y:auto;margin:0 -4px}
 .pop-hint{font-size:9px;color:var(--fnt);display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding-top:2px}
@@ -66,9 +69,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
   left:50%;transform:translateX(-50%);
   display:flex;align-items:center;gap:2px;
   background:#fff;border:1px solid var(--brd);border-radius:12px;
-  padding:4px;box-shadow:0 2px 16px rgba(0,0,0,.07);z-index:50;
+  padding:4px;z-index:50;
 }
-.tb-sep{width:1px;height:22px;background:var(--brd);margin:0 2px;flex-shrink:0}
 .tb-btn{
   height:36px;min-width:36px;border:none;background:transparent;border-radius:var(--r);
   cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -77,7 +79,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .tb-btn:hover{background:var(--bg-c);color:var(--pri)}
 .tb-btn:active{transform:scale(.95)}
 .tb-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
-.tb-btn .ph{font-size:18px;line-height:1;flex-shrink:0}
+.tb-btn .ph{font-size:24px;line-height:1;flex-shrink:0}
 .tb-btn.tb-play{background:var(--pri);color:#fff;width:40px}
 .tb-btn.tb-play:hover{background:#444}
 .tb-btn.tb-play.on{background:var(--sec)}
@@ -137,10 +139,10 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 body.view-mode .grid-outer{display:none}
 
 /* ─── MEASURE CONTROLS (per-measure ✕ + ghost ＋) ─── */
-.grid-outer{display:inline-flex;align-items:center;gap:12px;max-width:100%}
+.grid-outer{display:inline-flex;align-items:center;gap:12px;max-width:100%;margin-top:auto} /* pinned low: .main's 140px bottom padding leaves ~40px above the toolbar */
 /* per-measure wrapper in the label row, so the ✕ can pin to its top-right */
 .g-lbl-m{display:flex;gap:12px;position:relative}
-.g-meas-x{position:absolute;top:-16px;right:-3px;width:18px;height:18px;border:none;background:transparent;color:var(--fnt);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all .1s;z-index:3}
+.g-meas-x{position:absolute;top:-16px;right:-18px;width:18px;height:18px;border:none;background:transparent;color:var(--fnt);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all .1s;z-index:3}
 .g-meas-x:hover{background:var(--bg-c);color:var(--pri)}
 .g-meas-x .ph{font-size:13px}
 /* ghost add button, vertically centered to the right of the last measure */
@@ -286,7 +288,6 @@ body.view-mode .grid-outer{display:none}
   <button class="tb-btn tb-play" id="playBtn" title="Play / Pause">
     <i class="ph-fill ph-play" id="playIco"></i>
   </button>
-  <div class="tb-sep"></div>
   <!-- BPM + Swing -->
   <div class="tb-ctrl">
     <button class="tb-txt" data-pop="bpm" title="Tempo & Swing"><b id="bpmDisp">80</b>&nbsp;BPM</button>
@@ -300,7 +301,6 @@ body.view-mode .grid-outer{display:none}
       <input type="range" class="rng" id="swingR" min="0" max="100" value="0">
     </div>
   </div>
-  <div class="tb-sep"></div>
   <!-- Time signature -->
   <div class="tb-ctrl">
     <button class="tb-txt" data-pop="ts" title="Time Signature"><b id="tsDisp">4/4</b></button>
@@ -314,7 +314,6 @@ body.view-mode .grid-outer{display:none}
       </div>
     </div>
   </div>
-  <div class="tb-sep"></div>
   <!-- Subdivision -->
   <div class="tb-ctrl">
     <button class="tb-txt" data-pop="subdiv" title="Subdivision"><b id="subdivDisp">1/16</b></button>
@@ -346,7 +345,6 @@ body.view-mode .grid-outer{display:none}
       </div>
     </div>
   </div>
-  <div class="tb-sep"></div>
   <!-- Stickings -->
   <div class="tb-ctrl">
     <button class="tb-btn" data-pop="stick" id="stickBtn" title="Stickings">
@@ -367,12 +365,10 @@ body.view-mode .grid-outer{display:none}
   </div>
   <!-- Toms (direct show/hide toggle) -->
   <button class="tb-btn lit" id="tomsBtn" title="Show / hide toms"><i class="ph ph-circles-three"></i></button>
-  <div class="tb-sep"></div>
   <!-- Clear -->
   <button class="tb-btn" id="clearBtn" title="Clear All">
     <i class="ph ph-trash"></i>
   </button>
-  <div class="tb-sep"></div>
   <!-- Copy PNG -->
   <button class="tb-btn" id="copyPngBtn" title="Copy as PNG">
     <i class="ph ph-image"></i>
@@ -1070,10 +1066,27 @@ function copyLink(){
   }).catch(()=>{});
 }
 
+// The engine emits one <svg> per staff line — combine them all (stacked by y)
+// so copy/download include every measure, not just the first system. Nesting
+// the originals keeps <use href="#pclef"> etc. resolvable via the first
+// system's <defs> within the combined document.
+function combinedNotationSVG(){
+  const svgs=[...document.querySelectorAll('#notArea svg')];if(!svgs.length)return null;
+  const dims=svgs.map(s=>{const vb=s.getAttribute('viewBox').split(' ').map(Number);return{w:vb[2],h:vb[3]}});
+  const W=Math.max(...dims.map(d=>d.w)),H=dims.reduce((a,d)=>a+d.h,0);
+  let y=0,inner='';
+  svgs.forEach((s,i)=>{
+    const c=s.cloneNode(true);
+    c.setAttribute('x',0);c.setAttribute('y',y);
+    c.setAttribute('width',dims[i].w);c.setAttribute('height',dims[i].h);
+    inner+=new XMLSerializer().serializeToString(c);y+=dims[i].h;
+  });
+  return {data:'<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+inner+'</svg>',W,H};
+}
+
 function downloadSVG(){
-  const svg=document.querySelector('#notArea svg');if(!svg)return;
-  const data=new XMLSerializer().serializeToString(svg);
-  const blob=new Blob([data],{type:'image/svg+xml'});
+  const combo=combinedNotationSVG();if(!combo)return;
+  const blob=new Blob([combo.data],{type:'image/svg+xml'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=(document.getElementById('titleIn').value||'groove')+'.svg';
   a.click();URL.revokeObjectURL(a.href);
@@ -1091,12 +1104,11 @@ function exportMIDI(){
 }
 
 function copyPNG(){
-  const svg=document.querySelector('#notArea svg');if(!svg)return;
+  const combo=combinedNotationSVG();if(!combo)return;
   const btn=document.getElementById('copyPngBtn');
-  const vb=svg.getAttribute('viewBox').split(' ').map(Number);
   const scale=3;
-  const w=vb[2]*scale,h=vb[3]*scale;
-  const data=new XMLSerializer().serializeToString(svg);
+  const w=combo.W*scale,h=combo.H*scale;
+  const data=combo.data;
   const img=new Image();
   img.onload=function(){
     const c=document.createElement('canvas');
