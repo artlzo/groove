@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Groove Scribe — Functionality Reference</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #ffffff;
+      --bg-secondary: #f5f5f4;
+      --bg-tertiary: #eeede8;
+      --text: #1a1a1a;
+      --text-secondary: #6b6b6b;
+      --border: rgba(0,0,0,0.12);
+      --border-hover: rgba(0,0,0,0.25);
+      --info-bg: #e6f1fb;
+      --info-text: #185fa5;
+      --success-bg: #eaf3de;
+      --success-text: #3b6d11;
+      --warning-bg: #faeeda;
+      --warning-text: #854f0b;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #1c1c1a;
+        --bg-secondary: #252522;
+        --bg-tertiary: #2e2e2a;
+        --text: #f0efea;
+        --text-secondary: #9a9890;
+        --border: rgba(255,255,255,0.1);
+        --border-hover: rgba(255,255,255,0.22);
+        --info-bg: #042c53;
+        --info-text: #85b7eb;
+        --success-bg: #173404;
+        --success-text: #97c459;
+        --warning-bg: #412402;
+        --warning-text: #ef9f27;
+      }
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--bg-tertiary);
+      padding: 2rem 1rem;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 720px;
+      margin: 0 auto;
+    }
+
+    header { margin-bottom: 1.75rem; }
+    header h1 { font-size: 20px; font-weight: 500; margin-bottom: 4px; }
+    header p { font-size: 13px; color: var(--text-secondary); }
+
+    .section {
+      margin-bottom: 10px;
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      background: var(--bg);
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--bg-secondary);
+      cursor: pointer;
+      user-select: none;
+    }
+    .section-header:hover { background: var(--bg-tertiary); }
+    .section-header i { font-size: 18px; color: var(--text-secondary); }
+    .section-title { font-size: 14px; font-weight: 500; flex: 1; }
+    .chevron { font-size: 14px; color: var(--text-secondary); transition: transform 0.2s; margin-left: auto; }
+
+    .section-body { padding: 14px 16px; display: none; }
+    .section-body.open { display: block; }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 8px;
+    }
+
+    .feature {
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 10px 12px;
+    }
+    .feature-name { font-size: 13px; font-weight: 500; margin-bottom: 3px; }
+    .feature-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th {
+      text-align: left;
+      font-weight: 500;
+      font-size: 12px;
+      color: var(--text-secondary);
+      padding: 0 8px 8px 0;
+      border-bottom: 0.5px solid var(--border);
+    }
+    td {
+      padding: 7px 8px 7px 0;
+      border-bottom: 0.5px solid var(--border);
+      vertical-align: top;
+      line-height: 1.4;
+    }
+    tr:last-child td { border-bottom: none; }
+
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 7px;
+      border-radius: 99px;
+      margin-right: 4px;
+      margin-bottom: 4px;
+      white-space: nowrap;
+    }
+    .note-type { background: var(--info-bg); color: var(--info-text); }
+    .warn-type  { background: var(--warning-bg); color: var(--warning-text); }
+    .tag-list   { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+
+    .kbd {
+      font-family: monospace;
+      font-size: 11px;
+      padding: 2px 6px;
+      background: var(--bg-secondary);
+      border: 0.5px solid var(--border-hover);
+      border-radius: 4px;
+    }
+
+    .note {
+      font-size: 12px;
+      color: var(--text-secondary);
+      margin-top: 8px;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <h1>Groove Scribe — functionality reference</h1>
+    <p>Click any section to expand. Pulled directly from the source code.</p>
+  </header>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-player-play" aria-hidden="true"></i>
+      <span class="section-title">Playback</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body open">
+      <div class="feature-grid">
+        <div class="feature"><div class="feature-name">Play / Pause</div><div class="feature-desc">Click the play button to start MIDI playback. Click again to stop.</div></div>
+        <div class="feature"><div class="feature-name">BPM</div><div class="feature-desc">Drag the BPM slider or use ← → arrow keys to adjust tempo. Default is 80.</div></div>
+        <div class="feature"><div class="feature-name">Swing</div><div class="feature-desc">Drag the Swing % slider to add swing feel to the groove.</div></div>
+        <div class="feature"><div class="feature-name">Loop</div><div class="feature-desc">Playback loops continuously through all measures until stopped.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-metronome" aria-hidden="true"></i>
+      <span class="section-title">Metronome</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <table>
+        <tr><th>Option</th><th>What it does</th></tr>
+        <tr><td>OFF</td><td>No click track</td></tr>
+        <tr><td>4th</td><td>Click on every quarter note</td></tr>
+        <tr><td>8th</td><td>Click on every 8th note</td></tr>
+        <tr><td>16th</td><td>Click on every 16th note</td></tr>
+        <tr><td>Solo</td><td>Mutes the groove — plays only the metronome</td></tr>
+        <tr><td>Auto speed up</td><td>Raises tempo by a configurable BPM amount at a configurable interval (minutes)</td></tr>
+        <tr><td>Count it in</td><td>Plays one measure of metronome count before the groove starts</td></tr>
+        <tr><td>Offset click</td><td>Shifts when the click falls — start on 1, E, &, A, or rotate through all. Triplet-aware.</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-clock" aria-hidden="true"></i>
+      <span class="section-title">Time signature & subdivision</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <table style="margin-bottom: 12px;">
+        <tr><th>Control</th><th>Options</th></tr>
+        <tr><td>Time signature (top)</td><td>2 – 15</td></tr>
+        <tr><td>Time signature (bottom)</td><td>4, 8, 16</td></tr>
+      </table>
+      <p class="note" style="margin-bottom: 10px;">Click the TIME button in the sidebar to open the picker.</p>
+      <div class="tag-list">
+        <span class="badge note-type">1/8 notes</span>
+        <span class="badge note-type">1/16 notes</span>
+        <span class="badge note-type">1/32 notes</span>
+        <span class="badge note-type">1/8 triplets</span>
+        <span class="badge note-type">1/16 triplets</span>
+        <span class="badge warn-type">Mixed division</span>
+      </div>
+      <p class="note">Mixed division lets you combine triplet and non-triplet notes within the same measure.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-music" aria-hidden="true"></i>
+      <span class="section-title">Instruments & note types</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <table>
+        <tr><th>Instrument</th><th>Available note types</th></tr>
+        <tr><td>Hi-hat</td><td>Normal · Open · Accent · Crash · Ride · Ride bell · Cow bell · Stacker · Metronome click · Click accent</td></tr>
+        <tr><td>Snare</td><td>Normal · Accent · Ghost · Cross stick · Buzz · Flam</td></tr>
+        <tr><td>Kick</td><td>Normal · Hi-hat foot · Kick + hi-hat foot</td></tr>
+        <tr><td>Toms (1–4)</td><td>Normal (show/hide the tom rows with the Show Toms button)</td></tr>
+        <tr><td>Stickings</td><td>Right · Left · R/L · Count (annotated above each note)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-pointer" aria-hidden="true"></i>
+      <span class="section-title">Note entry & editing</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <table style="margin-bottom: 12px;">
+        <tr><th>Interaction</th><th>What it does</th></tr>
+        <tr><td>Left click a note</td><td>Cycles through available states for that instrument</td></tr>
+        <tr><td>Right click a note</td><td>Context menu to pick any specific note type directly</td></tr>
+        <tr><td>Click instrument label</td><td>Opens a bulk-action menu for that row in that measure</td></tr>
+      </table>
+      <p style="font-size: 12px; font-weight: 500; margin-bottom: 8px; color: var(--text-secondary);">Bulk actions per instrument (via label click):</p>
+      <table>
+        <tr><th>Instrument</th><th>Options</th></tr>
+        <tr><td>Hi-hat</td><td>All off · All on · Downbeats · Upbeats · Mute sound</td></tr>
+        <tr><td>Snare</td><td>All off · All accented · All normal · All ghosts · Mute sound</td></tr>
+        <tr><td>Kick</td><td>All off · All on · HH foot on #'s · HH foot on &'s · Mute sound</td></tr>
+        <tr><td>Toms</td><td>All off · All on · Mute sound</td></tr>
+        <tr><td>Stickings</td><td>All off · Alternate R/L · All R's · All L's · Counts</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-layout-columns" aria-hidden="true"></i>
+      <span class="section-title">Measures</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <div class="feature-grid">
+        <div class="feature"><div class="feature-name">Add measure</div><div class="feature-desc">Adds a new blank measure to the right. Max 10 measures.</div></div>
+        <div class="feature"><div class="feature-name">Remove measure</div><div class="feature-desc">Removes the last measure. Click the × on any measure.</div></div>
+        <div class="feature"><div class="feature-name">Multi-measure looping</div><div class="feature-desc">Playback loops through all measures in sequence.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-arrows-shuffle" aria-hidden="true"></i>
+      <span class="section-title">Permutations</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <p class="note" style="margin-bottom: 10px;">Only available in 4/4 time. Generates variations of the groove across multiple measures automatically.</p>
+      <table>
+        <tr><th>Type</th><th>What it generates</th></tr>
+        <tr><td>None</td><td>Off — standard groove editing</td></tr>
+        <tr><td>Kick permutation</td><td>Cycles kick pattern through 16th-note positions</td></tr>
+        <tr><td>Snare permutation</td><td>Cycles snare pattern through 16th-note positions</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-music-note" aria-hidden="true"></i>
+      <span class="section-title">Grooves library</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <p style="font-size: 13px; color: var(--text-secondary);">Click <strong>Grooves</strong> in the top nav to open a dropdown of preset grooves. Selecting one loads it directly into the editor, replacing the current groove.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-tools" aria-hidden="true"></i>
+      <span class="section-title">Bottom bar actions</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <table>
+        <tr><th>Button</th><th>What it does</th></tr>
+        <tr><td>Clear all</td><td>Wipes all notes across all measures and instruments</td></tr>
+        <tr><td>Show toms</td><td>Toggles the tom drum rows visible/hidden</td></tr>
+        <tr><td>Sticking</td><td>Expands/collapses the stickings row; sub-menu to show/hide or reverse R/L</td></tr>
+        <tr><td>Download</td><td>Sub-menu: SVG image · PNG image · MIDI file</td></tr>
+        <tr><td>Print</td><td>Opens the browser print dialog with a clean sheet music view</td></tr>
+        <tr><td>Share</td><td>Opens the share popup (see Sharing section)</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-share" aria-hidden="true"></i>
+      <span class="section-title">Sharing & export</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <div class="feature-grid">
+        <div class="feature"><div class="feature-name">Full URL</div><div class="feature-desc">The entire groove is encoded in the URL — bookmarkable and shareable at any time.</div></div>
+        <div class="feature"><div class="feature-name">Short URL</div><div class="feature-desc">Checkbox in the share popup to generate a shortened link.</div></div>
+        <div class="feature"><div class="feature-name">Embed code</div><div class="feature-desc">Checkbox to generate an iframe snippet for embedding in a webpage.</div></div>
+        <div class="feature"><div class="feature-name">Copy to clipboard</div><div class="feature-desc">One-click copy of the current URL or embed code.</div></div>
+        <div class="feature"><div class="feature-name">Social sharing</div><div class="feature-desc">Share directly to Facebook, Twitter, Reddit, or email.</div></div>
+        <div class="feature"><div class="feature-name">Download SVG</div><div class="feature-desc">Exports sheet music as a vector SVG file.</div></div>
+        <div class="feature"><div class="feature-name">Download PNG</div><div class="feature-desc">Exports sheet music as a raster PNG image.</div></div>
+        <div class="feature"><div class="feature-name">Download MIDI</div><div class="feature-desc">Exports the groove as a standard MIDI file.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-file-text" aria-hidden="true"></i>
+      <span class="section-title">Sheet music fields</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <table>
+        <tr><th>Field</th><th>Effect</th></tr>
+        <tr><td>Title</td><td>Appears as the title on the rendered sheet music</td></tr>
+        <tr><td>Author</td><td>Appears as the composer/author credit</td></tr>
+        <tr><td>Comment</td><td>Additional annotation on the sheet music</td></tr>
+        <tr><td>Legend (key icon)</td><td>Toggles a note legend showing what each symbol means</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-eye" aria-hidden="true"></i>
+      <span class="section-title">View / edit mode</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <p style="font-size: 13px; color: var(--text-secondary);">"Switch to VIEW mode" hides all editing controls, leaving only the sheet music and player — useful for performance or display. Click "Switch to EDIT mode" to restore. The mode is encoded in the URL.</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-keyboard" aria-hidden="true"></i>
+      <span class="section-title">Keyboard shortcuts</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <table>
+        <tr><th>Shortcut</th><th>Action</th></tr>
+        <tr><td><span class="kbd">Ctrl Z</span></td><td>Undo (up to 40 steps)</td></tr>
+        <tr><td><span class="kbd">Ctrl Y</span></td><td>Redo</td></tr>
+        <tr><td><span class="kbd">←</span></td><td>Decrease tempo by 1 BPM</td></tr>
+        <tr><td><span class="kbd">→</span></td><td>Increase tempo by 1 BPM</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header" onclick="toggle(this)">
+      <i class="ti ti-code" aria-hidden="true"></i>
+      <span class="section-title">URL parameters & advanced modes</span>
+      <i class="ti ti-chevron-down chevron"></i>
+    </div>
+    <div class="section-body">
+      <table>
+        <tr><th>Parameter</th><th>Effect</th></tr>
+        <tr><td><span class="kbd">?Debug=1</span></td><td>Shows raw ABC notation output, undo/redo stacks, and a re-render button</td></tr>
+        <tr><td><span class="kbd">?GDB_Author=1</span></td><td>GrooveDB authoring mode — generates metadata for submitting grooves to the database</td></tr>
+        <tr><td><span class="kbd">?Div=16</span></td><td>Sets the starting subdivision (8, 16, 32, 12, 24, 48)</td></tr>
+        <tr><td>All note data</td><td>Hi-hat, snare, kick, toms, stickings, tempo, swing, time sig — all encoded in the URL</td></tr>
+      </table>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function toggle(header) {
+    var body = header.nextElementSibling;
+    var chevron = header.querySelector('.chevron');
+    var isOpen = body.classList.contains('open');
+    body.classList.toggle('open', !isOpen);
+    chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+  }
+  document.querySelectorAll('.section-header').forEach(function(h) {
+    var chevron = h.querySelector('.chevron');
+    if (h.nextElementSibling.classList.contains('open')) {
+      chevron.style.transform = 'rotate(180deg)';
+    }
+  });
+</script>
+</body>
+</html>

@@ -13,63 +13,37 @@
   --r:8px;--rs:6px;
 }
 html,body{height:100%;overflow:hidden}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-weight:600;color:var(--sec);background:var(--bg)}
-.app{display:flex;height:100vh;overflow:hidden}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-weight:500;color:var(--sec);background:var(--bg)}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-/* ─── SIDEBAR ─── */
-.sb{width:268px;min-width:268px;background:var(--bg-sb);border-right:1px solid var(--brd);display:flex;flex-direction:column;overflow-y:auto;padding:24px 20px 20px;gap:0;transition:width .25s ease,min-width .25s ease,padding .25s ease}
-.sb.collapsed{width:0;min-width:0;padding:0;overflow:hidden;border-right:none}
-.sb-hdr{margin-bottom:22px;display:flex;align-items:center;justify-content:space-between}
-.logo{font-size:17px;font-weight:700;color:var(--pri);letter-spacing:-.03em}
-.sb-collapse{width:28px;height:28px;border:none;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:var(--rs);color:var(--mut);transition:background .12s,color .12s;flex-shrink:0}
-.sb-collapse:hover{background:var(--bg-c);color:var(--pri)}
-.sb-collapse svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.sb-expand{position:fixed;top:12px;left:12px;width:36px;height:36px;border:1px solid var(--brd);background:#fff;cursor:pointer;display:none;align-items:center;justify-content:center;border-radius:var(--r);color:var(--mut);z-index:60;box-shadow:0 2px 8px rgba(0,0,0,.06);transition:background .12s}
-.sb-expand:hover{background:var(--bg-c);color:var(--pri)}
-.sb-expand svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.sb.collapsed~.sb-expand-wrap .sb-expand{display:flex}
-.sb-s{padding:16px 0;border-top:1px solid var(--brd-lt)}
-.sb-s:first-of-type{border-top:none;padding-top:0}
-.s-tog{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;cursor:pointer;padding:0;font-family:inherit;margin-bottom:10px}
-.s-tog .s-lbl{margin-bottom:0}
-.s-lbl{font-size:13px;color:var(--sec);margin-bottom:10px;font-weight:600;letter-spacing:0}
-.s-chev{width:8px;height:8px;fill:var(--fnt);transition:transform .2s;flex-shrink:0}
-.s-tog.shut .s-chev{transform:rotate(-90deg)}
-.s-bod.shut{display:none}
+/* ─── TOP BAR ─── */
+.topbar{position:relative;display:flex;align-items:center;height:56px;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--brd);flex-shrink:0;z-index:40}
+.topbar .logo{font-size:17px;font-weight:500;color:var(--pri);letter-spacing:-.03em}
+.tb-actions{margin-left:auto;display:flex;align-items:center;gap:2px}
+.topbtn{width:36px;height:36px;border:none;background:transparent;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sec);transition:background .12s,color .12s}
+.topbtn:hover,.topbtn.on{background:var(--bg-c);color:var(--pri)}
+.topbtn .ph{font-size:19px;line-height:1}
+/* top-bar popovers open downward, right-aligned.
+   .pop.pop-tr (not .pop-tr): must outrank the later .pop base rule, whose
+   bottom:calc(100%+12px) would otherwise combine with our top and collapse
+   the box to a squashed pill with the content spilling out. */
+.pop.pop-tr{top:calc(100% + 8px);bottom:auto;left:auto;right:0;transform:none}
+.pop-more{min-width:220px}
+.lib-scroll{max-height:320px;overflow-y:auto;margin:0 -8px}
 
 /* inputs */
-.meta-in{width:100%;padding:6px 0;border:none;border-bottom:1px solid var(--brd-lt);font-family:inherit;font-weight:600;font-size:12px;color:var(--pri);background:transparent;outline:none;margin-bottom:8px}
+.meta-in{width:100%;padding:6px 0;border:none;border-bottom:1px solid var(--brd-lt);font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);background:transparent;outline:none;margin-bottom:8px}
 .meta-in:focus{border-color:var(--sec)}
 .meta-in::placeholder{color:var(--fnt)}
 .meta-in:last-child{margin-bottom:0}
 
-/* swing */
-.ctrl-row{display:flex;align-items:center;gap:8px;margin-top:8px}
-.ctrl-row:first-child{margin-top:0}
-.ctrl-lbl{font-size:10px;color:var(--mut);width:38px;flex-shrink:0}
-.ctrl-trk{flex:1}
+/* swing slider */
 .rng{-webkit-appearance:none;appearance:none;width:100%;height:3px;background:var(--brd);border-radius:2px;outline:none;cursor:pointer}
 .rng::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--sec);cursor:pointer;border:2.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
-.ctrl-val{font-size:10px;color:var(--mut);width:28px;text-align:right;flex-shrink:0}
 
 /* select */
-.sel{width:100%;height:32px;padding:0 8px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") right 8px center/10px no-repeat;font-family:inherit;font-weight:600;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px}
-.sel-row{display:flex;align-items:center;gap:8px;margin-top:6px}
-.sel-row:first-child{margin-top:0}
-.sel-lbl{font-size:10px;color:var(--mut);width:50px;flex-shrink:0}
-.sel-row .sel{flex:1}
-
-/* radio group */
-.rg{display:flex;border:1px solid var(--brd);border-radius:var(--rs);overflow:hidden}
-.rg-b{flex:1;padding:6px 0;border:none;border-right:1px solid var(--brd);background:#fff;font-family:inherit;font-weight:600;font-size:10px;color:var(--mut);cursor:pointer;transition:all .12s;text-align:center}
-.rg-b:last-child{border-right:none}
-.rg-b.on{background:var(--bg-c);color:var(--pri)}
-.rg-b:hover:not(.on){background:var(--brd-lt)}
-
+.sel{width:100%;height:32px;padding:0 8px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") right 8px center/10px no-repeat;font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px}
 /* toggle */
-.tog-row{display:flex;align-items:center;justify-content:space-between}
-.tog-row+.tog-row{margin-top:8px}
-.tog-row span{font-size:11px;color:var(--sec)}
 .tog{position:relative;width:34px;height:18px;flex-shrink:0}
 .tog input{opacity:0;width:0;height:0;position:absolute}
 .tog-s{position:absolute;inset:0;background:var(--brd);border-radius:9px;cursor:pointer;transition:background .2s}
@@ -77,33 +51,21 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .tog input:checked+.tog-s{background:var(--sec)}
 .tog input:checked+.tog-s::after{left:18px}
 
-/* action btns */
-.act{width:100%;padding:8px;background:transparent;border:1px solid var(--brd);border-radius:var(--rs);cursor:pointer;font-family:inherit;font-weight:600;font-size:11px;color:var(--mut);transition:all .12s}
-.act:hover{border-color:#ccc;color:var(--sec);background:var(--bg-c)}
-.act+.act{margin-top:5px}
-
 /* library */
-.lib-item{display:block;width:100%;text-align:left;padding:5px 8px;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .1s}
+.lib-item{display:block;width:100%;text-align:left;padding:5px 8px;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .1s}
 .lib-item:hover{background:var(--bg-c)}
-.lib-grp-lbl{font-size:11px;color:var(--mut);margin:10px 0 4px;font-weight:600}
+.lib-grp-lbl{font-size:11px;color:var(--mut);margin:10px 0 4px;padding:0 8px;font-weight:500}
 .lib-grp-lbl:first-child{margin-top:0}
 
-/* footer */
-.sb-ft{margin-top:auto;padding-top:16px;font-size:9px;color:var(--fnt);display:flex;align-items:center;gap:5px;flex-wrap:wrap}
-.kbd{display:inline-block;padding:1px 5px;background:var(--brd-lt);border:1px solid var(--brd);border-radius:3px;font-size:9px;font-weight:600;color:var(--mut);line-height:1.5}
 
 /* ─── BOTTOM TOOLBAR ─── */
 .toolbar{
   position:fixed;bottom:54px;
-  left:calc(268px + (100vw - 268px)/2);
-  transform:translateX(-50%);
-  display:flex;align-items:center;gap:2px;
+  left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:12px;
   background:#fff;border:1px solid var(--brd);border-radius:12px;
-  padding:4px;box-shadow:0 2px 16px rgba(0,0,0,.07);z-index:50;
-  transition:left .25s ease;
+  padding:12px;z-index:50;
 }
-.sb.collapsed~.main~.toolbar,.sb.collapsed~.sb-expand-wrap~.main~.toolbar{left:50%}
-.tb-sep{width:1px;height:22px;background:var(--brd);margin:0 2px;flex-shrink:0}
 .tb-btn{
   height:36px;min-width:36px;border:none;background:transparent;border-radius:var(--r);
   cursor:pointer;display:flex;align-items:center;justify-content:center;
@@ -111,36 +73,26 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 }
 .tb-btn:hover{background:var(--bg-c);color:var(--pri)}
 .tb-btn:active{transform:scale(.95)}
-.tb-btn svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.tb-btn .ph{font-size:24px;line-height:1;flex-shrink:0}
 .tb-btn.tb-play{background:var(--pri);color:#fff;width:40px}
 .tb-btn.tb-play:hover{background:#444}
 .tb-btn.tb-play.on{background:var(--sec)}
-.tb-btn.tb-play svg{fill:currentColor;stroke:none}
 
-/* bpm in toolbar */
-.tb-bpm{display:flex;align-items:center;height:36px;border:1px solid var(--brd);border-radius:var(--rs);overflow:hidden;background:#fff}
-.tb-bpm .tb-b{width:28px;height:36px;border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--mut);font-family:inherit;font-weight:600;display:flex;align-items:center;justify-content:center;transition:background .12s}
-.tb-bpm .tb-b:hover{background:var(--bg-c);color:var(--pri)}
-.tb-bpm-v{width:36px;text-align:center;font-size:13px;font-weight:700;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
-.tb-bpm-v::-webkit-inner-spin-button,.tb-bpm-v::-webkit-outer-spin-button{-webkit-appearance:none}
-.tb-bpm-lbl{font-size:8px;color:var(--fnt);margin-right:4px;font-weight:600;letter-spacing:.04em}
 
-/* time sig in toolbar */
-.tb-ts{height:36px;padding:0 6px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23ccc'/%3E%3C/svg%3E") right 6px center/8px no-repeat;font-family:inherit;font-weight:700;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:20px;min-width:56px}
 
 /* toolbar popover controls */
 .tb-ctrl{position:relative;display:flex;align-items:center}
-.tb-txt{height:36px;padding:0 10px;border:none;background:transparent;border-radius:8px;font-family:inherit;font-weight:600;font-size:12px;color:var(--sec);cursor:pointer;display:flex;align-items:center;transition:background .12s}
-.tb-txt b{color:var(--pri);font-weight:700}
+.tb-txt{height:36px;padding:0 10px;border:none;background:transparent;border-radius:8px;font-family:inherit;font-weight:500;font-size:12px;color:var(--sec);cursor:pointer;display:flex;align-items:center;transition:background .12s}
+.tb-txt b{color:var(--pri);font-weight:500}
 .tb-txt:hover,.tb-txt.on{background:var(--bg-c)}
 .tb-btn.lit{color:var(--pri);background:var(--bg-c)}
 .pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);min-width:190px;background:#fff;border:1px solid var(--brd);border-radius:12px;box-shadow:0 10px 34px rgba(0,0,0,.14);padding:14px;display:none;z-index:60}
 .pop.open{display:block}
-.pop-cap{display:block;font-size:10px;font-weight:600;color:var(--mut);margin-bottom:8px}
+.pop-cap{display:block;font-size:10px;font-weight:500;color:var(--mut);margin-bottom:8px}
 .pop-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px}
 .pop-step{width:30px;height:30px;border:1px solid var(--brd);border-radius:6px;background:#fff;font-size:15px;color:var(--sec);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
 .pop-step:hover{background:var(--bg-c);color:var(--pri)}
-.pop-bpm-v{width:52px;text-align:center;font-size:17px;font-weight:700;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
+.pop-bpm-v{width:52px;text-align:center;font-size:17px;font-weight:500;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
 .pop-bpm-v::-webkit-inner-spin-button,.pop-bpm-v::-webkit-outer-spin-button{-webkit-appearance:none}
 .pop-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin-bottom:6px}
 .pop-lbl.off{opacity:.38}
@@ -154,36 +106,61 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .pop-row-between .pop-cap{margin-bottom:0}
 .seg{display:flex;gap:3px;padding:3px;background:var(--bg-c);border-radius:8px;margin-bottom:6px}
 .seg:last-child{margin-bottom:0}
-.seg-b{flex:1;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .1s}
+.seg-b{flex:1;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .1s}
 .seg-b:hover:not(.on){background:rgba(0,0,0,.05)}
 .seg-b.on{background:var(--pri);color:#fff}
+/* stacked popover action list */
+.pop-acts{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.pop-act{width:100%;text-align:left;padding:6px 8px;border:none;background:transparent;border-radius:6px;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;transition:background .1s}
+.pop-act:hover{background:var(--bg-c);color:var(--pri)}
+.pop-div{height:1px;background:var(--brd-lt);margin:10px 0 2px}
+
+/* ─── VIEW / EDIT MODE SWITCH (floating, top-center) ─── */
+.mode-switch{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:3px;background:var(--bg-sb);border:1px solid var(--brd);border-radius:10px;padding:3px;z-index:1}
+.mode-b{border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .12s}
+.mode-b:hover:not(.on){background:var(--bg-c);color:var(--pri)}
+.mode-b.on{background:var(--pri);color:#fff}
+body.view-mode .grid-outer{display:none}
+
+/* ─── MEASURE CONTROLS (per-measure ✕ + ghost ＋) ─── */
+.grid-outer{display:inline-flex;align-items:center;gap:12px;max-width:100%;margin-top:auto} /* pinned low: .main's 140px bottom padding leaves ~40px above the toolbar */
+/* per-measure wrapper in the label row, so the ✕ can pin to its top-right */
+.g-lbl-m{display:flex;gap:12px;position:relative}
+.g-meas-x{position:absolute;top:-16px;left:-25px;width:18px;height:18px;border:none;background:transparent;color:var(--fnt);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all .1s;z-index:3}
+.g-meas-x:hover{background:var(--bg-c);color:var(--pri)}
+.g-meas-x .ph{font-size:13px}
+/* ghost add button, vertically centered to the right of the last measure */
+.g-meas-add{width:32px;height:32px;flex-shrink:0;border:1px dashed var(--brd);border-radius:8px;background:transparent;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.g-meas-add:hover{border-color:#bbb;color:var(--pri);background:var(--bg-c)}
+.g-meas-add .ph{font-size:16px}
 
 /* ─── MAIN ─── */
-.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 120px;overflow:auto;min-width:0}
+.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 140px;overflow:auto;min-width:0}
 
 /* notation */
-.notation-wrap{position:relative;width:100%;max-width:900px;margin-bottom:16px;overflow-x:auto;overflow-y:hidden}
-.notation-wrap svg{display:block;height:auto;min-width:100%}
+.notation-wrap{position:relative;width:100%;max-width:1200px;margin-bottom:16px;overflow-x:auto;overflow-y:hidden}
+/* abc2svg emits one <svg> per staff line — stack them (side by side puts a clef mid-line) */
+.notation-wrap svg{display:block;margin:0 auto;height:auto;max-width:100%}
 #notArea .abcr.highlighted{fill:rgba(45,140,90,.22)!important;transition:fill .04s}
 
 /* grid */
-.grid-wrap{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;overflow-x:auto;padding-bottom:4px}
+.grid-wrap{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;overflow-x:auto;padding:18px 20px 4px 0}
 .g-labels{display:flex;align-items:flex-end;margin-bottom:4px}
 .g-spacer{width:44px;flex-shrink:0}
 .g-lbl-c{display:flex;gap:12px}
 .g-lbl-g{display:flex;gap:3px}
-.g-lbl-g span{width:36px;text-align:center;font-size:9px;font-weight:600;line-height:1}
-.g-bn{color:var(--mut)!important;font-size:10px!important;font-weight:700!important}
+.g-lbl-g span{width:36px;text-align:center;font-size:9px;font-weight:500;line-height:1}
+.g-bn{color:var(--mut)!important;font-size:10px!important;font-weight:500!important}
 .g-sd{color:var(--fnt)!important}
 
 .g-row{display:flex;align-items:center}
-.g-row-lbl{width:44px;flex-shrink:0;font-size:10px;font-weight:600;color:var(--mut);text-align:right;padding-right:10px;letter-spacing:.02em;cursor:pointer;position:relative}
+.g-row-lbl{width:44px;flex-shrink:0;font-size:10px;font-weight:500;color:var(--mut);text-align:right;padding-right:10px;letter-spacing:.02em;cursor:pointer;position:relative}
 .g-row-lbl:hover{color:var(--sec)}
 .g-cells{display:flex;gap:12px}
 .g-beat{display:flex;gap:3px}
 .g-mbar{width:2px;background:var(--brd);align-self:stretch;margin:0 3px;border-radius:1px;flex-shrink:0}
 
-.cell{width:36px;height:34px;border-radius:5px;cursor:pointer;background:var(--bg-c);transition:background .08s,transform .08s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;user-select:none;-webkit-user-select:none;flex-shrink:0}
+.cell{width:36px;height:34px;border-radius:5px;cursor:pointer;background:var(--bg-c);transition:background .08s,transform .08s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;user-select:none;-webkit-user-select:none;flex-shrink:0}
 .cell:hover{background:var(--bg-ch)}
 .cell.on{background:#888}
 .cell.on:hover{background:#7a7a7a}
@@ -201,26 +178,17 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 
 /* context / row menus */
 .ctx{position:fixed;background:#fff;border:1px solid var(--brd);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.1);padding:4px;z-index:500;min-width:120px;display:none}
-.ctx-i{display:block;width:100%;text-align:left;padding:6px 10px;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .08s}
+.ctx-i{display:block;width:100%;text-align:left;padding:6px 10px;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .08s}
 .ctx-i:hover{background:var(--bg-c)}
 .ctx-i.on{color:var(--pri);background:var(--bg-c)}
 .row-menu{position:fixed;background:#fff;border:1px solid var(--brd);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.1);padding:4px;z-index:500;min-width:130px;display:none;white-space:nowrap}
 .row-menu.open{display:block}
 
 /* mobile */
-.mob-hdr{display:none;position:fixed;top:0;left:0;right:0;height:50px;background:var(--bg-sb);border-bottom:1px solid var(--brd);z-index:100;padding:0 14px;align-items:center;justify-content:space-between}
-.mob-hdr .logo{font-size:15px}
-.ham{width:36px;height:36px;border:none;background:transparent;cursor:pointer;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:3px;border-radius:var(--rs)}
-.ham:hover{background:var(--bg-c)}
-.ham span{display:block;width:16px;height:1.5px;background:var(--pri);border-radius:1px}
-.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.18);z-index:199}
-.ov.show{display:block}
 
 @media(max-width:900px){
-  .mob-hdr{display:flex}
-  .sb{position:fixed;top:0;left:-274px;height:100%;z-index:200;transition:left .25s ease;box-shadow:4px 0 24px rgba(0,0,0,.06)}
-  .sb.open{left:0}
-  .main{padding:56px 16px 62px;overflow:auto;justify-content:flex-start;align-items:flex-start}
+  .topbar{padding:0 12px}
+  .main{padding:20px 14px 100px;overflow:auto;justify-content:flex-start;align-items:flex-start}
   .notation-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .grid-wrap{overflow-x:auto;width:100%;padding-bottom:8px;-webkit-overflow-scrolling:touch}
   .toolbar{
@@ -234,93 +202,65 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 }
 
 @media print{
-  .sb,.mob-hdr,.ov,.sb-ft,.grid-wrap,.toolbar{display:none!important}
+  .topbar,.grid-outer,.toolbar{display:none!important}
   .app{display:block}
   .main{padding:20px;justify-content:flex-start;height:auto;overflow:visible}
   .notation-wrap{max-width:100%;overflow:visible}
   .notation-wrap svg{width:100%!important}
 }
 </style>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
 </head>
 <body>
 
-<div class="mob-hdr">
-  <span class="logo">Groove Scribe</span>
-  <button class="ham" id="menuBtn" aria-label="Menu"><span></span><span></span><span></span></button>
-</div>
-<div class="ov" id="ov"></div>
 <div class="ctx" id="ctx"></div>
 
 <div class="app">
-<aside class="sb" id="sb">
-  <div class="sb-hdr">
-    <span class="logo">Ritmo</span>
-    <button class="sb-collapse" id="sbCollapse" title="Collapse sidebar">
-      <svg viewBox="0 0 20 20"><path d="M12 4l-6 6 6 6"/></svg>
-    </button>
+<header class="topbar" id="topbar">
+  <span class="logo">Ritmo</span>
+  <!-- View / Edit switch, centered -->
+  <div class="mode-switch" id="modeSwitch">
+    <button class="mode-b on" type="button" data-mode="edit">Edit</button>
+    <button class="mode-b" type="button" data-mode="view">View</button>
   </div>
-
-  <!-- DETAILS -->
-  <div class="sb-s">
-    <button class="s-tog shut" data-sec="details"><span class="s-lbl">Details</span><svg class="s-chev" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg></button>
-    <div class="s-bod shut" id="sec-details">
-      <input type="text" class="meta-in" id="titleIn" placeholder="Title">
-      <input type="text" class="meta-in" id="authorIn" placeholder="Author">
+  <div class="tb-actions">
+    <!-- Details -->
+    <div class="tb-ctrl">
+      <button class="topbtn" data-pop="details" id="detailsBtn" title="Score details"><i class="ph ph-info"></i></button>
+      <div class="pop pop-tr" id="pop-details">
+        <span class="pop-cap">Score details</span>
+        <input type="text" class="meta-in" id="titleIn" placeholder="Title">
+        <input type="text" class="meta-in" id="authorIn" placeholder="Author">
+      </div>
     </div>
-  </div>
-
-  <!-- SCORE (tempo, time sig, subdivision, metronome now live in the toolbar) -->
-  <div class="sb-s">
-    <button class="s-tog shut" data-sec="score"><span class="s-lbl">Score</span><svg class="s-chev" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg></button>
-    <div class="s-bod shut" id="sec-score">
-      <div class="sel-row">
-        <span class="sel-lbl">Measures</span>
-        <select class="sel" id="measSel">
-          <option value="1" selected>1</option><option value="2">2</option>
-          <option value="3">3</option><option value="4">4</option>
-        </select>
+    <!-- Export -->
+    <div class="tb-ctrl">
+      <button class="topbtn" data-pop="export" id="exportBtn" title="Export"><i class="ph ph-export"></i></button>
+      <div class="pop pop-tr" id="pop-export">
+        <div class="pop-acts">
+          <button class="pop-act" type="button" id="shareBtn">Copy link</button>
+          <button class="pop-act" type="button" id="printBtn">Print</button>
+          <button class="pop-act" type="button" id="dlBtn">Download SVG</button>
+          <button class="pop-act" type="button" id="midiBtn">Export MIDI</button>
+        </div>
+      </div>
+    </div>
+    <!-- More (holds the groove library + shortcuts) -->
+    <div class="tb-ctrl">
+      <button class="topbtn" data-pop="more" id="moreBtn" title="More"><i class="ph ph-dots-three-outline"></i></button>
+      <div class="pop pop-tr pop-more" id="pop-more">
+        <span class="pop-cap">Groove library</span>
+        <div class="lib-scroll" id="sec-library"></div>
       </div>
     </div>
   </div>
-
-  <!-- VOICES -->
-  <div class="sb-s">
-    <button class="s-tog shut" data-sec="voices"><span class="s-lbl">Voices</span><svg class="s-chev" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg></button>
-    <div class="s-bod shut" id="sec-voices">
-      <div class="tog-row"><span>Stickings</span><label class="tog"><input type="checkbox" id="stickTog"><span class="tog-s"></span></label></div>
-      <div class="tog-row"><span>Toms</span><label class="tog"><input type="checkbox" id="tomsTog" checked><span class="tog-s"></span></label></div>
-    </div>
-  </div>
-
-  <!-- EXPORT -->
-  <div class="sb-s">
-    <button class="s-tog shut" data-sec="export"><span class="s-lbl">Export</span><svg class="s-chev" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg></button>
-    <div class="s-bod shut" id="sec-export">
-      <button class="act" id="shareBtn">Copy Link</button>
-      <button class="act" id="printBtn">Print</button>
-      <button class="act" id="dlBtn">Download SVG</button>
-      <button class="act" id="midiBtn">Export MIDI</button>
-    </div>
-  </div>
-
-  <!-- LIBRARY -->
-  <div class="sb-s">
-    <button class="s-tog shut" data-sec="library"><span class="s-lbl">Groove Library</span><svg class="s-chev" viewBox="0 0 10 6"><path d="M0 0l5 6 5-6z"/></svg></button>
-    <div class="s-bod shut" id="sec-library"></div>
-  </div>
-
-  <div class="sb-ft">
-    <span class="kbd">Space</span> play&nbsp;&nbsp;<span class="kbd">⌘Z</span> undo&nbsp;&nbsp;<span class="kbd">⌘Y</span> redo
-  </div>
-</aside>
-<div class="sb-expand-wrap">
-  <button class="sb-expand" id="sbExpand" title="Open sidebar">
-    <svg viewBox="0 0 20 20"><path d="M8 4l6 6-6 6"/></svg>
-  </button>
-</div>
+</header>
 <main class="main">
   <div class="notation-wrap" id="notWrap"><div id="notArea"></div></div>
-  <div class="grid-wrap" id="gridWrap"></div>
+  <div class="grid-outer" id="gridOuter">
+    <div class="grid-wrap" id="gridWrap"></div>
+    <button class="g-meas-add" id="addMeasBtn" type="button" title="Add measure"><i class="ph ph-plus"></i></button>
+  </div>
 </main>
 </div>
 
@@ -328,9 +268,8 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 <div class="toolbar" id="toolbar">
   <!-- Play -->
   <button class="tb-btn tb-play" id="playBtn" title="Play / Pause">
-    <svg viewBox="0 0 20 20" id="playIco"><polygon points="5,2 17,10 5,18"/></svg>
+    <i class="ph-fill ph-play" id="playIco"></i>
   </button>
-  <div class="tb-sep"></div>
   <!-- BPM + Swing -->
   <div class="tb-ctrl">
     <button class="tb-txt" data-pop="bpm" title="Tempo & Swing"><b id="bpmDisp">80</b>&nbsp;BPM</button>
@@ -344,7 +283,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
       <input type="range" class="rng" id="swingR" min="0" max="100" value="0">
     </div>
   </div>
-  <div class="tb-sep"></div>
   <!-- Time signature -->
   <div class="tb-ctrl">
     <button class="tb-txt" data-pop="ts" title="Time Signature"><b id="tsDisp">4/4</b></button>
@@ -358,7 +296,6 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
       </div>
     </div>
   </div>
-  <div class="tb-sep"></div>
   <!-- Subdivision -->
   <div class="tb-ctrl">
     <button class="tb-txt" data-pop="subdiv" title="Subdivision"><b id="subdivDisp">1/16</b></button>
@@ -378,7 +315,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
   <!-- Metronome -->
   <div class="tb-ctrl">
     <button class="tb-btn" data-pop="met" id="metBtn" title="Metronome">
-      <svg viewBox="0 0 20 20"><path d="M6.5 17h7l-2-13h-3z"/><path d="M4.5 17h11"/><path d="M10 14l4.5-4"/></svg>
+      <i class="ph ph-metronome"></i>
     </button>
     <div class="pop" id="pop-met">
       <div class="pop-row-between"><span class="pop-cap">Metronome</span>
@@ -390,24 +327,33 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
       </div>
     </div>
   </div>
-  <div class="tb-sep"></div>
-  <!-- Undo -->
-  <button class="tb-btn" id="undoBtn" title="Undo">
-    <svg viewBox="0 0 20 20"><path d="M8 4L3 9l5 5"/><path d="M3 9h10a4 4 0 010 8H9"/></svg>
-  </button>
-  <!-- Redo -->
-  <button class="tb-btn" id="redoBtn" title="Redo">
-    <svg viewBox="0 0 20 20"><path d="M12 4l5 5-5 5"/><path d="M17 9H7a4 4 0 000 8h4"/></svg>
-  </button>
-  <div class="tb-sep"></div>
+  <!-- Stickings -->
+  <div class="tb-ctrl">
+    <button class="tb-btn" data-pop="stick" id="stickBtn" title="Stickings">
+      <i class="ph ph-hand-tap"></i>
+    </button>
+    <div class="pop" id="pop-stick">
+      <div class="pop-row-between"><span class="pop-cap">Stickings</span>
+        <label class="tog"><input type="checkbox" id="stickTog"><span class="tog-s"></span></label></div>
+      <div class="pop-acts">
+        <button class="pop-act" type="button" data-sk="alt">Alternate R / L</button>
+        <button class="pop-act" type="button" data-sk="R">All R</button>
+        <button class="pop-act" type="button" data-sk="L">All L</button>
+        <button class="pop-act" type="button" data-sk="rev">Reverse R ↔ L</button>
+        <div class="pop-div"></div>
+        <button class="pop-act" type="button" data-sk="off">Clear</button>
+      </div>
+    </div>
+  </div>
+  <!-- Toms (direct show/hide toggle) -->
+  <button class="tb-btn lit" id="tomsBtn" title="Show / hide toms"><i class="ph ph-circles-three"></i></button>
   <!-- Clear -->
   <button class="tb-btn" id="clearBtn" title="Clear All">
-    <svg viewBox="0 0 20 20"><path d="M6 6h8M8 6V4.5a.5.5 0 01.5-.5h3a.5.5 0 01.5.5V6M7 6v9.5a1 1 0 001 1h4a1 1 0 001-1V6"/></svg>
+    <i class="ph ph-trash"></i>
   </button>
-  <div class="tb-sep"></div>
   <!-- Copy PNG -->
   <button class="tb-btn" id="copyPngBtn" title="Copy as PNG">
-    <svg viewBox="0 0 20 20"><path d="M6 4h5l3 3v7a1 1 0 01-1 1H6a1 1 0 01-1-1V5a1 1 0 011-1z"/><path d="M11 4v3h3"/><path d="M8 16h6a1 1 0 001-1V8" stroke-dasharray="2 1.5"/></svg>
+    <i class="ph ph-image"></i>
   </button>
 </div>
 
@@ -456,9 +402,21 @@ function stateToGrooveUrl(){
   u+='&H='+encVoice(p.hihat,H_MAP)+'&S='+encVoice(p.snare,S_MAP)+'&K='+encVoice(p.kick,K_MAP);
   if(S.showToms) u+='&T1='+encVoice(p.tom1,T_MAP)+'&T4='+encVoice(p.tom2,T_MAP);
   if(S.showStick) u+='&Stickings='+encVoice(p.sticking,STK_MAP);
+  // Score details -> engine renders Title (T:) and Author (C:) onto the sheet
+  const title=(document.getElementById('titleIn').value||'').trim();
+  const author=(document.getElementById('authorIn').value||'').trim();
+  if(title) u+='&Title='+encodeURIComponent(title);
+  if(author) u+='&Author='+encodeURIComponent(author);
   return u;
 }
-function notationWidth(){const w=(document.getElementById('notWrap')||{}).clientWidth||820;return Math.max(500,Math.min(1100,w));}
+// Size the page for ONE staff line: joinMeasureLines puts up to measuresPerLine()
+// measures per line, so the widest line has min(measures, mpl) measures. The
+// engine sets %%pagewidth = renderWidth*0.75; ~13px/note keeps spacing readable.
+function notationWidth(){
+  const measuresOnLine=Math.min(S.measures,measuresPerLine());
+  const pageW=40+measuresOnLine*spm()*13;
+  return Math.max(400,Math.min(3000,pageW/0.75));
+}
 // Tone.js subdivision per GrooveScribe division (straight + triplet)
 const TONE_SUB={8:'8n',16:'16n',32:'32n',12:'8t',24:'16t',48:'32t'};
 function spm(){return GU.calc_notes_per_measure(S.div,S.tsNum,S.tsDen)}  // steps per measure (engine-accurate, incl. triplets)
@@ -496,6 +454,31 @@ function resizePattern(){
     if(arr.length<n){const first=arr.slice(0,s);while(S.pattern[inst.id].length<n){const idx=S.pattern[inst.id].length%s;S.pattern[inst.id].push(first[idx]||0)}}
     else if(arr.length>n) S.pattern[inst.id]=arr.slice(0,n);
   });
+}
+// Point-and-click measure editing (no upper limit)
+function addMeasure(){
+  pushUndo();
+  const s=spm(),lastStart=(S.measures-1)*s;
+  INSTS.forEach(inst=>{const arr=S.pattern[inst.id],seg=arr.slice(lastStart,lastStart+s);for(let i=0;i<s;i++)arr.push(seg[i]||0)});
+  S.measures++;syncAll();
+}
+function removeMeasure(m){
+  if(S.measures<=1) return;
+  pushUndo();
+  const s=spm();
+  INSTS.forEach(inst=>{S.pattern[inst.id].splice(m*s,s)});
+  S.measures--;syncAll();
+}
+// Sticking presets (Alternate / All R / All L / Reverse / Clear). Any op auto-enables stickings.
+function applySticking(op){
+  pushUndo();
+  const n=numSteps(),arr=S.pattern.sticking;
+  if(op==='rev'){for(let i=0;i<n;i++){if(arr[i]==='R')arr[i]='L';else if(arr[i]==='L')arr[i]='R';}}
+  else if(op==='off'){for(let i=0;i<n;i++)arr[i]=0;}
+  else if(op==='alt'){for(let i=0;i<n;i++)arr[i]=i%2===0?'R':'L';}
+  else{for(let i=0;i<n;i++)arr[i]=op;} // 'R' or 'L'
+  if(op!=='off'){S.showStick=true;const t=document.getElementById('stickTog');if(t)t.checked=true;}
+  syncAll();
 }
 
 const LIB={
@@ -597,193 +580,44 @@ async function togglePlay(){
 
 function renderPlayBtn(){
   const b=document.getElementById('playBtn'),i=document.getElementById('playIco');
-  if(isPlaying){b.classList.add('on');i.innerHTML='<rect x="4" y="3" width="4.5" height="14" rx="1"/><rect x="11.5" y="3" width="4.5" height="14" rx="1"/>'}
-  else{b.classList.remove('on');i.innerHTML='<polygon points="5,2 17,10 5,18"/>'}
+  if(isPlaying){b.classList.add('on');i.className='ph-fill ph-pause'}
+  else{b.classList.remove('on');i.className='ph-fill ph-play'}
 }
 
-/* ═══ NOTATION — single SVG, stacked systems ═══ */
-const N_LG=10,N_LM=52,N_RM=16,BARGAP=14;
-function nStepW(){return S.div===16?38:56}
-const NOTE_Y={hihat:0,tom1:0.5,snare:2,tom2:2.5,kick:3.5};
-const ALL_VOICES=['hihat','tom1','snare','tom2','kick'];
-const MEAS_PER_LINE=2;
-const SYS_H=112,SYS_GAP=20,SYS_STOP=56;
+/* ═══ NOTATION — engine ABC → SVG ═══ */
 
+// createABCFromGrooveData ends EVERY measure with "|\n" — a hard line break, so
+// abc2svg gives each measure its own staff line. The legacy app instead joins
+// measures with an ABC continuation ("\\\n") and only breaks every
+// numberOfMeasuresPerLine (2, or 1 for 32nds+). Mirror that here by rewriting
+// the measure-line endings inside each voice block. (groove_writer.js:2890)
+function measuresPerLine(){return spm()>=32?1:2}
+function joinMeasureLines(abc,mpl){
+  if(mpl<=1) return abc;
+  const lines=abc.split('\n');
+  let k=-1; // music-line index within the current voice block
+  const isMusic=l=>/\|\s*$/.test(l)&&!/^[%A-Za-z]:/.test(l)&&l.charAt(0)!=='%';
+  for(let i=0;i<lines.length;i++){
+    if(/^V:/.test(lines[i])){k=-1;continue}
+    if(!isMusic(lines[i])) continue;
+    k++;
+    // continue this line onto the next unless it ends the group of mpl,
+    // ends the tune (||), or is the block's last music line
+    if(k%mpl===mpl-1) continue;
+    if(/\|\|\s*$/.test(lines[i])) continue;
+    let j=i+1; while(j<lines.length&&!isMusic(lines[j])&&!/^V:/.test(lines[j]))j++;
+    if(j<lines.length&&isMusic(lines[j])) lines[i]=lines[i].replace(/\s*$/,'')+'\\';
+  }
+  return lines.join('\n');
+}
 function renderNotation(){
   try{
-    const abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
+    let abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
+    abc=joinMeasureLines(abc,measuresPerLine());
     document.getElementById('notArea').innerHTML=GU.renderABCtoSVG(abc).svg;
   }catch(e){document.getElementById('notArea').innerHTML='<div style="color:#b00;padding:8px;font-size:12px">notation error: '+(e&&e.message||e)+'</div>';}
-  return;
-  /* ---- legacy hand-rolled renderer below (kept, unused) ---- */
-  const ns=numSteps(),sw=nStepW(),beats=S.tsNum,s2=spb();
-  const sPerM=spm();
-  const mpl=Math.min(S.measures,MEAS_PER_LINE);
-  const numLines=Math.ceil(S.measures/mpl);
-  const maxLineW=N_LM+mpl*sPerM*sw+(mpl-1)*BARGAP+N_RM;
-  const totalH=numLines*SYS_H+(numLines-1)*SYS_GAP;
-  const beamRel=32;
-
-  // pre-compute durations globally
-  const totalBeats=beats*S.measures;
-  const dur=new Array(ns).fill(0);
-  for(let b=0;b<totalBeats;b++){
-    const bs=b*s2,be=Math.min(bs+s2,ns);
-    const has=[];
-    for(let i=bs;i<be;i++){
-      let h2=false;
-      ALL_VOICES.forEach(k=>{if(!S.showToms&&(k==='tom1'||k==='tom2'))return;if(S.pattern[k][i])h2=true});
-      has.push(h2);
-    }
-    for(let i=0;i<has.length;i++){
-      if(!has[i]) continue;
-      let d=0;
-      for(let j=i+1;j<has.length;j++){if(has[j]){d=j-i;break}}
-      if(!d) d=has.length-i;
-      dur[bs+i]=d;
-    }
-  }
-
-  let s=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${maxLineW} ${totalH}" style="display:block;width:100%;height:auto">`;
-
-  for(let line=0;line<numLines;line++){
-    const yOff=line*(SYS_H+SYS_GAP);
-    const stTop=yOff+SYS_STOP;
-    const beamY=yOff+beamRel;
-    const sl=[0,1,2,3,4].map(i=>stTop+i*N_LG);
-    const posY=k=>stTop+NOTE_Y[k]*N_LG;
-
-    const startM=line*mpl,endM=Math.min(startM+mpl,S.measures);
-    const mil=endM-startM;
-    const startStep=startM*sPerM,endStep=startStep+mil*sPerM;
-    const lineW=N_LM+mil*sPerM*sw+(mil-1)*BARGAP+N_RM;
-
-    function lx(gi){
-      const li=gi-startStep,lm=Math.floor(li/sPerM);
-      return N_LM+li*sw+lm*BARGAP+sw/2;
-    }
-
-    // staff
-    sl.forEach(y=>{s+=`<line x1="${N_LM-4}" y1="${y}" x2="${lineW-N_RM}" y2="${y}" stroke="#DDD" stroke-width=".8"/>`});
-
-    // clef
-    s+=`<rect x="12" y="${sl[0]}" width="3.5" height="${sl[4]-sl[0]}" fill="#888" rx="1"/>`;
-    s+=`<rect x="19" y="${sl[0]}" width="3.5" height="${sl[4]-sl[0]}" fill="#888" rx="1"/>`;
-
-    // time sig (first line only)
-    if(line===0){
-      s+=`<text x="35" y="${sl[1]+4}" text-anchor="middle" font-size="18" font-weight="700" fill="#333" font-family="Georgia,serif">${S.tsNum}</text>`;
-      s+=`<text x="35" y="${sl[3]+4}" text-anchor="middle" font-size="18" font-weight="700" fill="#333" font-family="Georgia,serif">${S.tsDen}</text>`;
-    }
-
-    // barlines
-    s+=`<line x1="${N_LM-4}" y1="${sl[0]}" x2="${N_LM-4}" y2="${sl[4]}" stroke="#666" stroke-width="1.5"/>`;
-    for(let m=1;m<mil;m++){
-      const bx=N_LM+m*sPerM*sw+(m-1)*BARGAP+BARGAP/2;
-      s+=`<line x1="${bx}" y1="${sl[0]}" x2="${bx}" y2="${sl[4]}" stroke="#999" stroke-width="1"/>`;
-    }
-    s+=`<line x1="${lineW-N_RM}" y1="${sl[0]}" x2="${lineW-N_RM}" y2="${sl[4]}" stroke="#999" stroke-width="1"/>`;
-    if(line===numLines-1) s+=`<line x1="${lineW-N_RM+3}" y1="${sl[0]}" x2="${lineW-N_RM+3}" y2="${sl[4]}" stroke="#555" stroke-width="2.5"/>`;
-
-    // stickings
-    if(S.showStick){
-      for(let i=startStep;i<endStep;i++){
-        const v=S.pattern.sticking[i];
-        if(v) s+=`<text x="${lx(i)}" y="${yOff+18}" text-anchor="middle" font-size="10" font-weight="600" fill="#aaa" font-family="Inter,sans-serif">${v}</text>`;
-      }
-    }
-
-    // notes, stems, dots
-    for(let i=startStep;i<endStep;i++){
-      const x=lx(i),notes=[];
-      ALL_VOICES.forEach(k=>{
-        if(!S.showToms&&(k==='tom1'||k==='tom2'))return;
-        if(S.pattern[k][i]) notes.push({k,t:S.pattern[k][i],y:posY(k)});
-      });
-      notes.forEach(n=>{s+=drawHead(x,n.y,n.k,n.t)});
-      if(notes.length){
-        const lowest=Math.max(...notes.map(n=>n.y));
-        s+=`<line x1="${x+4}" y1="${lowest}" x2="${x+4}" y2="${beamY}" stroke="#333" stroke-width="1.1"/>`;
-        if(dur[i]===3){
-          const topN=notes.reduce((a,b)=>a.y<b.y?a:b);
-          const onLine=((topN.y-stTop)%N_LG)===0;
-          s+=`<circle cx="${x+7}" cy="${onLine?topN.y-N_LG/2:topN.y}" r="1.5" fill="#333"/>`;
-        }
-      }
-    }
-
-    // beams
-    const lsb=startM*beats,leb=endM*beats;
-    for(let b=lsb;b<leb;b++){
-      const bs=b*s2,be=Math.min(bs+s2,ns);
-      const bn=[];
-      for(let i=bs;i<be;i++){
-        let has=false;
-        ALL_VOICES.forEach(k=>{if(!S.showToms&&(k==='tom1'||k==='tom2'))return;if(S.pattern[k][i])has=true});
-        if(has) bn.push({x:lx(i)+4,dur:dur[i]});
-      }
-      if(bn.length<2) continue;
-      s+=`<line x1="${bn[0].x}" y1="${beamY}" x2="${bn[bn.length-1].x}" y2="${beamY}" stroke="#333" stroke-width="2.5"/>`;
-      if(s2===4){
-        let j=0;
-        while(j<bn.length){
-          if(bn[j].dur===1){
-            let rs=j;while(j<bn.length&&bn[j].dur===1)j++;let re=j-1;
-            if(rs===re){const n=bn[rs],dir=rs===0?1:-1;s+=`<line x1="${n.x}" y1="${beamY+5}" x2="${n.x+dir*8}" y2="${beamY+5}" stroke="#333" stroke-width="2.5"/>`}
-            else s+=`<line x1="${bn[rs].x}" y1="${beamY+5}" x2="${bn[re].x}" y2="${beamY+5}" stroke="#333" stroke-width="2.5"/>`;
-          } else j++;
-        }
-      }
-    }
-
-    // articulations
-    for(let i=startStep;i<endStep;i++){
-      const x=lx(i),notes=[];
-      ALL_VOICES.forEach(k=>{
-        if(!S.showToms&&(k==='tom1'||k==='tom2'))return;
-        if(S.pattern[k][i]) notes.push({k,t:S.pattern[k][i],y:posY(k)});
-      });
-      if(!notes.length) continue;
-      const hasOpen=notes.some(n=>n.k==='hihat'&&n.t==='o');
-      const hasAcc=notes.some(n=>n.t==='X'||n.t==='O');
-      if(!hasOpen&&!hasAcc) continue;
-      if(hasOpen&&hasAcc){
-        s+=`<circle cx="${x}" cy="${beamY-15}" r="3.5" fill="none" stroke="#333" stroke-width="1.3"/>`;
-        s+=`<text x="${x}" y="${beamY-4}" text-anchor="middle" font-size="11" font-weight="700" fill="#333" font-family="Georgia,serif">&gt;</text>`;
-      } else if(hasOpen){
-        s+=`<circle cx="${x}" cy="${beamY-8}" r="3.5" fill="none" stroke="#333" stroke-width="1.3"/>`;
-      } else if(hasAcc){
-        s+=`<text x="${x}" y="${beamY-4}" text-anchor="middle" font-size="11" font-weight="700" fill="#333" font-family="Georgia,serif">&gt;</text>`;
-      }
-    }
-
-    // playhead
-    if(currentStep>=startStep&&currentStep<endStep&&isPlaying){
-      const px=lx(currentStep)-sw/2;
-      s+=`<rect x="${px}" y="${yOff}" width="${sw}" height="${SYS_H}" fill="rgba(0,0,0,.04)" rx="2"/>`;
-    }
-  }
-
-  s+='</svg>';
-  document.getElementById('notArea').innerHTML=s;
 }
 
-function drawHead(x,y,inst,type){
-  let s='';
-  const isX=inst==='hihat'||(type==='x'&&inst==='snare')||(type==='f'&&inst==='kick');
-  if(isX){
-    const sz=3.5;
-    s+=`<line x1="${x-sz}" y1="${y-sz}" x2="${x+sz}" y2="${y+sz}" stroke="#333" stroke-width="1.6"/>`;
-    s+=`<line x1="${x-sz}" y1="${y+sz}" x2="${x+sz}" y2="${y-sz}" stroke="#333" stroke-width="1.6"/>`;
-  } else if(type==='g'){
-    s+=`<ellipse cx="${x}" cy="${y}" rx="3.2" ry="2.2" fill="#333" transform="rotate(-20,${x},${y})"/>`;
-    s+=`<text x="${x-5.5}" y="${y+3.5}" font-size="11" fill="#333" font-family="Georgia,serif">(</text>`;
-    s+=`<text x="${x+2.5}" y="${y+3.5}" font-size="11" fill="#333" font-family="Georgia,serif">)</text>`;
-  } else {
-    s+=`<ellipse cx="${x}" cy="${y}" rx="4" ry="2.8" fill="#333" transform="rotate(-20,${x},${y})"/>`;
-  }
-  return s;
-}
 
 /* ═══ GRID ═══ */
 function buildGrid(){
@@ -791,16 +625,28 @@ function buildGrid(){
   wrap.innerHTML='';
   const ns=numSteps(),beats=S.tsNum,s2=spb();
   const subdivLabels=subLabelsFor(s2);
+
   const lr=document.createElement('div');
   lr.className='g-labels';lr.innerHTML='<div class="g-spacer"></div>';
   const lc=document.createElement('div');lc.className='g-lbl-c';
   for(let m=0;m<S.measures;m++){
     if(m>0){const sep=document.createElement('div');sep.className='g-mbar';sep.style.visibility='hidden';lc.appendChild(sep)}
+    const mg=document.createElement('div');mg.className='g-lbl-m';
     for(let b=0;b<beats;b++){
       const g=document.createElement('div');g.className='g-lbl-g';
       for(let sub=0;sub<s2;sub++){const sp=document.createElement('span');sp.className=sub===0?'g-bn':'g-sd';sp.textContent=sub===0?''+(b+1):subdivLabels[sub];g.appendChild(sp)}
-      lc.appendChild(g);
+      mg.appendChild(g);
     }
+    // boundary ✕ — sits in the gap before measure m and removes THAT measure,
+    // so the control always belongs to the measure it visually precedes
+    // (measure 1 has none; a lone measure can't be removed)
+    if(m>0){
+      const x=document.createElement('button');x.className='g-meas-x';x.type='button';
+      x.innerHTML='<i class="ph ph-x"></i>';x.title='Remove measure '+(m+1);
+      x.addEventListener('click',()=>removeMeasure(m));
+      mg.appendChild(x);
+    }
+    lc.appendChild(mg);
   }
   lr.appendChild(lc);wrap.appendChild(lr);
 
@@ -887,7 +733,6 @@ function wireControls(){
     S.swing=+this.value;document.getElementById('swingV').textContent=isTriplet()?'N/A':S.swing+'%';
     applySwing();
   });
-  document.getElementById('measSel').addEventListener('change',function(){pushUndo();S.measures=+this.value;resizePattern();syncAll()});
   // time signature popover
   document.getElementById('tsNumSel').addEventListener('change',function(){pushUndo();S.tsNum=+this.value;resizePattern();syncAll()});
   document.getElementById('tsDenSel').addEventListener('change',function(){pushUndo();S.tsDen=+this.value;resizePattern();syncAll()});
@@ -898,34 +743,24 @@ function wireControls(){
   document.getElementById('metTog').addEventListener('change',function(){S.met=this.checked?metLastRate:'off';syncControls()});
   document.querySelectorAll('#segMetRate .seg-b').forEach(b=>b.addEventListener('click',()=>{metLastRate=b.dataset.rate;S.met=b.dataset.rate;syncControls()}));
   wirePopovers();
+  // Stickings toolbar popover: toggle + presets (incl. reverse)
   document.getElementById('stickTog').addEventListener('change',function(){S.showStick=this.checked;syncAll()});
-  document.getElementById('tomsTog').addEventListener('change',function(){S.showToms=this.checked;syncAll()});
-  document.getElementById('undoBtn').addEventListener('click',undo);
-  document.getElementById('redoBtn').addEventListener('click',redo);
+  document.querySelectorAll('#pop-stick .pop-act').forEach(b=>b.addEventListener('click',()=>applySticking(b.dataset.sk)));
+  // Toms: direct show/hide toggle button
+  document.getElementById('tomsBtn').addEventListener('click',()=>{S.showToms=!S.showToms;syncAll()});
+  // Score details -> notation
+  document.getElementById('titleIn').addEventListener('input',renderNotation);
+  document.getElementById('authorIn').addEventListener('input',renderNotation);
+  // Add-measure ghost button (right of the last measure)
+  document.getElementById('addMeasBtn').addEventListener('click',addMeasure);
+  // View / Edit mode switch
+  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
   document.getElementById('clearBtn').addEventListener('click',()=>{pushUndo();S.pattern=makeEmpty();syncAll()});
   document.getElementById('shareBtn').addEventListener('click',copyLink);
   document.getElementById('printBtn').addEventListener('click',()=>window.print());
   document.getElementById('dlBtn').addEventListener('click',downloadSVG);
   document.getElementById('midiBtn').addEventListener('click',exportMIDI);
   document.getElementById('copyPngBtn').addEventListener('click',copyPNG);
-
-  document.querySelectorAll('.s-tog').forEach(btn=>{
-    btn.addEventListener('click',()=>{btn.classList.toggle('shut');btn.nextElementSibling.classList.toggle('shut')});
-  });
-
-  // sidebar collapse/expand
-  const sbEl=document.getElementById('sb'),tbEl=document.getElementById('toolbar');
-  document.getElementById('sbCollapse').addEventListener('click',()=>{
-    sbEl.classList.add('collapsed');
-    tbEl.style.left='50%';
-  });
-  document.getElementById('sbExpand').addEventListener('click',()=>{
-    sbEl.classList.remove('collapsed');
-    tbEl.style.left='';
-  });
-
-  document.getElementById('menuBtn').addEventListener('click',()=>{document.getElementById('sb').classList.add('open');document.getElementById('ov').classList.add('show')});
-  document.getElementById('ov').addEventListener('click',()=>{document.getElementById('sb').classList.remove('open');document.getElementById('ov').classList.remove('show')});
 
   document.addEventListener('click',e=>{
     if(!e.target.closest('.ctx'))document.getElementById('ctx').style.display='none';
@@ -975,11 +810,21 @@ function syncControls(){
   set('swingV',el=>el.textContent=trip?'N/A':S.swing+'%');
   set('swingR',el=>{el.value=S.swing;el.disabled=trip;});
   set('swingRow',el=>el.classList.toggle('off',trip));
+  set('stickTog',el=>el.checked=S.showStick);
+  set('stickBtn',el=>el.classList.toggle('lit',S.showStick));
+  set('tomsBtn',el=>el.classList.toggle('lit',S.showToms));
   applySwing();
 }
 
+let mode='edit';
+function setMode(m){
+  mode=m;
+  document.body.classList.toggle('view-mode',m==='view');
+  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
+}
+
 function closePops(except){
-  ['bpm','ts','subdiv','met'].forEach(id=>{const p=document.getElementById('pop-'+id);if(p&&id!==except)p.classList.remove('open');});
+  document.querySelectorAll('.pop').forEach(p=>{const id=p.id.replace('pop-','');if(id!==except)p.classList.remove('open');});
   document.querySelectorAll('[data-pop]').forEach(b=>{if(b.dataset.pop!==except)b.classList.remove('on');});
 }
 function wirePopovers(){
@@ -1013,7 +858,7 @@ function loadLib(data){
   if(data.ts){const[n,d]=data.ts.split('-').map(Number);S.tsNum=n;S.tsDen=d;}
   if(data.div){S.div=data.div;}
   if(data.bpm) setBpm(data.bpm);
-  S.measures=1;document.getElementById('measSel').value=1;
+  S.measures=1;
   resizePattern();
   const ns=numSteps();
   INSTS.forEach(inst=>{
@@ -1031,10 +876,27 @@ function copyLink(){
   }).catch(()=>{});
 }
 
+// The engine emits one <svg> per staff line — combine them all (stacked by y)
+// so copy/download include every measure, not just the first system. Nesting
+// the originals keeps <use href="#pclef"> etc. resolvable via the first
+// system's <defs> within the combined document.
+function combinedNotationSVG(){
+  const svgs=[...document.querySelectorAll('#notArea svg')];if(!svgs.length)return null;
+  const dims=svgs.map(s=>{const vb=s.getAttribute('viewBox').split(' ').map(Number);return{w:vb[2],h:vb[3]}});
+  const W=Math.max(...dims.map(d=>d.w)),H=dims.reduce((a,d)=>a+d.h,0);
+  let y=0,inner='';
+  svgs.forEach((s,i)=>{
+    const c=s.cloneNode(true);
+    c.setAttribute('x',0);c.setAttribute('y',y);
+    c.setAttribute('width',dims[i].w);c.setAttribute('height',dims[i].h);
+    inner+=new XMLSerializer().serializeToString(c);y+=dims[i].h;
+  });
+  return {data:'<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+inner+'</svg>',W,H};
+}
+
 function downloadSVG(){
-  const svg=document.querySelector('#notArea svg');if(!svg)return;
-  const data=new XMLSerializer().serializeToString(svg);
-  const blob=new Blob([data],{type:'image/svg+xml'});
+  const combo=combinedNotationSVG();if(!combo)return;
+  const blob=new Blob([combo.data],{type:'image/svg+xml'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download=(document.getElementById('titleIn').value||'groove')+'.svg';
   a.click();URL.revokeObjectURL(a.href);
@@ -1052,12 +914,11 @@ function exportMIDI(){
 }
 
 function copyPNG(){
-  const svg=document.querySelector('#notArea svg');if(!svg)return;
+  const combo=combinedNotationSVG();if(!combo)return;
   const btn=document.getElementById('copyPngBtn');
-  const vb=svg.getAttribute('viewBox').split(' ').map(Number);
   const scale=3;
-  const w=vb[2]*scale,h=vb[3]*scale;
-  const data=new XMLSerializer().serializeToString(svg);
+  const w=combo.W*scale,h=combo.H*scale;
+  const data=combo.data;
   const img=new Image();
   img.onload=function(){
     const c=document.createElement('canvas');
