@@ -29,8 +29,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
    the box to a squashed pill with the content spilling out. */
 .pop.pop-tr{top:calc(100% + 8px);bottom:auto;left:auto;right:0;transform:none}
 .pop-more{min-width:220px}
-.lib-scroll{max-height:320px;overflow-y:auto;margin:0 -4px}
-.pop-hint{font-size:9px;color:var(--fnt);display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding-top:2px}
+.lib-scroll{max-height:320px;overflow-y:auto;margin:0 -8px}
 
 /* inputs */
 .meta-in{width:100%;padding:6px 0;border:none;border-bottom:1px solid var(--brd-lt);font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);background:transparent;outline:none;margin-bottom:8px}
@@ -55,10 +54,9 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 /* library */
 .lib-item{display:block;width:100%;text-align:left;padding:5px 8px;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .1s}
 .lib-item:hover{background:var(--bg-c)}
-.lib-grp-lbl{font-size:11px;color:var(--mut);margin:10px 0 4px;font-weight:500}
+.lib-grp-lbl{font-size:11px;color:var(--mut);margin:10px 0 4px;padding:0 8px;font-weight:500}
 .lib-grp-lbl:first-child{margin-top:0}
 
-.kbd{display:inline-block;padding:1px 5px;background:var(--brd-lt);border:1px solid var(--brd);border-radius:3px;font-size:9px;font-weight:500;color:var(--mut);line-height:1.5}
 
 /* ─── BOTTOM TOOLBAR ─── */
 .toolbar{
@@ -253,8 +251,6 @@ body.view-mode .grid-outer{display:none}
       <div class="pop pop-tr pop-more" id="pop-more">
         <span class="pop-cap">Groove library</span>
         <div class="lib-scroll" id="sec-library"></div>
-        <div class="pop-div"></div>
-        <div class="pop-hint"><span class="kbd">Space</span> play&nbsp;·&nbsp;<span class="kbd">⌘Z</span> undo&nbsp;·&nbsp;<span class="kbd">⌘Y</span> redo</div>
       </div>
     </div>
   </div>
