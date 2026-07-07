@@ -13,12 +13,12 @@
   --r:8px;--rs:6px;
 }
 html,body{height:100%;overflow:hidden}
-body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-weight:600;color:var(--sec);background:var(--bg)}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-weight:500;color:var(--sec);background:var(--bg)}
 .app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
 /* ─── TOP BAR ─── */
 .topbar{position:relative;display:flex;align-items:center;height:56px;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--brd);flex-shrink:0;z-index:40}
-.topbar .logo{font-size:17px;font-weight:700;color:var(--pri);letter-spacing:-.03em}
+.topbar .logo{font-size:17px;font-weight:500;color:var(--pri);letter-spacing:-.03em}
 .tb-actions{margin-left:auto;display:flex;align-items:center;gap:2px}
 .topbtn{width:36px;height:36px;border:none;background:transparent;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sec);transition:background .12s,color .12s}
 .topbtn:hover,.topbtn.on{background:var(--bg-c);color:var(--pri)}
@@ -33,7 +33,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .pop-hint{font-size:9px;color:var(--fnt);display:flex;align-items:center;gap:4px;flex-wrap:wrap;padding-top:2px}
 
 /* inputs */
-.meta-in{width:100%;padding:6px 0;border:none;border-bottom:1px solid var(--brd-lt);font-family:inherit;font-weight:600;font-size:12px;color:var(--pri);background:transparent;outline:none;margin-bottom:8px}
+.meta-in{width:100%;padding:6px 0;border:none;border-bottom:1px solid var(--brd-lt);font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);background:transparent;outline:none;margin-bottom:8px}
 .meta-in:focus{border-color:var(--sec)}
 .meta-in::placeholder{color:var(--fnt)}
 .meta-in:last-child{margin-bottom:0}
@@ -43,7 +43,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .rng::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--sec);cursor:pointer;border:2.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 
 /* select */
-.sel{width:100%;height:32px;padding:0 8px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") right 8px center/10px no-repeat;font-family:inherit;font-weight:600;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px}
+.sel{width:100%;height:32px;padding:0 8px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") right 8px center/10px no-repeat;font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px}
 /* toggle */
 .tog-row{display:flex;align-items:center;justify-content:space-between}
 .tog-row+.tog-row{margin-top:8px}
@@ -56,20 +56,20 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .tog input:checked+.tog-s::after{left:18px}
 
 /* library */
-.lib-item{display:block;width:100%;text-align:left;padding:5px 8px;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .1s}
+.lib-item{display:block;width:100%;text-align:left;padding:5px 8px;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .1s}
 .lib-item:hover{background:var(--bg-c)}
-.lib-grp-lbl{font-size:11px;color:var(--mut);margin:10px 0 4px;font-weight:600}
+.lib-grp-lbl{font-size:11px;color:var(--mut);margin:10px 0 4px;font-weight:500}
 .lib-grp-lbl:first-child{margin-top:0}
 
-.kbd{display:inline-block;padding:1px 5px;background:var(--brd-lt);border:1px solid var(--brd);border-radius:3px;font-size:9px;font-weight:600;color:var(--mut);line-height:1.5}
+.kbd{display:inline-block;padding:1px 5px;background:var(--brd-lt);border:1px solid var(--brd);border-radius:3px;font-size:9px;font-weight:500;color:var(--mut);line-height:1.5}
 
 /* ─── BOTTOM TOOLBAR ─── */
 .toolbar{
   position:fixed;bottom:54px;
   left:50%;transform:translateX(-50%);
-  display:flex;align-items:center;gap:2px;
+  display:flex;align-items:center;gap:12px;
   background:#fff;border:1px solid var(--brd);border-radius:12px;
-  padding:4px;z-index:50;
+  padding:12px;z-index:50;
 }
 .tb-btn{
   height:36px;min-width:36px;border:none;background:transparent;border-radius:var(--r);
@@ -87,28 +87,28 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 
 /* bpm in toolbar */
 .tb-bpm{display:flex;align-items:center;height:36px;border:1px solid var(--brd);border-radius:var(--rs);overflow:hidden;background:#fff}
-.tb-bpm .tb-b{width:28px;height:36px;border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--mut);font-family:inherit;font-weight:600;display:flex;align-items:center;justify-content:center;transition:background .12s}
+.tb-bpm .tb-b{width:28px;height:36px;border:none;background:transparent;cursor:pointer;font-size:14px;color:var(--mut);font-family:inherit;font-weight:500;display:flex;align-items:center;justify-content:center;transition:background .12s}
 .tb-bpm .tb-b:hover{background:var(--bg-c);color:var(--pri)}
-.tb-bpm-v{width:36px;text-align:center;font-size:13px;font-weight:700;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
+.tb-bpm-v{width:36px;text-align:center;font-size:13px;font-weight:500;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
 .tb-bpm-v::-webkit-inner-spin-button,.tb-bpm-v::-webkit-outer-spin-button{-webkit-appearance:none}
-.tb-bpm-lbl{font-size:8px;color:var(--fnt);margin-right:4px;font-weight:600;letter-spacing:.04em}
+.tb-bpm-lbl{font-size:8px;color:var(--fnt);margin-right:4px;font-weight:500;letter-spacing:.04em}
 
 /* time sig in toolbar */
-.tb-ts{height:36px;padding:0 6px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23ccc'/%3E%3C/svg%3E") right 6px center/8px no-repeat;font-family:inherit;font-weight:700;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:20px;min-width:56px}
+.tb-ts{height:36px;padding:0 6px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='5'%3E%3Cpath d='M0 0l4 5 4-5z' fill='%23ccc'/%3E%3C/svg%3E") right 6px center/8px no-repeat;font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:20px;min-width:56px}
 
 /* toolbar popover controls */
 .tb-ctrl{position:relative;display:flex;align-items:center}
-.tb-txt{height:36px;padding:0 10px;border:none;background:transparent;border-radius:8px;font-family:inherit;font-weight:600;font-size:12px;color:var(--sec);cursor:pointer;display:flex;align-items:center;transition:background .12s}
-.tb-txt b{color:var(--pri);font-weight:700}
+.tb-txt{height:36px;padding:0 10px;border:none;background:transparent;border-radius:8px;font-family:inherit;font-weight:500;font-size:12px;color:var(--sec);cursor:pointer;display:flex;align-items:center;transition:background .12s}
+.tb-txt b{color:var(--pri);font-weight:500}
 .tb-txt:hover,.tb-txt.on{background:var(--bg-c)}
 .tb-btn.lit{color:var(--pri);background:var(--bg-c)}
 .pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);min-width:190px;background:#fff;border:1px solid var(--brd);border-radius:12px;box-shadow:0 10px 34px rgba(0,0,0,.14);padding:14px;display:none;z-index:60}
 .pop.open{display:block}
-.pop-cap{display:block;font-size:10px;font-weight:600;color:var(--mut);margin-bottom:8px}
+.pop-cap{display:block;font-size:10px;font-weight:500;color:var(--mut);margin-bottom:8px}
 .pop-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px}
 .pop-step{width:30px;height:30px;border:1px solid var(--brd);border-radius:6px;background:#fff;font-size:15px;color:var(--sec);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
 .pop-step:hover{background:var(--bg-c);color:var(--pri)}
-.pop-bpm-v{width:52px;text-align:center;font-size:17px;font-weight:700;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
+.pop-bpm-v{width:52px;text-align:center;font-size:17px;font-weight:500;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
 .pop-bpm-v::-webkit-inner-spin-button,.pop-bpm-v::-webkit-outer-spin-button{-webkit-appearance:none}
 .pop-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin-bottom:6px}
 .pop-lbl.off{opacity:.38}
@@ -122,18 +122,18 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .pop-row-between .pop-cap{margin-bottom:0}
 .seg{display:flex;gap:3px;padding:3px;background:var(--bg-c);border-radius:8px;margin-bottom:6px}
 .seg:last-child{margin-bottom:0}
-.seg-b{flex:1;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .1s}
+.seg-b{flex:1;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .1s}
 .seg-b:hover:not(.on){background:rgba(0,0,0,.05)}
 .seg-b.on{background:var(--pri);color:#fff}
 /* stacked popover action list */
 .pop-acts{display:flex;flex-direction:column;gap:2px;margin-top:8px}
-.pop-act{width:100%;text-align:left;padding:6px 8px;border:none;background:transparent;border-radius:6px;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);cursor:pointer;transition:background .1s}
+.pop-act{width:100%;text-align:left;padding:6px 8px;border:none;background:transparent;border-radius:6px;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;transition:background .1s}
 .pop-act:hover{background:var(--bg-c);color:var(--pri)}
 .pop-div{height:1px;background:var(--brd-lt);margin:10px 0 2px}
 
 /* ─── VIEW / EDIT MODE SWITCH (floating, top-center) ─── */
 .mode-switch{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:3px;background:var(--bg-sb);border:1px solid var(--brd);border-radius:10px;padding:3px;z-index:1}
-.mode-b{border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .12s}
+.mode-b{border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .12s}
 .mode-b:hover:not(.on){background:var(--bg-c);color:var(--pri)}
 .mode-b.on{background:var(--pri);color:#fff}
 body.view-mode .grid-outer{display:none}
@@ -142,7 +142,7 @@ body.view-mode .grid-outer{display:none}
 .grid-outer{display:inline-flex;align-items:center;gap:12px;max-width:100%;margin-top:auto} /* pinned low: .main's 140px bottom padding leaves ~40px above the toolbar */
 /* per-measure wrapper in the label row, so the ✕ can pin to its top-right */
 .g-lbl-m{display:flex;gap:12px;position:relative}
-.g-meas-x{position:absolute;top:-16px;right:-18px;width:18px;height:18px;border:none;background:transparent;color:var(--fnt);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all .1s;z-index:3}
+.g-meas-x{position:absolute;top:-16px;left:-25px;width:18px;height:18px;border:none;background:transparent;color:var(--fnt);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all .1s;z-index:3}
 .g-meas-x:hover{background:var(--bg-c);color:var(--pri)}
 .g-meas-x .ph{font-size:13px}
 /* ghost add button, vertically centered to the right of the last measure */
@@ -160,23 +160,23 @@ body.view-mode .grid-outer{display:none}
 #notArea .abcr.highlighted{fill:rgba(45,140,90,.22)!important;transition:fill .04s}
 
 /* grid */
-.grid-wrap{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;overflow-x:auto;padding:18px 0 4px}
+.grid-wrap{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;overflow-x:auto;padding:18px 20px 4px 0}
 .g-labels{display:flex;align-items:flex-end;margin-bottom:4px}
 .g-spacer{width:44px;flex-shrink:0}
 .g-lbl-c{display:flex;gap:12px}
 .g-lbl-g{display:flex;gap:3px}
-.g-lbl-g span{width:36px;text-align:center;font-size:9px;font-weight:600;line-height:1}
-.g-bn{color:var(--mut)!important;font-size:10px!important;font-weight:700!important}
+.g-lbl-g span{width:36px;text-align:center;font-size:9px;font-weight:500;line-height:1}
+.g-bn{color:var(--mut)!important;font-size:10px!important;font-weight:500!important}
 .g-sd{color:var(--fnt)!important}
 
 .g-row{display:flex;align-items:center}
-.g-row-lbl{width:44px;flex-shrink:0;font-size:10px;font-weight:600;color:var(--mut);text-align:right;padding-right:10px;letter-spacing:.02em;cursor:pointer;position:relative}
+.g-row-lbl{width:44px;flex-shrink:0;font-size:10px;font-weight:500;color:var(--mut);text-align:right;padding-right:10px;letter-spacing:.02em;cursor:pointer;position:relative}
 .g-row-lbl:hover{color:var(--sec)}
 .g-cells{display:flex;gap:12px}
 .g-beat{display:flex;gap:3px}
 .g-mbar{width:2px;background:var(--brd);align-self:stretch;margin:0 3px;border-radius:1px;flex-shrink:0}
 
-.cell{width:36px;height:34px;border-radius:5px;cursor:pointer;background:var(--bg-c);transition:background .08s,transform .08s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;user-select:none;-webkit-user-select:none;flex-shrink:0}
+.cell{width:36px;height:34px;border-radius:5px;cursor:pointer;background:var(--bg-c);transition:background .08s,transform .08s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;user-select:none;-webkit-user-select:none;flex-shrink:0}
 .cell:hover{background:var(--bg-ch)}
 .cell.on{background:#888}
 .cell.on:hover{background:#7a7a7a}
@@ -194,7 +194,7 @@ body.view-mode .grid-outer{display:none}
 
 /* context / row menus */
 .ctx{position:fixed;background:#fff;border:1px solid var(--brd);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.1);padding:4px;z-index:500;min-width:120px;display:none}
-.ctx-i{display:block;width:100%;text-align:left;padding:6px 10px;border:none;background:transparent;font-family:inherit;font-weight:600;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .08s}
+.ctx-i{display:block;width:100%;text-align:left;padding:6px 10px;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .08s}
 .ctx-i:hover{background:var(--bg-c)}
 .ctx-i.on{color:var(--pri);background:var(--bg-c)}
 .row-menu{position:fixed;background:#fff;border:1px solid var(--brd);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.1);padding:4px;z-index:500;min-width:130px;display:none;white-space:nowrap}
@@ -829,8 +829,10 @@ function buildGrid(){
       for(let sub=0;sub<s2;sub++){const sp=document.createElement('span');sp.className=sub===0?'g-bn':'g-sd';sp.textContent=sub===0?''+(b+1):subdivLabels[sub];g.appendChild(sp)}
       mg.appendChild(g);
     }
-    // per-measure remove — only offered when there's more than one measure
-    if(S.measures>1){
+    // boundary ✕ — sits in the gap before measure m and removes THAT measure,
+    // so the control always belongs to the measure it visually precedes
+    // (measure 1 has none; a lone measure can't be removed)
+    if(m>0){
       const x=document.createElement('button');x.className='g-meas-x';x.type='button';
       x.innerHTML='<i class="ph ph-x"></i>';x.title='Remove measure '+(m+1);
       x.addEventListener('click',()=>removeMeasure(m));
