@@ -1,547 +1,946 @@
 <!DOCTYPE html>
 <html lang="en">
-	<!-- HTML for the Groove Writer part of the Groove Scribe HTML application -->
-	<!--Copyright 2015-2020 Lou Montulli, Mike Johnston  GPL V2.0 Please See LICENSE.txt for more details -->
-	<!-- Art's copy-->
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ritmo</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --pri:#333;--sec:#666;--mut:#999;--fnt:#ccc;
+  --brd:#E5E5E5;--brd-lt:#F0F0F0;
+  --bg:#fff;--bg-sb:#FAFAFA;--bg-c:#F2F2F2;--bg-ch:#EAEAEA;
+  --r:8px;--rs:6px;
+}
+html,body{height:100%;overflow:hidden}
+body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-weight:500;color:var(--sec);background:var(--bg)}
+.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
 
-    <head>
-		<meta charset="utf-8">
-		<title>Groove Scribe</title>
+/* ─── TOP BAR ─── */
+.topbar{position:relative;display:flex;align-items:center;height:56px;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--brd);flex-shrink:0;z-index:40}
+.topbar .logo{font-size:17px;font-weight:500;color:var(--pri);letter-spacing:-.03em}
+.tb-actions{margin-left:auto;display:flex;align-items:center;gap:2px}
+.topbtn{width:36px;height:36px;border:none;background:transparent;border-radius:var(--r);cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--sec);transition:background .12s,color .12s}
+.topbtn:hover,.topbtn.on{background:var(--bg-c);color:var(--pri)}
+.topbtn .ph{font-size:19px;line-height:1}
+/* top-bar popovers open downward, right-aligned.
+   .pop.pop-tr (not .pop-tr): must outrank the later .pop base rule, whose
+   bottom:calc(100%+12px) would otherwise combine with our top and collapse
+   the box to a squashed pill with the content spilling out. */
+.pop.pop-tr{top:calc(100% + 8px);bottom:auto;left:auto;right:0;transform:none}
+.pop-more{min-width:220px}
+.lib-scroll{max-height:320px;overflow-y:auto;margin:0 -8px}
 
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="mobile-web-app-capable" content="yes">
-		<link rel="icon" sizes="192x192" href="images/gscribe-icon-192.png">
-		<link rel="icon" sizes="96x96" href="images/gscribe-icon-96.png">
-		<link rel="apple-touch-icon" href="images/apple-touch-icon.png">
-		
+/* inputs */
+.meta-in{width:100%;padding:6px 0;border:none;border-bottom:1px solid var(--brd-lt);font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);background:transparent;outline:none;margin-bottom:8px}
+.meta-in:focus{border-color:var(--sec)}
+.meta-in::placeholder{color:var(--fnt)}
+.meta-in:last-child{margin-bottom:0}
 
+/* swing slider */
+.rng{-webkit-appearance:none;appearance:none;width:100%;height:3px;background:var(--brd);border-radius:2px;outline:none;cursor:pointer}
+.rng::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--sec);cursor:pointer;border:2.5px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.15)}
 
-		<!--meta property="og:image" content="https://mikeslessons.com/groove/images/GScribe_Logo_on_orange.png"> -->
-		<meta property="og:description" content="Groove Scribe allows drummers to easily create grooves, listen, share, print sheet music, and more. Use the Groove Scribe to create new grooves, figure out the groove to your favorite song, or write down the groove to your latest tune."/>
-		<meta property="og:site_name" content="GrooveScribe at MikesLessons.com"/>
+/* select */
+.sel{width:100%;height:32px;padding:0 8px;border:1px solid var(--brd);border-radius:var(--rs);background:#fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23999'/%3E%3C/svg%3E") right 8px center/10px no-repeat;font-family:inherit;font-weight:500;font-size:12px;color:var(--pri);cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px}
+/* toggle */
+.tog{position:relative;width:34px;height:18px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0;position:absolute}
+.tog-s{position:absolute;inset:0;background:var(--brd);border-radius:9px;cursor:pointer;transition:background .2s}
+.tog-s::after{content:'';position:absolute;width:14px;height:14px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s}
+.tog input:checked+.tog-s{background:var(--sec)}
+.tog input:checked+.tog-s::after{left:18px}
 
-		<script>
-			document.write('<meta property="og:image" content="https://gscribe-png-image.herokuapp.com/' + window.location.search + '">');
-		</script>
-		<meta property="og:image" content="https://mikeslessons.com/groove/images/GScribe_Logo_on_orange.png">
-
-		<link rel="stylesheet" type="text/css" href="font-awesome/4.7.0/css/font-awesome.min.css">
-		<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
-		<link rel="stylesheet" type="text/css" href="css/share-button.min.css">
-	    <link rel="stylesheet" type="text/css" href="css/groove_writer_orange.css?v=4">
-		<link rel="stylesheet" type="text/css" href="css/groove_display_orange.css?v=4">
-		<link rel="stylesheet" type="text/css" href="css/groove_writer_orange_responsive.css?v=4">
-		<link href='https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700&display=swap' rel='stylesheet'>
-
-		<!--   Other peoples JS libraries    -->
-		<!-- <script src="./MIDI.js/js/MIDI/MIDI.JS.min.js" type="text/javascript"></script> -->
-		<script src="./MIDI.js/js/MIDI/AudioDetect.js" type="text/javascript"></script>
-		<script src="./MIDI.js/js/MIDI/LoadPlugin.js" type="text/javascript"></script>
-		<script src="./MIDI.js/js/MIDI/Plugin.js" type="text/javascript"></script>
-		<script src="./MIDI.js/js/MIDI/Player.js" type="text/javascript"></script>
-		<script src="./MIDI.js/inc/DOMLoader.XMLHttp.js" type="text/javascript"></script>
-		<script src="./MIDI.js/inc/jasmid/stream.js"></script>
-		<script src="./MIDI.js/inc/jasmid/midifile.js"></script>
-		<script src="./MIDI.js/inc/jasmid/replayer.js"></script>
-		<script src="./MIDI.js/inc/Base64.js"></script>
-		<script src="./MIDI.js/inc/base64binary.js"></script>
-
-		<!-- script to render ABC to an SVG image -->
-		<script type="text/javascript" src="./js/abc2svg-1.js"></script>
-
-		<!-- script to convert SVG to PNGs for download -->
-		<script type="text/javascript" src="./js/pablo.min.js"></script>
-
-		<!-- script for sharing to social sites -->
-		<script src="js/share-button.min.js"></script>
-
-
-		<!-- Minified version: <script src="./js/groove_writer.min.js" type="text/javascript"></script> -->
-
-		<!-- jsmidgen for generating a midi file -->
-		<script src="./js/jsmidgen.js" type="text/javascript"></script>
-		<!--   our custom JS  -->
-		<script src="js/groove_writer.js?v=4"></script>
-		<script src="js/groove_utils.js?v=4"></script>
-		<script src="js/grooves.js?v=4"></script>
-		<!--   new grouped sidebar UI (controller/mirror over the legacy controls)  -->
-		<script src="js/ui_sidebar.js?v=4"></script>
-
-		<script type="text/javascript">
-			/*jslint browser:true evil:true on:true */
-			/*global GrooveWriter, grooves */
-			// instantiate a global instance of the GrooveWriterClass.    This page only uses one
-			var myGrooveWriter = new GrooveWriter();
-			if (myGrooveWriter.myGrooveUtils.grooveDBAuthoring) {
-				document.write('<link rel="stylesheet" type="text/css" href="css/grooveDB_authoring.css">');
-			}
-			if (myGrooveWriter.myGrooveUtils.debugMode) {
-				document.write('<link rel="stylesheet" type="text/css" href="css/groove_debug.css">');
-			}
-		</script>
-
-    </head>
-    <body>
-
-	<div id="GrooveWriter">
-		<div class="nonPrintable">
-			<div id="LeftHandNav">
-				<span id="divisionButtonContainer">
-					<!-- NEW grouped sidebar panels — drive the hidden legacy controls below -->
-					<div class="gs-panel">
-						<div class="gs-panel-label">Time Signature</div>
-						<div class="gs-timesig">
-							<span class="gs-timesig-caption">Beats</span>
-							<span class="gs-field">
-								<select id="gsBeatsSelect" aria-label="Beats per measure">
-									<option>2</option><option>3</option><option>4</option><option>5</option>
-									<option>6</option><option>7</option><option>8</option><option>9</option>
-									<option>10</option><option>11</option><option>12</option><option>13</option>
-									<option>14</option><option>15</option>
-								</select>
-							</span>
-							<span class="gs-timesig-slash">/</span>
-							<span class="gs-field gs-field--muted">
-								<select id="gsDenomSelect" aria-label="Note value">
-									<option>4</option><option>8</option><option>16</option>
-								</select>
-							</span>
-						</div>
-					</div>
-
-					<div class="gs-panel">
-						<div class="gs-panel-label">Subdivision</div>
-						<div class="gs-segment" id="gsNoteValueSeg">
-							<button type="button" class="gs-seg-btn" data-value="8">1/8</button>
-							<button type="button" class="gs-seg-btn" data-value="16">1/16</button>
-							<button type="button" class="gs-seg-btn" data-value="32">1/32</button>
-						</div>
-						<div class="gs-segment" id="gsFeelSeg">
-							<button type="button" class="gs-seg-btn" data-feel="straight">Straight</button>
-							<button type="button" class="gs-seg-btn" data-feel="triplets">Triplets</button>
-							<button type="button" class="gs-seg-btn" data-feel="mixed">Mixed</button>
-						</div>
-					</div>
-
-					<div class="gs-panel">
-						<div class="gs-panel-label">Metronome</div>
-						<div class="gs-segment" id="gsMetronomeSeg">
-							<button type="button" class="gs-seg-btn" data-freq="0">Off</button>
-							<button type="button" class="gs-seg-btn" data-freq="4">4th</button>
-							<button type="button" class="gs-seg-btn" data-freq="8">8th</button>
-							<button type="button" class="gs-seg-btn" data-freq="16">16th</button>
-						</div>
-						<button type="button" class="gs-link-btn grooveDB_hidden" id="metronomeOptionsAnchor" onclick="myGrooveWriter.metronomeOptionsAnchorClick(event);">Options…</button>
-					</div>
-
-					<!-- Legacy controls kept hidden: the engine reads/writes their state; the panels above mirror them -->
-					<span class="gs-legacy-hidden">
-						<span class="left-button edit-block" id="timeLabel" onclick="myGrooveWriter.timeSigPopupOpen();"><span class="left-button-content"><span><span id="timeSigLabel" class="buttonFraction"><sup>4</sup>/<sub>4</sub></span><span id="timeSubLabel">TIME</span></span></span></span>
-						<span class="left-button subdivision edit-block" id="subdivision_8ths"  onclick="myGrooveWriter.changeDivision(8);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>8</sub></span>NOTES</span></span></span>
-						<span class="left-button subdivision edit-block" id="subdivision_16ths" onclick="myGrooveWriter.changeDivision(16);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>16</sub></span>NOTES</span></span></span>
-						<span class="left-button subdivision edit-block" id="subdivision_32ths" onclick="myGrooveWriter.changeDivision(32);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>32</sub></span>NOTES</span></span></span>
-						<span class="left-button subdivision edit-block" id="subdivision_12ths" onclick="myGrooveWriter.changeDivision(12);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>8</sub></span>TRIPLETS</span></span></span>
-						<span class="left-button subdivision edit-block" id="subdivision_24ths" onclick="myGrooveWriter.changeDivision(24);"><span class="left-button-content"><span><span class="buttonFraction"><sup>1</sup>/<sub>16</sub></span>TRIPLETS</span></span></span>
-						<span class="left-button subdivision edit-block" id="subdivision_48ths" onclick="myGrooveWriter.changeDivision(48);"><span class="left-button-content"><span>MIXED<br>Division</span></span></span>
-					</span>
-
-					<script>
-						if (!myGrooveWriter.myGrooveUtils.grooveDBAuthoring) {
-							document.write('<span class="left-button" onclick="myGrooveWriter.swapViewEditMode();"><span class="left-button-content"><span id="view-edit-switch" >Switch to Edit mode</span></span></span>');
-						}
-					</script>
-
-					<script>
-						if (myGrooveWriter.myGrooveUtils.is_touch_device()) {
-							document.write('<span class="left-button edit-block" id="advancedEditAnchor" onclick="event.preventDefault(); myGrooveWriter.toggleAdvancedEdit()"><span class="left-button-content">Advanced Edit</span></span>');
-						}
-					</script>
-
-					<span class="left-button edit-block" id="undoButton" onclick="myGrooveWriter.undoCommand();"><span class="left-button-content"><i class="ph ph-arrow-counter-clockwise"></i>&nbsp;&nbsp;Undo</span></span>
-				</span>
-
-			</div>
-			<div id="TopNav" class="fullWidthEle">
-				<span id="upperLeft">
-					<span id="metronomeContainer">
-						<span id="metronomeLabel">METRONOME:</span>
-						<span class="metronomeButton" id="metronomeOff" onclick="myGrooveWriter.setMetronomeFrequency(0);">OFF</span>
-						<span class="metronomeButton" id="metronome4ths" onclick="myGrooveWriter.setMetronomeFrequency(4);">4th</span>
-						<span class="metronomeButton" id="metronome8ths" onclick="myGrooveWriter.setMetronomeFrequency(8);">8th</span>
-						<span class="metronomeButton" id="metronome16ths" onclick="myGrooveWriter.setMetronomeFrequency(16);">16th</span>
-					</span>
-				</span>
-				<span id="upperRight">
-					<span class="rightButtons grooveDB_hidden" id="permutationAnchor" onclick="myGrooveWriter.permutationAnchorClick(event);"><i class="ph ph-shuffle"></i> Permutations</span>
-					<span class="rightButtons" id="groovesAnchor" onclick="myGrooveWriter.groovesAnchorClick(event);"><i class="ph ph-music-notes"></i> Grooves</span>
-					<span class="rightButtons" id="helpAnchor" onclick="myGrooveWriter.helpAnchorClick(event);"><i class="ph ph-question"></i> Help</span>
-				</span>
-			</div>
-			<div id="midiPlayer" class="fullWidthEle"><!-- space for the midiplayer to be attached by the javascript --></div>
-		</div>
-
-		<div id="RightHandContent">
-			<div class="nonPrintable">
-
-				<div id="PermutationOptions">
-					<script type="text/javascript">
-							var genHTML = "";
-							genHTML += myGrooveWriter.HTMLforPermutationOptions();
-							document.write(genHTML);
-					</script>
-				</div>
-			</div>
-
-			<div class="Printable">
-				<!-- rendering area -->
-				<div id="sheetMusicDiv" class="fullWidthEle">
-					<div id="svgTarget" class="svgTarget">
-						<!-- space for the SVG sheet music to display -->
-					</div>
-				</div>
-			</div>
-			<div class="nonPrintable">
-
-				<p class="warnings">Warnings:</p>
-				<div class="warnings" id="diverr">
-				</div>
-
-				<div id="sheetMusicTextFields" class="fullWidthEle grooveDB_hidden edit-block">
-					<span class="sheetMusicTextField"><b>Title:</b> <input class="sheetMusicInputField" id="tuneTitle" onchange="myGrooveWriter.refresh_ABC();" type="text"></span>
-					<span class="sheetMusicTextField"><b>Author:</b> <input class="sheetMusicInputField" id="tuneAuthor" onchange="myGrooveWriter.refresh_ABC();"  type="text"></span>
-					<span class="sheetMusicTextField"><b>Comment:</b> <input class="sheetMusicInputField" id="tuneComments" onchange="myGrooveWriter.refresh_ABC();"  type="text"></span>
-					<span id='KeyButton'><input type="checkbox" class="hiddenCheckbox" id="showLegend" onclick="myGrooveWriter.refresh_ABC();"><label id="LegendLabel" for="showLegend"><i class="ph ph-key"></i></label></span>
-				</div>
-
-				<div id="musicalInput" class="fullWidthEle edit-block">
-					<div id="measureContainer">
-						<script type="text/javascript">
-              var genHTML = "";
-              var cur_measure;
-              for (cur_measure = 1; cur_measure <= myGrooveWriter.numberOfMeasures(); cur_measure++) {
-                genHTML += myGrooveWriter.HTMLforStaffContainer(cur_measure, (cur_measure - 1) * myGrooveWriter.notesPerMeasure());
-              }
-              document.write(genHTML);
-              //console.log(genHTML);
-						</script>
-					</div>
-				</div>
+/* library */
+.lib-item{display:block;width:100%;text-align:left;padding:5px 8px;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .1s}
+.lib-item:hover{background:var(--bg-c)}
+.lib-grp-lbl{font-size:11px;color:var(--mut);margin:10px 0 4px;padding:0 8px;font-weight:500}
+.lib-grp-lbl:first-child{margin-top:0}
 
 
-				<div id="bottomButtonRow" class="fullWidthEle">
-					<span class="pageBottomButton edit-block" id="clearAllNotesButton" onclick="event.preventDefault(); myGrooveWriter.clearAllNotes();"><span class="bottomButtonIcon"><i class="ph-bold ph-trash"></i></span><span class="bottomButtonLabel">Clear All</span></span>
-					<span class="pageBottomButton edit-block" id="showHideTomsButton" onclick="event.preventDefault(); myGrooveWriter.showHideToms(false, false);"><span class="bottomButtonIcon"><i class="ph-bold ph-circles-three"></i></span><span class="bottomButtonLabel">Show Toms</span></span>
-					<span class=" grooveDB_hidden pageBottomButton" id="stickingsButton" onclick="myGrooveWriter.stickingsAnchorClick();"><span class="bottomButtonIcon"><i class="ph-bold ph-arrows-out icon-sticking-expand"></i><i class="ph-bold ph-arrows-in icon-sticking-compress"></i></span><span class="bottomButtonLabel">Sticking</span></span>
-					<span class=" grooveDB_hidden pageBottomButton" id="downloadButton" onclick="myGrooveWriter.DownloadAnchorClick();"><span class="bottomButtonIcon"><i class="ph-bold ph-download-simple"></i></span><span class="bottomButtonLabel">Download</span></span>
-					<span class=" grooveDB_hidden pageBottomButton" id="printButton" onclick="myGrooveWriter.printMusic();"><span class="bottomButtonIcon"><i class="ph-bold ph-printer"></i></span><span class="bottomButtonLabel">Print</span></span>
-					<span class=" grooveDB_hidden pageBottomButton" id="shareSaveButton" onclick="event.preventDefault(); myGrooveWriter.show_FullURLPopup();"><span class="bottomButtonIcon"><i class="ph-bold ph-share-network"></i></span><span class="bottomButtonLabel">SHARE</span></span>
-				</div>
-
-				<div id="midiTextOutput">
-				</div>
-
-				<span id="hiddenDescription">
-					GrooveScribe allows drummers to easily create grooves, listen, share, print sheet music, and more.
-					Use the GrooveScribe to create new grooves, figure out the groove to your favorite song,
-					or write down the groove to your latest tune.
-				</span>
-
-				<!-- GrooveDB output area -->
-				<div id="GrooveDB_MetaData" class="grooveDB_show" style="display:none;">
-					<div id="grooveDBInstructions">
-					This is the text that should be added to the GrooveDB for this groove.  <br>
-					<b>Copy and paste it into the GrooveDB edit window </b>
-					</div>
-					<div>
-					<textarea id="GrooveDB_source" class="fullWidthEle"></textarea>
-					</div>
-				</div>
-
-				<div id="debugDisplayArea">
-					<span id="undoStack"></span>
-					<span id="redoStack"></span>
-					<span id="URLSearchData"></span>
-					<!-- ABC notation -->
-					<A href="" id="showHideABC" onclick="event.preventDefault(); myGrooveWriter.ShowHideABCResults();">Show/Hide ABC Notation</a>
-
-					<div id="ABC_Results">
-						ABC Notation is used for rendering the music.  You can see what is being generated below.
-						You can even edit it.  <br>
-						NOTE: whenever the page is modified, the ABC Notation below will be overwritten automatically. <br>
-						For more information about ABC Notation go here: <a href="http://abcnotation.com/">http://abcnotation.com/</a>
-						<p></p>
-						<textarea id="ABCsource" rows="10" cols="72" ></textarea>
-						<br>
-						<button type="button" onclick="myGrooveWriter.displayNewSVG();">Re-render the music</button>
-						<button type="button" onclick="myGrooveWriter.saveABCtoFile();">Save ABC to file</button>
-					</div>
-					<span id="debugOutput"></span>
-				</div>
-
-				<div id="totalPlayTime">
-				</div>
-			</div>
-		</div>
+/* ─── BOTTOM TOOLBAR ─── */
+.toolbar{
+  position:fixed;bottom:54px;
+  left:50%;transform:translateX(-50%);
+  display:flex;align-items:center;gap:12px;
+  background:#fff;border:1px solid var(--brd);border-radius:12px;
+  padding:12px;z-index:50;
+}
+.tb-btn{
+  height:36px;min-width:36px;border:none;background:transparent;border-radius:var(--r);
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  color:var(--sec);transition:background .12s,color .12s;padding:0 6px;flex-shrink:0;
+}
+.tb-btn:hover{background:var(--bg-c);color:var(--pri)}
+.tb-btn:active{transform:scale(.95)}
+.tb-btn .ph{font-size:24px;line-height:1;flex-shrink:0}
+.tb-btn.tb-play{background:var(--pri);color:#fff;width:40px}
+.tb-btn.tb-play:hover{background:#444}
+.tb-btn.tb-play.on{background:var(--sec)}
 
 
-		<!-- context menu that will pop up over notes in advaced edit mode or right click -->
-		<div class="noteContextMenu">
-			<ul id="metronomeOptionsContextMenu" class="list">
-				<li class="metronomeOptionsContextMenuItem" id="metronomeOptionsContextMenuSolo"      onclick='myGrooveWriter.metronomeOptionsMenuPopupClick("Solo");'  title="Just hear the metronome." >Solo</li>
-				<li class="metronomeOptionsContextMenuItem" id="metronomeOptionsContextMenuSpeedUp"   onclick='myGrooveWriter.metronomeOptionsMenuPopupClick("SpeedUp");' title="Increase the tempo automatically" >Auto speed up</li>
-				<li class="metronomeOptionsContextMenuItem" id="metronomeOptionsContextMenuCountIn"   onclick='myGrooveWriter.metronomeOptionsMenuPopupClick("CountIn");' title="One measure of metronome count in at the start" >Count it in</li>
-				<li class="metronomeOptionsContextMenuItem" id="metronomeOptionsContextMenuOffTheOne" onclick='myGrooveWriter.metronomeOptionsMenuPopupClick("OffTheOne");' title="Click on the e, &, or a">Offset click</li>
-				<!--
-				<li id="metronomeOptionsContextMenuDropper"   onclick='myGrooveWriter.metronomeOptionsMenuPopupClick("Dropper")'  >Beat Dropper</li>
-				-->
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="metronomeOptionsOffsetClickContextMenu" class="list">
-				<li class="metronomeOptionsOffsetClickContextMenuItem menuChecked" id="metronomeOptionsOffsetClickContextMenuOnThe1"   onclick='myGrooveWriter.metronomeOptionsMenuOffsetClickPopupClick("1");'>Start on "<b>1</b>"</li>
-				<li class="metronomeOptionsOffsetClickContextMenuItem" id="metronomeOptionsOffsetClickContextMenuOnTheE"   onclick='myGrooveWriter.metronomeOptionsMenuOffsetClickPopupClick("E");'>Start on "<b>E</b>"</li>
-				<li class="metronomeOptionsOffsetClickContextMenuItem" id="metronomeOptionsOffsetClickContextMenuOnTheAND" onclick='myGrooveWriter.metronomeOptionsMenuOffsetClickPopupClick("AND");'>Start on "<b>&amp;</b>"</li>
-				<li class="metronomeOptionsOffsetClickContextMenuItem" id="metronomeOptionsOffsetClickContextMenuOnTheA"   onclick='myGrooveWriter.metronomeOptionsMenuOffsetClickPopupClick("A");'>Start on "<b>A</b>"</li>
-				<li class="metronomeOptionsOffsetClickContextMenuItem" id="metronomeOptionsOffsetClickContextMenuOnTheROTATE"  onclick='myGrooveWriter.metronomeOptionsMenuOffsetClickPopupClick("ROTATE");'>Rotate through</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="metronomeOptionsOffsetClickForTripletsContextMenu" class="list">
-				<li class="metronomeOptionsOffsetClickContextMenuItem menuChecked" id="metronomeOptionsOffsetClickContextMenuOnThe1Triplet"  onclick='myGrooveWriter.metronomeOptionsMenuOffsetClickPopupClick("1");'>Start on "<b>1</b>"</li>
-				<li class="metronomeOptionsOffsetClickContextMenuItem" id="metronomeOptionsOffsetClickContextMenuOnTheTI" onclick='myGrooveWriter.metronomeOptionsMenuOffsetClickPopupClick("TI");'>Start on "<b>&amp;</b>"</li>
-				<li class="metronomeOptionsOffsetClickContextMenuItem" id="metronomeOptionsOffsetClickContextMenuOnTheTA" onclick='myGrooveWriter.metronomeOptionsMenuOffsetClickPopupClick("TA");'>Start on "<b>A</b>"</li>
-				<li class="metronomeOptionsOffsetClickContextMenuItem" id="metronomeOptionsOffsetClickContextMenuOnTheROTATE"   onclick='myGrooveWriter.metronomeOptionsMenuOffsetClickPopupClick("ROTATE");'>Rotate through</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="stickingContextMenu" class="list">
-				<li onclick='myGrooveWriter.notePopupClick("sticking", "off");'>Off</li>
-				<li onclick='myGrooveWriter.notePopupClick("sticking","right");'><b>R</b>ight</li>
-				<li onclick='myGrooveWriter.notePopupClick("sticking","left");'><b>L</b>eft</li>
-				<li onclick='myGrooveWriter.notePopupClick("sticking","both");'><b>R/L</b></li>
-				<li onclick='myGrooveWriter.notePopupClick("sticking", "count");'>Count</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="hhContextMenu" class="list">
-				<li onclick='myGrooveWriter.notePopupClick("hh", "off");'>Off</li>
-				<li onclick='myGrooveWriter.notePopupClick("hh","normal");'>Hi-hat normal</li>
-				<li onclick='myGrooveWriter.notePopupClick("hh","open");'>Hi-hat open</li>
-				<!-- <li onclick='myGrooveWriter.notePopupClick("hh","close");'>Hi-hat closed</li> -->
-				<li onclick='myGrooveWriter.notePopupClick("hh","accent");'>Hi-hat accent</li>
-				<li onclick='myGrooveWriter.notePopupClick("hh","crash");'>Crash</li>
-				<li onclick='myGrooveWriter.notePopupClick("hh","ride");'>Ride</li>
-				<li onclick='myGrooveWriter.notePopupClick("hh","ride_bell");'>Ride Bell</li>
-				<li onclick='myGrooveWriter.notePopupClick("hh","cow_bell");'>Cow Bell</li>
-				<li onclick='myGrooveWriter.notePopupClick("hh","stacker");'>Stacker</li>
-				<li onclick='myGrooveWriter.notePopupClick("hh","metronome_normal");'>Click</li>
-				<li onclick='myGrooveWriter.notePopupClick("hh","metronome_accent");'>Click - accent</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="tom1ContextMenu" class="list">
-				<li onclick='myGrooveWriter.notePopupClick("tom1", "off");'>Off</li>
-				<li onclick='myGrooveWriter.notePopupClick("tom1", "normal");'>Tom Normal</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="tom4ContextMenu" class="list">
-				<li onclick='myGrooveWriter.notePopupClick("tom4", "off");'>Off</li>
-				<li onclick='myGrooveWriter.notePopupClick("tom4", "normal");'>Tom Normal</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="snareContextMenu" class="list">
-				<li onclick='myGrooveWriter.notePopupClick("snare", "off");'>Off</li>
-				<li onclick='myGrooveWriter.notePopupClick("snare", "normal");'>Snare Normal</li>
-				<li onclick='myGrooveWriter.notePopupClick("snare", "accent");'>Snare Accent</li>
-				<li onclick='myGrooveWriter.notePopupClick("snare", "ghost");'>Ghost Note</li>
-				<li onclick='myGrooveWriter.notePopupClick("snare", "xstick");'>Cross Stick</li>
-				<li onclick='myGrooveWriter.notePopupClick("snare", "buzz");'>Buzz Stroke</li>
-				<li onclick='myGrooveWriter.notePopupClick("snare", "flam");'>Flam</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="kickContextMenu" class="list">
-				<li onclick='myGrooveWriter.notePopupClick("kick", "off");'>Off</li>
-				<li onclick='myGrooveWriter.notePopupClick("kick", "normal");'>Kick Normal</li>
-				<li onclick='myGrooveWriter.notePopupClick("kick", "splash");'>Hi-hat foot</li>
-				<li onclick='myGrooveWriter.notePopupClick("kick", "kick_and_splash");'>Kick &amp; Hi-hat foot</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="stickingsLabelContextMenu" class="list">
-				<li onclick='myGrooveWriter.noteLabelPopupClick("stickings", "all_off");'>all <b>Off</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("stickings", "alternate");'>alternate <b>R</b>/<b>L</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("stickings", "all_right");'>all <b>R</b>s</li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("stickings", "all_left");'>all <b>L</b>s</li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("stickings", "all_count");'><b>C</b>ounts</li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("stickings", "cancel");'>cancel</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="hhLabelContextMenu" class="list">
-				<li onclick='myGrooveWriter.noteLabelPopupClick("hh", "all_off");'>all Hi-hats <b>Off</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("hh", "all_on");'>all Hi-hats <b>On</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("hh", "downbeats");'>downbeats</li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("hh", "upbeats");'>upbeats</li>
-				<li id='mute_hh_menu_item' onclick='myGrooveWriter.noteLabelPopupClick("hh", "mute");'>mute HH sound</li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("hh", "cancel");'>cancel</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="tom1LabelContextMenu" class="list">
-				<li onclick='myGrooveWriter.noteLabelPopupClick("tom1", "all_off");'>all Toms <b>Off</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("tom1", "all_on");'>all Toms <b>On</b></li>
-				<li id='mute_tom1_menu_item' onclick='myGrooveWriter.noteLabelPopupClick("tom1", "mute");'>mute tom sound</li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("tom1", "cancel");'>cancel</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="tom4LabelContextMenu" class="list">
-				<li onclick='myGrooveWriter.noteLabelPopupClick("tom4", "all_off");'>all Toms <b>Off</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("tom4", "all_on");'>all Toms <b>On</b></li>
-				<li id='mute_tom4_menu_item' onclick='myGrooveWriter.noteLabelPopupClick("tom4", "mute");'>mute tom sound</li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("tom4", "cancel");'>cancel</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="snareLabelContextMenu" class="list">
-				<li onclick='myGrooveWriter.noteLabelPopupClick("snare", "all_off");'>all Snares <b>Off</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("snare", "all_on");'>all <b>Accented</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("snare", "all_on_normal");'>all <b>Normal</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("snare", "all_on_ghost");'>all <b>Ghosts</b></li>
-				<li id='mute_snare_menu_item' onclick='myGrooveWriter.noteLabelPopupClick("snare", "mute");'>mute snare sound</li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("snare", "cancel");'>cancel</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="kickLabelContextMenu" class="list">
-				<li onclick='myGrooveWriter.noteLabelPopupClick("kick", "all_off");'>all Kicks <b>Off</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("kick", "all_on");'>all Kicks <b>On</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("kick", "hh_foot_nums_on");'>HH foot #'s <b>On</b></li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("kick", "hh_foot_ands_on");'>HH foot &'s <b>On</b></li>
-				<li id='mute_kick_menu_item' onclick='myGrooveWriter.noteLabelPopupClick("kick", "mute");'>mute kick sound</li>
-				<li onclick='myGrooveWriter.noteLabelPopupClick("kick", "cancel");'>cancel</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="permutationContextMenu" class="list">
-				<li onclick='myGrooveWriter.permutationPopupClick("none");'><b>None</b></li>
-				<li onclick='myGrooveWriter.permutationPopupClick("kick_16ths");'><b>Kick</b> Permutation</li>
-				<li onclick='myGrooveWriter.permutationPopupClick("snare_16ths");'><b>Snare</b> Permutation</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="helpContextMenu" class="list">
-				<li onclick='myGrooveWriter.helpMenuPopupClick("undo");'>Undo (Ctrl-Z)</li>
-				<li onclick='myGrooveWriter.helpMenuPopupClick("redo");'>Redo (Ctrl-Y)</li>
-				<li onclick='myGrooveWriter.helpMenuPopupClick("help");'>Help</li>
-				<li onclick='myGrooveWriter.helpMenuPopupClick("about");'>About</li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="stickingsContextMenu" class="list" style="width: 200px;">
-				<li onclick='myGrooveWriter.stickingsShowHideToggle();'><b>Show or Hide stickings</b></li>
-				<li onclick='myGrooveWriter.stickingsReverseRL();'><b>Reverse stickings R/L</b></li>
-			</ul>
-		</div>
-		<div class="noteContextMenu">
-			<ul id="downloadContextMenu" class="list" style="width: 200px;">
-				<li onclick='myGrooveWriter.SVGSaveAs();'><b>Download SVG Images</b></li>
-				<li onclick='myGrooveWriter.PNGSaveAs();'><b>Download PNG Images</b></li>
-				<li onclick='myGrooveWriter.MIDISaveAs();'><b>Download MIDI file</b></li>
-			</ul>
-		</div>
-		<div id="grooveListWrapper">
-			<script>
-				document.write(grooves.getGroovesAsHTML());
-			</script>
-		</div>
 
-		<!-- dialog for the TIME label, hidden by default -->
-		<div id="timeSigPopup">
-			<div id="timeSigPopupTitle">Choose a Time Signature</div>
-			<div id="timeSigPopupOptions">
-			 <select id="timeSigPopupTimeSigTop">
-			  <option value="2">2</option>
-			  <option value="3">3</option>
-			  <option selected value="4">4</option>
-			  <option value="5">5</option>
-			  <option value="6">6</option>
-			  <option value="7">7</option>
-			  <option value="8">8</option>
-			  <option value="9">9</option>
-			  <option value="10">10</option>
-			  <option value="11">11</option>
-			  <option value="12">12</option>
-			  <option value="13">13</option>
-			  <option value="14">14</option>
-			  <option value="15">15</option>
-			</select>
-			<b id="timeSigPopupSlash">/</b>
-			<select id="timeSigPopupTimeSigBottom">
-			  <option selected value="4">4</option>
-			  <option value="8">8</option>
-			  <option value="16">16</option>
-			</select>
-			</div>
-			<div id="timeSigPopupButtons">
-			<button id="timeSigPopupCancel" onclick="myGrooveWriter.timeSigPopupClose('cancel');">Cancel</button>
-			<button id="timeSigPopupOK" onclick="myGrooveWriter.timeSigPopupClose('ok');">Done</button>
-			</div>
-		</div>
+/* toolbar popover controls */
+.tb-ctrl{position:relative;display:flex;align-items:center}
+.tb-txt{height:36px;padding:0 10px;border:none;background:transparent;border-radius:8px;font-family:inherit;font-weight:500;font-size:12px;color:var(--sec);cursor:pointer;display:flex;align-items:center;transition:background .12s}
+.tb-txt b{color:var(--pri);font-weight:500}
+.tb-txt:hover,.tb-txt.on{background:var(--bg-c)}
+.tb-btn.lit{color:var(--pri);background:var(--bg-c)}
+.pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);min-width:190px;background:#fff;border:1px solid var(--brd);border-radius:12px;box-shadow:0 10px 34px rgba(0,0,0,.14);padding:14px;display:none;z-index:60}
+.pop.open{display:block}
+.pop-cap{display:block;font-size:10px;font-weight:500;color:var(--mut);margin-bottom:8px}
+.pop-row{display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:12px}
+.pop-step{width:30px;height:30px;border:1px solid var(--brd);border-radius:6px;background:#fff;font-size:15px;color:var(--sec);cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center}
+.pop-step:hover{background:var(--bg-c);color:var(--pri)}
+.pop-bpm-v{width:52px;text-align:center;font-size:17px;font-weight:500;color:var(--pri);border:none;background:transparent;font-family:inherit;outline:none;-moz-appearance:textfield}
+.pop-bpm-v::-webkit-inner-spin-button,.pop-bpm-v::-webkit-outer-spin-button{-webkit-appearance:none}
+.pop-lbl{display:flex;justify-content:space-between;font-size:10px;color:var(--mut);margin-bottom:6px}
+.pop-lbl.off{opacity:.38}
+.rng:disabled{opacity:.4;cursor:not-allowed}
+.pop-ts-row{display:flex;align-items:flex-end;gap:8px}
+.pop-field{display:flex;flex-direction:column;gap:5px}
+.pop-field .pop-cap{margin-bottom:0}
+.pop-field .sel{width:72px}
+.pop-slash{color:var(--mut);font-size:15px;padding-bottom:7px}
+.pop-row-between{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.pop-row-between .pop-cap{margin-bottom:0}
+.seg{display:flex;gap:3px;padding:3px;background:var(--bg-c);border-radius:8px;margin-bottom:6px}
+.seg:last-child{margin-bottom:0}
+.seg-b{flex:1;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);padding:6px 8px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .1s}
+.seg-b:hover:not(.on){background:rgba(0,0,0,.05)}
+.seg-b.on{background:var(--pri);color:#fff}
+/* stacked popover action list */
+.pop-acts{display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.pop-act{width:100%;text-align:left;padding:6px 8px;border:none;background:transparent;border-radius:6px;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;transition:background .1s}
+.pop-act:hover{background:var(--bg-c);color:var(--pri)}
+.pop-div{height:1px;background:var(--brd-lt);margin:10px 0 2px}
 
-		<!-- this is used by the share/save button, and is hidden by default -->
-		<div id="fullURLPopup">
-			<span id="fullURLPopupCloseButton" onclick="myGrooveWriter.close_FullURLPopup();"><i class="ph ph-x-circle"></i></span>
-			<div id="fullURLPopupTitle">Share Your Groove</div>
-			<div id="fullURLPopupSubTitle">Use this URL to share or save this groove</div>
-			<div id="fullURLPopupSubSubTitle">(You can also bookmark this page)</div>
-			<div id="fullURLPopupCheckboxes">
-				<span><label  id="shortURLLabel" class="fullURLPopupCheckboxLabel"><input type="checkbox" id="shortenerCheckbox" onchange="myGrooveWriter.shortenerCheckboxChanged();">Short URL</label></span>
-				<span><label id="embedCodeLabel" class="fullURLPopupCheckboxLabel"><input type="checkbox" id="embedCodeCheckbox" onchange="myGrooveWriter.embedCodeCheckboxChanged();">Embed Code</label></span>
-			</div>
-			<div id="fullURLPopupTextFieldContainer"><input type="text" id="fullURLPopupTextField"></div>
-			<br>
-			<div id="shareButtonContainer">
-				<button id="fullURLPopupCopyButton" onclick="myGrooveWriter.copyShareURLToClipboard();">&nbsp;<i class="ph ph-copy"></i> &nbsp;COPY&nbsp;</button>
-				&nbsp; &nbsp; &nbsp;
-				<share-button id="shareButton"></share-button>
-			</div>
-		</div>
+/* ─── VIEW / EDIT MODE SWITCH (floating, top-center) ─── */
+.mode-switch{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:3px;background:var(--bg-sb);border:1px solid var(--brd);border-radius:10px;padding:3px;z-index:1}
+.mode-b{border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .12s}
+.mode-b:hover:not(.on){background:var(--bg-c);color:var(--pri)}
+.mode-b.on{background:var(--pri);color:#fff}
+body.view-mode .grid-outer{display:none}
+
+/* ─── MEASURE CONTROLS (per-measure ✕ + ghost ＋) ─── */
+.grid-outer{display:inline-flex;align-items:center;gap:12px;max-width:100%;margin-top:auto} /* pinned low: .main's 140px bottom padding leaves ~40px above the toolbar */
+/* per-measure wrapper in the label row, so the ✕ can pin to its top-right */
+.g-lbl-m{display:flex;gap:12px;position:relative}
+.g-meas-x{position:absolute;top:-16px;left:-25px;width:18px;height:18px;border:none;background:transparent;color:var(--fnt);border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;transition:all .1s;z-index:3}
+.g-meas-x:hover{background:var(--bg-c);color:var(--pri)}
+.g-meas-x .ph{font-size:13px}
+/* ghost add button, vertically centered to the right of the last measure */
+.g-meas-add{width:32px;height:32px;flex-shrink:0;border:1px dashed var(--brd);border-radius:8px;background:transparent;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
+.g-meas-add:hover{border-color:#bbb;color:var(--pri);background:var(--bg-c)}
+.g-meas-add .ph{font-size:16px}
+
+/* ─── MAIN ─── */
+.main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 140px;overflow:auto;min-width:0}
+
+/* notation */
+.notation-wrap{position:relative;width:100%;max-width:1200px;margin-bottom:16px;overflow-x:auto;overflow-y:hidden}
+/* abc2svg emits one <svg> per staff line — stack them (side by side puts a clef mid-line) */
+.notation-wrap svg{display:block;margin:0 auto;height:auto;max-width:100%}
+#notArea .abcr.highlighted{fill:rgba(45,140,90,.22)!important;transition:fill .04s}
+
+/* grid */
+.grid-wrap{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;overflow-x:auto;padding:18px 20px 4px 0}
+.g-labels{display:flex;align-items:flex-end;margin-bottom:4px}
+.g-spacer{width:44px;flex-shrink:0}
+.g-lbl-c{display:flex;gap:12px}
+.g-lbl-g{display:flex;gap:3px}
+.g-lbl-g span{width:36px;text-align:center;font-size:9px;font-weight:500;line-height:1}
+.g-bn{color:var(--mut)!important;font-size:10px!important;font-weight:500!important}
+.g-sd{color:var(--fnt)!important}
+
+.g-row{display:flex;align-items:center}
+.g-row-lbl{width:44px;flex-shrink:0;font-size:10px;font-weight:500;color:var(--mut);text-align:right;padding-right:10px;letter-spacing:.02em;cursor:pointer;position:relative}
+.g-row-lbl:hover{color:var(--sec)}
+.g-cells{display:flex;gap:12px}
+.g-beat{display:flex;gap:3px}
+.g-mbar{width:2px;background:var(--brd);align-self:stretch;margin:0 3px;border-radius:1px;flex-shrink:0}
+
+.cell{width:36px;height:34px;border-radius:5px;cursor:pointer;background:var(--bg-c);transition:background .08s,transform .08s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;user-select:none;-webkit-user-select:none;flex-shrink:0}
+.cell:hover{background:var(--bg-ch)}
+.cell.on{background:#888}
+.cell.on:hover{background:#7a7a7a}
+.g-row[data-inst="sticking"] .cell.on{background:#aaa}
+.g-row[data-inst="hihat"] .cell.on{background:#888}
+.g-row[data-inst="tom1"] .cell.on{background:#777}
+.g-row[data-inst="snare"] .cell.on{background:#666}
+.g-row[data-inst="tom2"] .cell.on{background:#777}
+.g-row[data-inst="kick"] .cell.on{background:#444}
+.cell[data-t="g"]{font-size:9px;opacity:.7}
+.cell[data-t="X"],.cell[data-t="O"]{box-shadow:inset 0 -2px 0 rgba(255,255,255,.3)}
+.cell[data-t="o"][data-inst="hihat"]{box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
+.cell.phead:not(.on){background:#E4E4E4;box-shadow:inset 0 0 0 2px rgba(0,0,0,.05)}
+.cell.on.phead{filter:brightness(1.2)}
+
+/* context / row menus */
+.ctx{position:fixed;background:#fff;border:1px solid var(--brd);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.1);padding:4px;z-index:500;min-width:120px;display:none}
+.ctx-i{display:block;width:100%;text-align:left;padding:6px 10px;border:none;background:transparent;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;border-radius:4px;transition:background .08s}
+.ctx-i:hover{background:var(--bg-c)}
+.ctx-i.on{color:var(--pri);background:var(--bg-c)}
+.row-menu{position:fixed;background:#fff;border:1px solid var(--brd);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.1);padding:4px;z-index:500;min-width:130px;display:none;white-space:nowrap}
+.row-menu.open{display:block}
+
+/* mobile */
+
+@media(max-width:900px){
+  .topbar{padding:0 12px}
+  .main{padding:20px 14px 100px;overflow:auto;justify-content:flex-start;align-items:flex-start}
+  .notation-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .grid-wrap{overflow-x:auto;width:100%;padding-bottom:8px;-webkit-overflow-scrolling:touch}
+  .toolbar{
+    position:fixed;bottom:0;left:0;right:0;
+    transform:none;border-radius:0;
+    border:none;border-top:1px solid var(--brd);
+    padding:6px 12px;justify-content:center;
+    box-shadow:0 -2px 12px rgba(0,0,0,.06);
+    gap:4px;
+  }
+}
+
+@media print{
+  .topbar,.grid-outer,.toolbar{display:none!important}
+  .app{display:block}
+  .main{padding:20px;justify-content:flex-start;height:auto;overflow:visible}
+  .notation-wrap{max-width:100%;overflow:visible}
+  .notation-wrap svg{width:100%!important}
+}
+</style>
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+</head>
+<body>
+
+<div class="ctx" id="ctx"></div>
+
+<div class="app">
+<header class="topbar" id="topbar">
+  <span class="logo">Ritmo</span>
+  <!-- View / Edit switch, centered -->
+  <div class="mode-switch" id="modeSwitch">
+    <button class="mode-b on" type="button" data-mode="edit">Edit</button>
+    <button class="mode-b" type="button" data-mode="view">View</button>
+  </div>
+  <div class="tb-actions">
+    <!-- Details -->
+    <div class="tb-ctrl">
+      <button class="topbtn" data-pop="details" id="detailsBtn" title="Score details"><i class="ph ph-info"></i></button>
+      <div class="pop pop-tr" id="pop-details">
+        <span class="pop-cap">Score details</span>
+        <input type="text" class="meta-in" id="titleIn" placeholder="Title">
+        <input type="text" class="meta-in" id="authorIn" placeholder="Author">
+      </div>
+    </div>
+    <!-- Export -->
+    <div class="tb-ctrl">
+      <button class="topbtn" data-pop="export" id="exportBtn" title="Export"><i class="ph ph-export"></i></button>
+      <div class="pop pop-tr" id="pop-export">
+        <div class="pop-acts">
+          <button class="pop-act" type="button" id="shareBtn">Copy link</button>
+          <button class="pop-act" type="button" id="printBtn">Print</button>
+          <button class="pop-act" type="button" id="dlBtn">Download SVG</button>
+          <button class="pop-act" type="button" id="midiBtn">Export MIDI</button>
+        </div>
+      </div>
+    </div>
+    <!-- More (holds the groove library + shortcuts) -->
+    <div class="tb-ctrl">
+      <button class="topbtn" data-pop="more" id="moreBtn" title="More"><i class="ph ph-dots-three-outline"></i></button>
+      <div class="pop pop-tr pop-more" id="pop-more">
+        <span class="pop-cap">Groove library</span>
+        <div class="lib-scroll" id="sec-library"></div>
+      </div>
+    </div>
+  </div>
+</header>
+<main class="main">
+  <div class="notation-wrap" id="notWrap"><div id="notArea"></div></div>
+  <div class="grid-outer" id="gridOuter">
+    <div class="grid-wrap" id="gridWrap"></div>
+    <button class="g-meas-add" id="addMeasBtn" type="button" title="Add measure"><i class="ph ph-plus"></i></button>
+  </div>
+</main>
+</div>
+
+<!-- BOTTOM TOOLBAR -->
+<div class="toolbar" id="toolbar">
+  <!-- Play -->
+  <button class="tb-btn tb-play" id="playBtn" title="Play / Pause">
+    <i class="ph-fill ph-play" id="playIco"></i>
+  </button>
+  <!-- BPM + Swing -->
+  <div class="tb-ctrl">
+    <button class="tb-txt" data-pop="bpm" title="Tempo & Swing"><b id="bpmDisp">80</b>&nbsp;BPM</button>
+    <div class="pop" id="pop-bpm">
+      <div class="pop-row">
+        <button class="pop-step" id="bpmDn" type="button">&minus;</button>
+        <input type="number" class="pop-bpm-v" id="bpmV" value="80" min="40" max="240">
+        <button class="pop-step" id="bpmUp" type="button">+</button>
+      </div>
+      <div class="pop-lbl" id="swingRow"><span>Swing</span><span id="swingV">0%</span></div>
+      <input type="range" class="rng" id="swingR" min="0" max="100" value="0">
+    </div>
+  </div>
+  <!-- Time signature -->
+  <div class="tb-ctrl">
+    <button class="tb-txt" data-pop="ts" title="Time Signature"><b id="tsDisp">4/4</b></button>
+    <div class="pop" id="pop-ts">
+      <div class="pop-ts-row">
+        <label class="pop-field"><span class="pop-cap">Beats</span>
+          <select class="sel" id="tsNumSel"><option>2</option><option>3</option><option selected>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option><option>10</option><option>11</option><option>12</option><option>13</option><option>14</option><option>15</option></select></label>
+        <span class="pop-slash">/</span>
+        <label class="pop-field"><span class="pop-cap">Value</span>
+          <select class="sel" id="tsDenSel"><option selected>4</option><option>8</option><option>16</option></select></label>
+      </div>
+    </div>
+  </div>
+  <!-- Subdivision -->
+  <div class="tb-ctrl">
+    <button class="tb-txt" data-pop="subdiv" title="Subdivision"><b id="subdivDisp">1/16</b></button>
+    <div class="pop" id="pop-subdiv">
+      <span class="pop-cap">Subdivision</span>
+      <div class="seg" id="segNote">
+        <button class="seg-b" type="button" data-val="8">1/8</button>
+        <button class="seg-b" type="button" data-val="16">1/16</button>
+        <button class="seg-b" type="button" data-val="32">1/32</button>
+      </div>
+      <div class="seg" id="segFeel">
+        <button class="seg-b" type="button" data-feel="straight">Straight</button>
+        <button class="seg-b" type="button" data-feel="triplet">Triplets</button>
+      </div>
+    </div>
+  </div>
+  <!-- Metronome -->
+  <div class="tb-ctrl">
+    <button class="tb-btn" data-pop="met" id="metBtn" title="Metronome">
+      <i class="ph ph-metronome"></i>
+    </button>
+    <div class="pop" id="pop-met">
+      <div class="pop-row-between"><span class="pop-cap">Metronome</span>
+        <label class="tog"><input type="checkbox" id="metTog"><span class="tog-s"></span></label></div>
+      <div class="seg" id="segMetRate">
+        <button class="seg-b" type="button" data-rate="4">4th</button>
+        <button class="seg-b" type="button" data-rate="8">8th</button>
+        <button class="seg-b" type="button" data-rate="16">16th</button>
+      </div>
+    </div>
+  </div>
+  <!-- Stickings -->
+  <div class="tb-ctrl">
+    <button class="tb-btn" data-pop="stick" id="stickBtn" title="Stickings">
+      <i class="ph ph-hand-tap"></i>
+    </button>
+    <div class="pop" id="pop-stick">
+      <div class="pop-row-between"><span class="pop-cap">Stickings</span>
+        <label class="tog"><input type="checkbox" id="stickTog"><span class="tog-s"></span></label></div>
+      <div class="pop-acts">
+        <button class="pop-act" type="button" data-sk="alt">Alternate R / L</button>
+        <button class="pop-act" type="button" data-sk="R">All R</button>
+        <button class="pop-act" type="button" data-sk="L">All L</button>
+        <button class="pop-act" type="button" data-sk="rev">Reverse R ↔ L</button>
+        <div class="pop-div"></div>
+        <button class="pop-act" type="button" data-sk="off">Clear</button>
+      </div>
+    </div>
+  </div>
+  <!-- Toms (direct show/hide toggle) -->
+  <button class="tb-btn lit" id="tomsBtn" title="Show / hide toms"><i class="ph ph-circles-three"></i></button>
+  <!-- Clear -->
+  <button class="tb-btn" id="clearBtn" title="Clear All">
+    <i class="ph ph-trash"></i>
+  </button>
+  <!-- Copy PNG -->
+  <button class="tb-btn" id="copyPngBtn" title="Copy as PNG">
+    <i class="ph ph-image"></i>
+  </button>
+</div>
+
+<!-- GrooveScribe engine: notation rendering (abc2svg + groove_utils) -->
+<script src="js/abc2svg-1.js"></script>
+<script src="js/jsmidgen.js"></script>
+<script src="js/groove_utils.js"></script>
+<script src="https://artifactcdn.diabrowser.engineering/ajax/libs/tone/Tone.min.js"></script>
+<script>
+(function(){
+
+const NT={
+  sticking:[{id:0,ch:''},{id:'R',ch:'R'},{id:'L',ch:'L'}],
+  hihat:[{id:0,ch:'',lb:'Off'},{id:'x',ch:'×',lb:'Closed'},{id:'X',ch:'×',lb:'Accent'},{id:'o',ch:'○',lb:'Open'},{id:'cr',ch:'✦',lb:'Crash'},{id:'rd',ch:'◇',lb:'Ride'},{id:'rb',ch:'◆',lb:'Ride Bell'}],
+  tom1:[{id:0,ch:'',lb:'Off'},{id:'o',ch:'●',lb:'Normal'}],
+  snare:[{id:0,ch:'',lb:'Off'},{id:'o',ch:'●',lb:'Normal'},{id:'O',ch:'●',lb:'Accent'},{id:'g',ch:'·',lb:'Ghost'},{id:'x',ch:'×',lb:'Cross Stick'},{id:'z',ch:'z',lb:'Buzz'}],
+  tom2:[{id:0,ch:'',lb:'Off'},{id:'o',ch:'●',lb:'Normal'}],
+  kick:[{id:0,ch:'',lb:'Off'},{id:'o',ch:'●',lb:'Normal'},{id:'f',ch:'×',lb:'HH Foot'}]
+};
+const INSTS=[{id:'sticking',lb:'SK',nm:'Stickings'},{id:'hihat',lb:'HH',nm:'Hi-Hat'},{id:'tom1',lb:'T1',nm:'Hi Tom'},{id:'snare',lb:'SN',nm:'Snare'},{id:'tom2',lb:'T2',nm:'Lo Tom'},{id:'kick',lb:'KK',nm:'Kick'}];
+const CYCLE={sticking:[0,'R','L'],hihat:[0,'x','X','o'],tom1:[0,'o'],snare:[0,'o','O','g','x'],tom2:[0,'o'],kick:[0,'o','f']};
+const ROW_OPS={
+  sticking:[{lb:'All Off',fn:()=>0},{lb:'Alternate R/L',fn:i=>i%2===0?'R':'L'},{lb:'All R',fn:()=>'R'},{lb:'All L',fn:()=>'L'}],
+  hihat:[{lb:'All Off',fn:()=>0},{lb:'All On',fn:()=>'x'},{lb:'Downbeats',fn:(i,s)=>i%s===0?'x':0},{lb:'Upbeats',fn:(i,s)=>i%s!==0?'x':0}],
+  tom1:[{lb:'All Off',fn:()=>0},{lb:'All On',fn:()=>'o'}],
+  snare:[{lb:'All Off',fn:()=>0},{lb:'All Accented',fn:(_,__,v)=>v?'O':0},{lb:'All Normal',fn:(_,__,v)=>v?'o':0},{lb:'All Ghosts',fn:(_,__,v)=>v?'g':0}],
+  tom2:[{lb:'All Off',fn:()=>0},{lb:'All On',fn:()=>'o'}],
+  kick:[{lb:'All Off',fn:()=>0},{lb:'All On',fn:()=>'o'},{lb:'HH Foot On Beats',fn:(i,s)=>i%s===0?'f':0}]
+};
+
+let S={tsNum:4,tsDen:4,div:16,bpm:80,swing:0,met:'off',measures:1,showStick:false,showToms:true,pattern:{}};
+let hist=[],histIdx=-1;
+
+/* ═══ ENGINE ADAPTER — render notation via GrooveScribe (groove_utils) ═══ */
+const GU=new GrooveUtils();
+// Ritmo note id -> GrooveScribe URL letter (nothing lost)
+const H_MAP={x:'x',X:'X',o:'o',cr:'c',rd:'r',rb:'b'};   // closed/accent/open/crash/ride/bell
+const S_MAP={o:'o',O:'O',g:'g',x:'x',z:'b'};            // normal/accent/ghost/cross-stick/buzz
+const K_MAP={o:'o',f:'x'};                              // kick / hi-hat-foot -> splash
+const T_MAP={o:'o'};
+const STK_MAP={R:'R',L:'L'};
+function encVoice(arr,map){return '|'+arr.map(v=>(v&&map[v])?map[v]:'-').join('')+'|';}
+function stateToGrooveUrl(){
+  const p=S.pattern;
+  let u='?TimeSig='+S.tsNum+'/'+S.tsDen+'&Div='+S.div+'&measures='+S.measures+'&tempo='+S.bpm+'&swing='+S.swing;
+  u+='&H='+encVoice(p.hihat,H_MAP)+'&S='+encVoice(p.snare,S_MAP)+'&K='+encVoice(p.kick,K_MAP);
+  if(S.showToms) u+='&T1='+encVoice(p.tom1,T_MAP)+'&T4='+encVoice(p.tom2,T_MAP);
+  if(S.showStick) u+='&Stickings='+encVoice(p.sticking,STK_MAP);
+  // Score details -> engine renders Title (T:) and Author (C:) onto the sheet
+  const title=(document.getElementById('titleIn').value||'').trim();
+  const author=(document.getElementById('authorIn').value||'').trim();
+  if(title) u+='&Title='+encodeURIComponent(title);
+  if(author) u+='&Author='+encodeURIComponent(author);
+  return u;
+}
+// Size the page for ONE staff line: joinMeasureLines puts up to measuresPerLine()
+// measures per line, so the widest line has min(measures, mpl) measures. The
+// engine sets %%pagewidth = renderWidth*0.75; ~13px/note keeps spacing readable.
+function notationWidth(){
+  const measuresOnLine=Math.min(S.measures,measuresPerLine());
+  const pageW=40+measuresOnLine*spm()*13;
+  return Math.max(400,Math.min(3000,pageW/0.75));
+}
+// Tone.js subdivision per GrooveScribe division (straight + triplet)
+const TONE_SUB={8:'8n',16:'16n',32:'32n',12:'8t',24:'16t',48:'32t'};
+function spm(){return GU.calc_notes_per_measure(S.div,S.tsNum,S.tsDen)}  // steps per measure (engine-accurate, incl. triplets)
+function spb(){return spm()/S.tsNum}                                      // steps per beat
+function subLabelsFor(n){
+  if(n===2) return ['','&'];
+  if(n===4) return ['','e','&','a'];
+  if(n===3) return ['','·','·'];              // 8th triplet
+  if(n===6) return ['','·','·','·','·','·'];  // 16th triplet
+  if(n===8) return ['','·','e','·','&','·','a','·']; // 32nd
+  const a=new Array(n).fill('·'); a[0]=''; return a;
+}
+function numSteps(){return spm()*S.measures}
+function A(n){return new Array(n).fill(0)}
+function makeEmpty(){const n=numSteps();return{sticking:A(n),hihat:A(n),tom1:A(n),snare:A(n),tom2:A(n),kick:A(n)}}
+function initPattern(){
+  S.pattern=makeEmpty();
+  for(let m=0;m<S.measures;m++){
+    const o=m*spm(),s=spb();
+    for(let i=0;i<spm();i++) S.pattern.hihat[o+i]='x';
+    if(o+1*s<numSteps()) S.pattern.snare[o+1*s]='o';
+    if(o+3*s<numSteps()) S.pattern.snare[o+3*s]='o';
+    S.pattern.kick[o]='o';
+    if(o+2*s<numSteps()) S.pattern.kick[o+2*s]='o';
+  }
+}
+function clonePat(){return JSON.parse(JSON.stringify(S.pattern))}
+function pushUndo(){hist.splice(histIdx+1);hist.push(clonePat());if(hist.length>80)hist.shift();histIdx=hist.length-1}
+function undo(){if(histIdx>0){histIdx--;S.pattern=JSON.parse(JSON.stringify(hist[histIdx]));syncAll()}}
+function redo(){if(histIdx<hist.length-1){histIdx++;S.pattern=JSON.parse(JSON.stringify(hist[histIdx]));syncAll()}}
+function resizePattern(){
+  const n=numSteps(),s=spm();
+  INSTS.forEach(inst=>{
+    const arr=S.pattern[inst.id];
+    if(arr.length<n){const first=arr.slice(0,s);while(S.pattern[inst.id].length<n){const idx=S.pattern[inst.id].length%s;S.pattern[inst.id].push(first[idx]||0)}}
+    else if(arr.length>n) S.pattern[inst.id]=arr.slice(0,n);
+  });
+}
+// Point-and-click measure editing (no upper limit)
+function addMeasure(){
+  pushUndo();
+  const s=spm(),lastStart=(S.measures-1)*s;
+  INSTS.forEach(inst=>{const arr=S.pattern[inst.id],seg=arr.slice(lastStart,lastStart+s);for(let i=0;i<s;i++)arr.push(seg[i]||0)});
+  S.measures++;syncAll();
+}
+function removeMeasure(m){
+  if(S.measures<=1) return;
+  pushUndo();
+  const s=spm();
+  INSTS.forEach(inst=>{S.pattern[inst.id].splice(m*s,s)});
+  S.measures--;syncAll();
+}
+// Sticking presets (Alternate / All R / All L / Reverse / Clear). Any op auto-enables stickings.
+function applySticking(op){
+  pushUndo();
+  const n=numSteps(),arr=S.pattern.sticking;
+  if(op==='rev'){for(let i=0;i<n;i++){if(arr[i]==='R')arr[i]='L';else if(arr[i]==='L')arr[i]='R';}}
+  else if(op==='off'){for(let i=0;i<n;i++)arr[i]=0;}
+  else if(op==='alt'){for(let i=0;i<n;i++)arr[i]=i%2===0?'R':'L';}
+  else{for(let i=0;i<n;i++)arr[i]=op;} // 'R' or 'L'
+  if(op!=='off'){S.showStick=true;const t=document.getElementById('stickTog');if(t)t.checked=true;}
+  syncAll();
+}
+
+const LIB={
+  'Rock':{'8th Note Rock':{ts:'4-4',div:16,bpm:100,p:{hihat:['x',0,'x',0,'x',0,'x',0,'x',0,'x',0,'x',0,'x',0],snare:[0,0,0,0,'o',0,0,0,0,0,0,0,'o',0,0,0],kick:['o',0,0,0,0,0,0,0,'o',0,0,0,0,0,0,0]}},'16th Note Rock':{ts:'4-4',div:16,bpm:80,p:{hihat:['x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'],snare:[0,0,0,0,'o',0,0,0,0,0,0,0,'o',0,0,0],kick:['o',0,0,0,0,0,0,0,'o',0,0,0,0,0,0,0]}},'Train Beat':{ts:'4-4',div:16,bpm:110,p:{hihat:['x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'],snare:['o',0,'o',0,'o',0,'o',0,'o',0,'o',0,'o',0,'o',0],kick:['o',0,0,0,'o',0,0,0,'o',0,0,0,'o',0,0,0]}}},
+  'Funk':{'Basic Funk':{ts:'4-4',div:16,bpm:95,p:{hihat:['x','x','x','x','x','x','x','x','x','x','x','x','x','x','x','x'],snare:[0,0,0,0,'o',0,0,'g',0,0,0,0,'o',0,0,0],kick:['o',0,0,'o',0,0,0,0,'o',0,'o',0,0,0,0,0]}},'Disco':{ts:'4-4',div:16,bpm:110,p:{hihat:['x',0,'x',0,'x',0,'x',0,'x',0,'x',0,'x',0,'x',0],snare:[0,0,0,0,'o',0,0,0,0,0,0,0,'o',0,0,0],kick:['o',0,0,'o',0,0,'o',0,'o',0,0,'o',0,0,'o',0]}},'Hip Hop':{ts:'4-4',div:16,bpm:85,p:{hihat:['x',0,'x',0,'x',0,'x',0,'x',0,'x',0,'x',0,'x',0],snare:[0,0,0,0,'o',0,0,0,0,0,0,0,'o',0,0,0],kick:['o',0,0,0,0,0,'o',0,0,0,'o',0,0,0,0,'o']}}},
+  'World':{'Bossa Nova':{ts:'4-4',div:16,bpm:130,p:{hihat:['x',0,'x',0,'x',0,'x',0,'x',0,'x',0,'x',0,'x',0],snare:[0,0,0,'x',0,0,'x',0,0,0,'x',0,0,'x',0,0],kick:['o',0,0,0,0,0,'o',0,0,0,'o',0,0,0,0,0]}},'Songo':{ts:'4-4',div:16,bpm:100,p:{hihat:['x',0,'x','x',0,'x',0,'x','x',0,'x','x',0,'x',0,'x'],snare:[0,0,0,0,'O',0,'g',0,0,0,'g',0,'O',0,0,'g'],kick:['o',0,0,0,0,0,0,0,'o',0,0,'o',0,0,0,0]}}}
+};
+
+/* ═══ AUDIO ═══ */
+let audioReady=false,isPlaying=false,currentStep=-1;
+let players=null,seq;
+
+// Real GrooveScribe drum samples (per articulation) played through Ritmo's sequencer
+const SAMPLE_BASE='soundfont/NewDrumSamples/OGG/';
+const SAMPLE_FILES={
+  hh_x:'Hi Hat Normal.ogg', hh_X:'Hi Hat Accent.ogg', hh_o:'Hi Hat Open.ogg',
+  hh_cr:'Crash.ogg', hh_rd:'Ride.ogg', hh_rb:'Bell.ogg',
+  sn_o:'Snare Normal.ogg', sn_O:'Snare Accent.ogg', sn_g:'Snare Ghost.ogg',
+  sn_x:'Snare Cross Stick.ogg', sn_z:'Buzz.ogg',
+  kk_o:'Kick.ogg', kk_f:'Hi Hat Foot.ogg',
+  t1_o:'Rack Tom.ogg', t2_o:'Floor Tom.ogg',
+  met_hi:'metronome1Count.ogg', met_lo:'metronomeClick.ogg'
+};
+
+function initAudio(){
+  if(audioReady) return;
+  const master=new Tone.Compressor(-18,4).toDestination();
+  const urls={};
+  Object.keys(SAMPLE_FILES).forEach(k=>{urls[k]=SAMPLE_BASE+encodeURIComponent(SAMPLE_FILES[k])});
+  players=new Tone.Players(urls).connect(master);
+  audioReady=true;
+  Tone.getTransport().bpm.value=S.bpm;
+}
+
+function play(key,time){ if(players&&players.loaded&&players.has(key)) players.player(key).start(time); }
+
+function trig(inst,type,time){
+  if(!type) return;
+  if(inst==='hihat') play('hh_'+type,time);
+  else if(inst==='snare') play('sn_'+type,time);
+  else if(inst==='kick') play('kk_'+type,time);
+  else if(inst==='tom1') play('t1_o',time);
+  else if(inst==='tom2') play('t2_o',time);
+}
+
+function trigMet(step,time){
+  if(S.met==='off') return;
+  const s2=spb(),isBeat=step%s2===0,is8=step%(s2/2||1)===0;
+  const click=accent=>play(accent?'met_hi':'met_lo',time);
+  if(S.met==='4'&&isBeat) click(true);
+  else if(S.met==='8'&&is8) click(isBeat);
+  else if(S.met==='16') click(isBeat);
+}
+
+function recreateSeq(){
+  if(!audioReady) return;
+  const was=isPlaying;
+  if(isPlaying){Tone.getTransport().stop();if(seq)seq.stop();isPlaying=false}
+  if(seq)seq.dispose();
+  const ns=numSteps(),steps=Array.from({length:ns},(_,i)=>i);
+  seq=new Tone.Sequence((time,step)=>{
+    INSTS.forEach(inst=>{if(inst.id==='sticking')return;if(!S.showToms&&(inst.id==='tom1'||inst.id==='tom2'))return;trig(inst.id,S.pattern[inst.id][step],time)});
+    trigMet(step,time);
+    if(Tone.Draw&&Tone.Draw.schedule) Tone.Draw.schedule(()=>onStep(step),time);
+    else requestAnimationFrame(()=>onStep(step));
+  },steps,TONE_SUB[S.div]||'16n');
+  seq.loop=true;
+  if(was){seq.start(0);Tone.getTransport().start('+0.05');isPlaying=true}
+}
+
+function soundsAt(j){
+  const p=S.pattern;
+  return !!(p.hihat[j]||p.snare[j]||p.kick[j]||(S.showToms&&(p.tom1[j]||p.tom2[j])));
+}
+function onStep(step){
+  currentStep=step;
+  document.querySelectorAll('.cell.phead').forEach(c=>c.classList.remove('phead'));
+  document.querySelectorAll(`.cell[data-step="${step}"]`).forEach(c=>c.classList.add('phead'));
+  // highlight the playing note in the engine notation (abc index = # of sounding steps so far).
+  // on rest steps we leave the previous highlight, so the note "rings" until the next one.
+  if(soundsAt(step)){
+    let idx=-1; for(let j=0;j<=step;j++){ if(soundsAt(j)) idx++; }
+    try{ GU.highlightNoteInABCSVGByIndex(idx); }catch(e){}
+  }
+}
+
+async function togglePlay(){
+  initAudio();await Tone.start();
+  if(isPlaying){
+    Tone.getTransport().stop();seq.stop();isPlaying=false;currentStep=-1;
+    document.querySelectorAll('.cell.phead').forEach(c=>c.classList.remove('phead'));
+    renderNotation();
+  } else {
+    if(!seq) recreateSeq();
+    seq.start(0);Tone.getTransport().start('+0.05');isPlaying=true;
+  }
+  renderPlayBtn();
+}
+
+function renderPlayBtn(){
+  const b=document.getElementById('playBtn'),i=document.getElementById('playIco');
+  if(isPlaying){b.classList.add('on');i.className='ph-fill ph-pause'}
+  else{b.classList.remove('on');i.className='ph-fill ph-play'}
+}
+
+/* ═══ NOTATION — engine ABC → SVG ═══ */
+
+// createABCFromGrooveData ends EVERY measure with "|\n" — a hard line break, so
+// abc2svg gives each measure its own staff line. The legacy app instead joins
+// measures with an ABC continuation ("\\\n") and only breaks every
+// numberOfMeasuresPerLine (2, or 1 for 32nds+). Mirror that here by rewriting
+// the measure-line endings inside each voice block. (groove_writer.js:2890)
+function measuresPerLine(){return spm()>=32?1:2}
+function joinMeasureLines(abc,mpl){
+  if(mpl<=1) return abc;
+  const lines=abc.split('\n');
+  let k=-1; // music-line index within the current voice block
+  const isMusic=l=>/\|\s*$/.test(l)&&!/^[%A-Za-z]:/.test(l)&&l.charAt(0)!=='%';
+  for(let i=0;i<lines.length;i++){
+    if(/^V:/.test(lines[i])){k=-1;continue}
+    if(!isMusic(lines[i])) continue;
+    k++;
+    // continue this line onto the next unless it ends the group of mpl,
+    // ends the tune (||), or is the block's last music line
+    if(k%mpl===mpl-1) continue;
+    if(/\|\|\s*$/.test(lines[i])) continue;
+    let j=i+1; while(j<lines.length&&!isMusic(lines[j])&&!/^V:/.test(lines[j]))j++;
+    if(j<lines.length&&isMusic(lines[j])) lines[i]=lines[i].replace(/\s*$/,'')+'\\';
+  }
+  return lines.join('\n');
+}
+function renderNotation(){
+  try{
+    let abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
+    abc=joinMeasureLines(abc,measuresPerLine());
+    document.getElementById('notArea').innerHTML=GU.renderABCtoSVG(abc).svg;
+  }catch(e){document.getElementById('notArea').innerHTML='<div style="color:#b00;padding:8px;font-size:12px">notation error: '+(e&&e.message||e)+'</div>';}
+}
 
 
-		<!-- this is used by the metronome auto speed up option menu, and is hidden by default -->
-		<div id="metronomeAutoSpeedupConfiguration">
-			<div id="metronomeAutoSpeedupOutputText">
-				Increase <span id="metronomeAutoSpeedupTempoIncreaseAmountOutput">5</span> bpm in
-				<span id="metronomeAutoSpeedupTempoIncreaseIntervalOutput">2</span> min
-			</div>
-			<div id="metronomeAutoSpeedupConfigurationKeepIncreasing">
-				<input type="checkbox" checked id="metronomeAutoSpeedUpKeepGoingForever"><label for="metronomeAutoSpeedUpKeepGoingForever">Keep increasing after the first interval</label>
-			</div>
-			<div id="metronomeAutoSpeedupConfigurationSliders">
-				<div id="metronomeAutoSpeedupConfigurationAmountLable">Amount in BPM</div>
-				<input type=range min=1 max=100 value=5 class="metronomeAutoSpeedUpRange" id="metronomeAutoSpeedupTempoIncreaseAmount" oninput="myGrooveWriter.updateRangeLabel(event, 'metronomeAutoSpeedupTempoIncreaseAmountOutput');">
-				<div id="metronomeAutoSpeedupConfigurationIntervalLable">Interval in Minutes</div>
-				<input type=range min=1 max=20 value=2 class="metronomeAutoSpeedUpRange" id="metronomeAutoSpeedupTempoIncreaseInterval" step="1" oninput="myGrooveWriter.updateRangeLabel(event, 'metronomeAutoSpeedupTempoIncreaseIntervalOutput');">
-			</div>
-			<div id="metronomeAutoSpeedupCloseButtonDiv">
-				<button id="metronomeAutoSpeedupConfigurationCloseButton" onclick="myGrooveWriter.close_MetronomeAutoSpeedupConfiguration('ok');">Done</button>
-			</div>
-		</div>
+/* ═══ GRID ═══ */
+function buildGrid(){
+  const wrap=document.getElementById('gridWrap');
+  wrap.innerHTML='';
+  const ns=numSteps(),beats=S.tsNum,s2=spb();
+  const subdivLabels=subLabelsFor(s2);
 
+  const lr=document.createElement('div');
+  lr.className='g-labels';lr.innerHTML='<div class="g-spacer"></div>';
+  const lc=document.createElement('div');lc.className='g-lbl-c';
+  for(let m=0;m<S.measures;m++){
+    if(m>0){const sep=document.createElement('div');sep.className='g-mbar';sep.style.visibility='hidden';lc.appendChild(sep)}
+    const mg=document.createElement('div');mg.className='g-lbl-m';
+    for(let b=0;b<beats;b++){
+      const g=document.createElement('div');g.className='g-lbl-g';
+      for(let sub=0;sub<s2;sub++){const sp=document.createElement('span');sp.className=sub===0?'g-bn':'g-sd';sp.textContent=sub===0?''+(b+1):subdivLabels[sub];g.appendChild(sp)}
+      mg.appendChild(g);
+    }
+    // boundary ✕ — sits in the gap before measure m and removes THAT measure,
+    // so the control always belongs to the measure it visually precedes
+    // (measure 1 has none; a lone measure can't be removed)
+    if(m>0){
+      const x=document.createElement('button');x.className='g-meas-x';x.type='button';
+      x.innerHTML='<i class="ph ph-x"></i>';x.title='Remove measure '+(m+1);
+      x.addEventListener('click',()=>removeMeasure(m));
+      mg.appendChild(x);
+    }
+    lc.appendChild(mg);
+  }
+  lr.appendChild(lc);wrap.appendChild(lr);
 
-		<script>
-			// set up the page after it has fully loaded
-			window.onload = function () { 'use strict';
-				myGrooveWriter.runsOnPageLoad();   // Initialize the notes
-			};
-		</script>
+  INSTS.forEach(inst=>{
+    if(inst.id==='sticking'&&!S.showStick) return;
+    if((inst.id==='tom1'||inst.id==='tom2')&&!S.showToms) return;
+    const row=document.createElement('div');row.className='g-row';row.dataset.inst=inst.id;
+    const lbl=document.createElement('div');lbl.className='g-row-lbl';lbl.textContent=inst.lb;lbl.title=inst.nm+' — click for options';
+    lbl.addEventListener('click',e=>showRowMenu(e,inst.id,lbl));
+    row.appendChild(lbl);
+    const cells=document.createElement('div');cells.className='g-cells';
+    for(let m=0;m<S.measures;m++){
+      if(m>0){const sep=document.createElement('div');sep.className='g-mbar';cells.appendChild(sep)}
+      for(let b=0;b<beats;b++){
+        const bg=document.createElement('div');bg.className='g-beat';
+        for(let sub=0;sub<s2;sub++){
+          const step=m*spm()+b*s2+sub;
+          const cell=document.createElement('div');const v=S.pattern[inst.id][step];
+          cell.className='cell'+(v?' on':'');cell.dataset.step=step;cell.dataset.inst=inst.id;
+          if(v){cell.dataset.t=v;cell.textContent=charFor(inst.id,v)}
+          cell.addEventListener('click',()=>{
+            pushUndo();const cur=S.pattern[inst.id][step];
+            // Only the snare cycles through articulations on click (GrooveScribe behavior);
+            // every other voice just toggles on/off. Right-click still offers all articulations.
+            let nxt;
+            if(inst.id==='snare'){const cyc=CYCLE.snare,idx=cyc.indexOf(cur);nxt=cyc[(idx+1)%cyc.length];}
+            else{nxt=cur?0:CYCLE[inst.id][1];}
+            S.pattern[inst.id][step]=nxt;updateCell(cell,inst.id,nxt);
+            cell.style.transform='scale(0.88)';setTimeout(()=>cell.style.transform='',100);
+            renderNotation();
+          });
+          cell.addEventListener('contextmenu',e=>{e.preventDefault();showCtx(e,inst.id,step)});
+          bg.appendChild(cell);
+        }
+        cells.appendChild(bg);
+      }
+    }
+    row.appendChild(cells);wrap.appendChild(row);
+  });
+}
 
+function charFor(inst,v){if(!v)return'';const t=NT[inst].find(n=>n.id===v);return t?t.ch:''}
+function updateCell(cell,inst,v){cell.classList.toggle('on',!!v);cell.textContent=charFor(inst,v);if(v){cell.dataset.t=v;cell.dataset.inst=inst}else delete cell.dataset.t}
+function syncAll(){buildGrid();renderNotation();recreateSeq();syncControls()}
 
-	</div>
+function showCtx(e,inst,step){
+  const m=document.getElementById('ctx');m.innerHTML='';
+  NT[inst].forEach(n=>{
+    const b=document.createElement('button');b.className='ctx-i'+(S.pattern[inst][step]===n.id?' on':'');
+    b.textContent=n.lb||n.ch||'Off';
+    b.addEventListener('click',()=>{pushUndo();S.pattern[inst][step]=n.id;syncAll();m.style.display='none'});
+    m.appendChild(b);
+  });
+  const bnd=document.body.getBoundingClientRect();
+  m.style.left=Math.min(e.clientX,bnd.width-140)+'px';
+  m.style.top=Math.min(e.clientY,bnd.height-200)+'px';
+  m.style.display='block';
+}
 
-    </body>
+let openRowMenu=null;
+function showRowMenu(e,inst,lbl){
+  e.stopPropagation();closeRowMenu();
+  const m=document.createElement('div');m.className='row-menu open';
+  (ROW_OPS[inst]||[]).forEach(op=>{
+    const b=document.createElement('button');b.className='ctx-i';b.textContent=op.lb;
+    b.addEventListener('click',()=>{pushUndo();const ns2=numSteps(),spb2=spb();for(let i=0;i<ns2;i++)S.pattern[inst][i]=op.fn(i,spb2,S.pattern[inst][i]);syncAll();closeRowMenu()});
+    m.appendChild(b);
+  });
+  const r=lbl.getBoundingClientRect();
+  m.style.left=r.right+4+'px';
+  m.style.top=r.top+'px';
+  document.body.appendChild(m);
+  openRowMenu=m;
+}
+function closeRowMenu(){if(openRowMenu){openRowMenu.remove();openRowMenu=null}}
+
+/* ═══ CONTROLS ═══ */
+function wireControls(){
+  document.getElementById('playBtn').addEventListener('click',togglePlay);
+  document.getElementById('bpmUp').addEventListener('click',()=>setBpm(S.bpm+1));
+  document.getElementById('bpmDn').addEventListener('click',()=>setBpm(S.bpm-1));
+  document.getElementById('bpmV').addEventListener('change',function(){setBpm(+this.value)});
+  document.getElementById('swingR').addEventListener('input',function(){
+    S.swing=+this.value;document.getElementById('swingV').textContent=isTriplet()?'N/A':S.swing+'%';
+    applySwing();
+  });
+  // time signature popover
+  document.getElementById('tsNumSel').addEventListener('change',function(){pushUndo();S.tsNum=+this.value;resizePattern();syncAll()});
+  document.getElementById('tsDenSel').addEventListener('change',function(){pushUndo();S.tsDen=+this.value;resizePattern();syncAll()});
+  // subdivision popover (note value × feel -> engine division)
+  document.querySelectorAll('#segNote .seg-b').forEach(b=>b.addEventListener('click',()=>{applyDivision(divFor(+b.dataset.val,valFeelFor(S.div)[1]))}));
+  document.querySelectorAll('#segFeel .seg-b').forEach(b=>b.addEventListener('click',()=>{applyDivision(divFor(valFeelFor(S.div)[0],b.dataset.feel))}));
+  // metronome popover
+  document.getElementById('metTog').addEventListener('change',function(){S.met=this.checked?metLastRate:'off';syncControls()});
+  document.querySelectorAll('#segMetRate .seg-b').forEach(b=>b.addEventListener('click',()=>{metLastRate=b.dataset.rate;S.met=b.dataset.rate;syncControls()}));
+  wirePopovers();
+  // Stickings toolbar popover: toggle + presets (incl. reverse)
+  document.getElementById('stickTog').addEventListener('change',function(){S.showStick=this.checked;syncAll()});
+  document.querySelectorAll('#pop-stick .pop-act').forEach(b=>b.addEventListener('click',()=>applySticking(b.dataset.sk)));
+  // Toms: direct show/hide toggle button
+  document.getElementById('tomsBtn').addEventListener('click',()=>{S.showToms=!S.showToms;syncAll()});
+  // Score details -> notation
+  document.getElementById('titleIn').addEventListener('input',renderNotation);
+  document.getElementById('authorIn').addEventListener('input',renderNotation);
+  // Add-measure ghost button (right of the last measure)
+  document.getElementById('addMeasBtn').addEventListener('click',addMeasure);
+  // View / Edit mode switch
+  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+  document.getElementById('clearBtn').addEventListener('click',()=>{pushUndo();S.pattern=makeEmpty();syncAll()});
+  document.getElementById('shareBtn').addEventListener('click',copyLink);
+  document.getElementById('printBtn').addEventListener('click',()=>window.print());
+  document.getElementById('dlBtn').addEventListener('click',downloadSVG);
+  document.getElementById('midiBtn').addEventListener('click',exportMIDI);
+  document.getElementById('copyPngBtn').addEventListener('click',copyPNG);
+
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.ctx'))document.getElementById('ctx').style.display='none';
+    if(!e.target.closest('.g-row-lbl'))closeRowMenu();
+  });
+
+  document.addEventListener('keydown',e=>{
+    if(e.target.tagName==='INPUT'||e.target.tagName==='SELECT') return;
+    if(e.code==='Space'){e.preventDefault();togglePlay()}
+    if(e.code==='KeyZ'&&(e.metaKey||e.ctrlKey)){e.preventDefault();undo()}
+    if(e.code==='KeyY'&&(e.metaKey||e.ctrlKey)){e.preventDefault();redo()}
+  });
+}
+
+function setBpm(v){
+  S.bpm=Math.max(40,Math.min(240,v||80));
+  const bv=document.getElementById('bpmV'); if(bv)bv.value=S.bpm;
+  const bd=document.getElementById('bpmDisp'); if(bd)bd.textContent=S.bpm;
+  if(audioReady)Tone.getTransport().bpm.value=S.bpm;
+}
+
+/* ═══ TOOLBAR POPOVER CONTROLS ═══ */
+let metLastRate='4';
+function divFor(val,feel){ return feel==='triplet' ? ({8:12,16:24,32:48})[val] : val; }
+function valFeelFor(div){ return ({8:[8,'straight'],16:[16,'straight'],32:[32,'straight'],12:[8,'triplet'],24:[16,'triplet'],48:[32,'triplet']})[div] || [16,'straight']; }
+function applyDivision(div){ if(!div||div===S.div) return; pushUndo();S.div=div;resizePattern();syncAll(); }
+function subdivLabel(){ const vf=valFeelFor(S.div); return '1/'+vf[0]+(vf[1]==='triplet'?'T':''); }
+function isTriplet(){ return valFeelFor(S.div)[1]==='triplet'; }  // swing is a straight-feel shift; disabled for triplets (matches engine)
+function applySwing(){ if(audioReady){ Tone.getTransport().swing=isTriplet()?0:(S.swing/100); Tone.getTransport().swingSubdivision='8n'; } }
+
+function syncControls(){
+  const set=(id,fn)=>{const el=document.getElementById(id);if(el)fn(el);};
+  set('bpmDisp',el=>el.textContent=S.bpm);
+  set('bpmV',el=>el.value=S.bpm);
+  set('tsDisp',el=>el.textContent=S.tsNum+'/'+S.tsDen);
+  set('tsNumSel',el=>el.value=S.tsNum);
+  set('tsDenSel',el=>el.value=S.tsDen);
+  set('subdivDisp',el=>el.textContent=subdivLabel());
+  const vf=valFeelFor(S.div);
+  document.querySelectorAll('#segNote .seg-b').forEach(b=>b.classList.toggle('on',+b.dataset.val===vf[0]));
+  document.querySelectorAll('#segFeel .seg-b').forEach(b=>b.classList.toggle('on',b.dataset.feel===vf[1]));
+  const on=S.met!=='off';
+  set('metTog',el=>el.checked=on);
+  set('metBtn',el=>el.classList.toggle('lit',on));
+  document.querySelectorAll('#segMetRate .seg-b').forEach(b=>b.classList.toggle('on',on&&b.dataset.rate===S.met));
+  const trip=isTriplet();
+  set('swingV',el=>el.textContent=trip?'N/A':S.swing+'%');
+  set('swingR',el=>{el.value=S.swing;el.disabled=trip;});
+  set('swingRow',el=>el.classList.toggle('off',trip));
+  set('stickTog',el=>el.checked=S.showStick);
+  set('stickBtn',el=>el.classList.toggle('lit',S.showStick));
+  set('tomsBtn',el=>el.classList.toggle('lit',S.showToms));
+  applySwing();
+}
+
+let mode='edit';
+function setMode(m){
+  mode=m;
+  document.body.classList.toggle('view-mode',m==='view');
+  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
+}
+
+function closePops(except){
+  document.querySelectorAll('.pop').forEach(p=>{const id=p.id.replace('pop-','');if(id!==except)p.classList.remove('open');});
+  document.querySelectorAll('[data-pop]').forEach(b=>{if(b.dataset.pop!==except)b.classList.remove('on');});
+}
+function wirePopovers(){
+  document.querySelectorAll('[data-pop]').forEach(btn=>{
+    btn.addEventListener('click',e=>{
+      e.stopPropagation();
+      const id=btn.dataset.pop,pop=document.getElementById('pop-'+id);
+      const willOpen=!pop.classList.contains('open');
+      closePops(willOpen?id:null);
+      pop.classList.toggle('open',willOpen);
+      btn.classList.toggle('on',willOpen);
+    });
+  });
+  document.querySelectorAll('.pop').forEach(p=>p.addEventListener('click',e=>e.stopPropagation()));
+  document.addEventListener('click',()=>closePops(null));
+}
+
+function buildLibrary(){
+  const body=document.getElementById('sec-library');body.innerHTML='';
+  Object.entries(LIB).forEach(([grp,items])=>{
+    const gl=document.createElement('div');gl.className='lib-grp-lbl';gl.textContent=grp;body.appendChild(gl);
+    Object.entries(items).forEach(([name,data])=>{
+      const b=document.createElement('button');b.className='lib-item';b.textContent=name;
+      b.addEventListener('click',()=>loadLib(data));body.appendChild(b);
+    });
+  });
+}
+
+function loadLib(data){
+  pushUndo();
+  if(data.ts){const[n,d]=data.ts.split('-').map(Number);S.tsNum=n;S.tsDen=d;}
+  if(data.div){S.div=data.div;}
+  if(data.bpm) setBpm(data.bpm);
+  S.measures=1;
+  resizePattern();
+  const ns=numSteps();
+  INSTS.forEach(inst=>{
+    if(data.p&&data.p[inst.id]) S.pattern[inst.id]=data.p[inst.id].slice(0,ns).concat(A(Math.max(0,ns-data.p[inst.id].length)));
+    else S.pattern[inst.id]=A(ns);
+  });
+  syncAll();
+}
+
+function copyLink(){
+  const enc=k=>S.pattern[k].map(v=>v||'-').join('');
+  const url=`${location.origin}${location.pathname}?ts=${S.tsNum}-${S.tsDen}&div=${S.div}&bpm=${S.bpm}&m=${S.measures}&H=${enc('hihat')}&S=${enc('snare')}&K=${enc('kick')}`;
+  navigator.clipboard.writeText(url).then(()=>{
+    const b=document.getElementById('shareBtn');b.textContent='Copied!';setTimeout(()=>b.textContent='Copy Link',1500);
+  }).catch(()=>{});
+}
+
+// The engine emits one <svg> per staff line — combine them all (stacked by y)
+// so copy/download include every measure, not just the first system. Nesting
+// the originals keeps <use href="#pclef"> etc. resolvable via the first
+// system's <defs> within the combined document.
+function combinedNotationSVG(){
+  const svgs=[...document.querySelectorAll('#notArea svg')];if(!svgs.length)return null;
+  const dims=svgs.map(s=>{const vb=s.getAttribute('viewBox').split(' ').map(Number);return{w:vb[2],h:vb[3]}});
+  const W=Math.max(...dims.map(d=>d.w)),H=dims.reduce((a,d)=>a+d.h,0);
+  let y=0,inner='';
+  svgs.forEach((s,i)=>{
+    const c=s.cloneNode(true);
+    c.setAttribute('x',0);c.setAttribute('y',y);
+    c.setAttribute('width',dims[i].w);c.setAttribute('height',dims[i].h);
+    inner+=new XMLSerializer().serializeToString(c);y+=dims[i].h;
+  });
+  return {data:'<svg xmlns="http://www.w3.org/2000/svg" width="'+W+'" height="'+H+'" viewBox="0 0 '+W+' '+H+'">'+inner+'</svg>',W,H};
+}
+
+function downloadSVG(){
+  const combo=combinedNotationSVG();if(!combo)return;
+  const blob=new Blob([combo.data],{type:'image/svg+xml'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download=(document.getElementById('titleIn').value||'groove')+'.svg';
+  a.click();URL.revokeObjectURL(a.href);
+}
+
+// Standard MIDI file via the GrooveScribe engine (general MIDI drum map)
+function exportMIDI(){
+  try{
+    const gd=GU.getGrooveDataFromUrlString(stateToGrooveUrl());
+    const url=GU.create_MIDIURLFromGrooveData(gd,'general_MIDI');
+    const a=document.createElement('a');a.href=url;
+    a.download=(document.getElementById('titleIn').value||'groove')+'.mid';
+    a.click();
+  }catch(e){ console.error('MIDI export failed:',e); }
+}
+
+function copyPNG(){
+  const combo=combinedNotationSVG();if(!combo)return;
+  const btn=document.getElementById('copyPngBtn');
+  const scale=3;
+  const w=combo.W*scale,h=combo.H*scale;
+  const data=combo.data;
+  const img=new Image();
+  img.onload=function(){
+    const c=document.createElement('canvas');
+    c.width=w;c.height=h;
+    const ctx2=c.getContext('2d');
+    ctx2.fillStyle='#fff';ctx2.fillRect(0,0,w,h);
+    ctx2.drawImage(img,0,0,w,h);
+    c.toBlob(function(blob){
+      if(!blob)return;
+      navigator.clipboard.write([new ClipboardItem({'image/png':blob})]).then(()=>{
+        btn.style.color='#2a2';setTimeout(()=>btn.style.color='',1200);
+      }).catch(()=>{});
+    },'image/png');
+  };
+  img.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(data)));
+}
+
+function init(){initPattern();pushUndo();buildLibrary();wireControls();syncAll();try{initAudio()}catch(e){}}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
+else init();
+
+})();
+</script>
+</body>
 </html>
