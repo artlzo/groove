@@ -241,7 +241,7 @@ body.view-mode .grid-outer{display:none}
   .topbar,.grid-outer,.toolbar{display:none!important}
   .app{display:block}
   .main{padding:20px;justify-content:flex-start;height:auto;overflow:visible}
-  .notation-wrap{max-width:100%;overflow:visible}
+  .notation-wrap{max-width:100%;overflow:visible;margin-left:0!important;width:auto!important}
   .notation-wrap svg{width:100%!important}
 }
 </style>
@@ -481,15 +481,41 @@ function stateToGrooveUrl(){
 // Size the page for ONE staff line: joinMeasureLines puts up to measuresPerLine()
 // measures per line, so the widest line has min(measures, mpl) measures.
 // The engine's SVG comes out exactly renderWidth CSS px wide, so render at the
-// size we want to show (never wider than the container) — no browser rescaling,
-// which kept shrinking the music. A measure gets at least 600px (more for
-// 32nds), and on a phone the line is simply the screen width.
+// size we want to show — no browser rescaling, which kept shrinking the music.
+// Desktop (grid on one line): the staff lines up with the grid under it — it
+// starts at the first cell and a measure of staff is as wide as a measure of
+// cells (see gridGeom / alignNotation). Otherwise (phone, View mode) a measure
+// gets at least 600px (more for 32nds), capped at the container width.
 const MEASURE_PX=600;
-function notationAvail(){return document.getElementById('notWrap').clientWidth||MEASURE_PX+40}
+function notationAvail(){return Math.min(1200,mainInnerWidth())||MEASURE_PX+40} // .notation-wrap max-width
+// Where the grid's cells sit: left edge of the first cell, width of one
+// measure of cells, gap between measures. null when the grid isn't a single
+// line on screen (phone layout, View mode), so there's nothing to line up with.
+function gridGeom(){
+  if(document.body.classList.contains('view-mode')||document.getElementById('gridOuter').classList.contains('compact')) return null;
+  const row=document.querySelector('#gridWrap .g-row');if(!row) return null;
+  const bt=row.querySelectorAll('.g-beat'),n=S.tsNum;if(bt.length<n) return null;
+  const a=bt[0].getBoundingClientRect(),b=bt[n-1].getBoundingClientRect();
+  return {left:a.left+document.getElementById('gridWrap').scrollLeft,measW:b.right-a.left,
+    sep:bt.length>n?bt[n].getBoundingClientRect().left-b.right:32};
+}
+function gridLineWidth(g,k){return k*g.measW+(k-1)*g.sep}
 function notationWidth(){
-  const measuresOnLine=Math.min(S.measures,measuresPerLine());
+  const measuresOnLine=Math.min(S.measures,measuresPerLine()),g=gridGeom();
+  if(g) return Math.round(gridLineWidth(g,measuresOnLine));
   const perMeasure=Math.max(MEASURE_PX,spm()*24);
   return Math.max(280,Math.min(notationAvail(),40+measuresOnLine*perMeasure));
+}
+// Pin the notation's left edge to the grid's first cell (or re-center it)
+function alignNotation(){
+  const w=document.getElementById('notWrap'),g=gridGeom();
+  if(!g){w.style.width=w.style.marginLeft=w.style.alignSelf='';return}
+  const m=document.querySelector('.main'),ml=m.getBoundingClientRect().left+parseFloat(getComputedStyle(m).paddingLeft);
+  w.style.alignSelf='flex-start';
+  w.style.marginLeft=Math.round(g.left-ml)+'px';
+  // as wide as what was rendered (normal score or permutation sheet)
+  const svgW=[...w.querySelectorAll('svg')].reduce((mx,sv)=>Math.max(mx,sv.width.baseVal.value),0);
+  w.style.width=Math.round(svgW)+'px';
 }
 // Tone.js subdivision per GrooveScribe division (straight + triplet)
 const TONE_SUB={8:'8n',16:'16n',32:'32n',12:'8t',24:'16t',48:'32t'};
@@ -700,7 +726,11 @@ function renderPlayBtn(){
 // the measure-line endings inside each voice block. (groove_writer.js:2890)
 // 2 measures per line like the legacy app (1 for 32nds+), but only when two
 // measures still get a readable width — on a phone it's one per line.
-function measuresPerLine(){return spm()>=32||notationAvail()<40+2*480?1:2}
+function measuresPerLine(){
+  if(spm()>=32) return 1;
+  const g=gridGeom();
+  return (g?gridLineWidth(g,2):40+2*480)<=notationAvail()?2:1;
+}
 function joinMeasureLines(abc,mpl){
   if(mpl<=1) return abc;
   const lines=abc.split('\n');
@@ -728,6 +758,7 @@ function renderNotation(){
       abc=joinMeasureLines(abc,measuresPerLine());
     }
     document.getElementById('notArea').innerHTML=GU.renderABCtoSVG(abc).svg;
+    alignNotation();
   }catch(e){document.getElementById('notArea').innerHTML='<div style="color:#b00;padding:8px;font-size:12px">notation error: '+(e&&e.message||e)+'</div>';}
 }
 
@@ -821,10 +852,11 @@ function permSheet(){
 }
 function permutationABC(){
   const sheet=permSheet(),gd=sheet[0].gd,N=sheet[0].hh.length,trip=permTriplets();
-  const mpl=notationAvail()>=40+2*480?2:1;
+  // two sections per line when they fit; on desktop each bar is as wide as the grid's measure
+  const g=gridGeom(),mpl=(g?gridLineWidth(g,2):40+2*480)<=notationAvail()?2:1;
   const title=(document.getElementById('titleIn').value||'').trim();
   const author=(document.getElementById('authorIn').value||'').trim();
-  const width=Math.min(notationAvail(),40+mpl*MEASURE_PX);
+  const width=g?Math.round(gridLineWidth(g,mpl)):Math.min(notationAvail(),40+mpl*MEASURE_PX);
   let abc=GU.get_top_ABC_BoilerPlate(true,title,author,'',false,trip,true,4,4,width);
   sheet.forEach((s,i)=>{
     const first=i===0||sheet[i-1].group!==s.group;
@@ -976,7 +1008,7 @@ function buildCell(inst,step){
 
 function charFor(inst,v){if(!v)return'';const t=NT[inst].find(n=>n.id===v);return t?t.ch:''}
 function updateCell(cell,inst,v){cell.classList.toggle('on',!!v);cell.textContent=charFor(inst,v);if(v){cell.dataset.t=v;cell.dataset.inst=inst}else delete cell.dataset.t}
-function syncAll(){if(S.perm.on&&!is44())S.perm.on=false;buildGrid();renderNotation();recreateSeq();syncControls()}
+function syncAll(){if(S.perm.on&&!is44())S.perm.on=false;document.body.classList.toggle('perm-on',permActive());buildGrid();renderNotation();recreateSeq();syncControls()}
 
 function showCtx(e,inst,step){
   const m=document.getElementById('ctx');m.innerHTML='';
@@ -1163,6 +1195,7 @@ function setMode(m){
   mode=m;
   document.body.classList.toggle('view-mode',m==='view');
   document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.classList.toggle('on',b.dataset.mode===m));
+  renderNotation(); // View mode hides the grid: notation re-centers instead of lining up with it
 }
 
 function closePops(except){
@@ -1287,7 +1320,11 @@ window.addEventListener('resize',()=>{
   rzT=setTimeout(()=>{buildGrid();renderNotation();},150);
 });
 
-function init(){initPattern();buildLibrary();wireControls();syncAll();try{initAudio()}catch(e){}}
+function init(){
+  initPattern();buildLibrary();wireControls();syncAll();try{initAudio()}catch(e){}
+  // keep the staff lined up with the grid if either shifts (fonts loading, scrollbars, panes)
+  if(window.ResizeObserver){const ro=new ResizeObserver(()=>alignNotation());ro.observe(document.getElementById('gridOuter'));ro.observe(document.querySelector('.main'));}
+}
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
 else init();
 
