@@ -41,10 +41,13 @@ the root `index.html`:
   `GU.create_ABC_from_snare_HH_kick_arrays`, MIDI via `GU.MIDI_from_HH_Snare_Kick_Arrays`.
   Playback goes through `buildPlayModel()` (`PM`): the grid normally, or the
   whole sheet at full resolution (32nds / 32nd triplets) when permutations are on.
-- **Phone layout**: when one measure is wider than the screen, `buildGrid()`
-  splits measures into lines of whole beats (`.grid-outer.compact`); notation
-  renders at the container width (≥600px per measure on desktop) and both
-  re-render when the width changes. Long-press a cell = articulation menu.
+- **Layout**: the grid is ALWAYS one line (all measures side by side) and
+  scrolls sideways inside `.grid-wrap`, with sticky row labels — never stack
+  it (Arturo rejected a stacked phone grid). The notation DOES stack (1–2
+  measures per line). On desktop the staff lines up with the grid
+  (`gridGeom()`/`alignNotation()`: starts at the first cell, measure width =
+  grid measure width); on a phone it fills the screen width. Long-press a
+  cell = articulation menu.
 
 **Do not edit the engine JS** (`groove_utils.js`, `groove_writer.js`) — the whole
 premise is a new shell over the proven engine.

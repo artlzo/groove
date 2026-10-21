@@ -147,7 +147,6 @@ body.view-mode .grid-outer{display:none}
 .g-meas-add{width:32px;height:32px;flex-shrink:0;border:1px dashed var(--brd);border-radius:8px;background:transparent;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
 .g-meas-add:hover{border-color:#bbb;color:var(--pri);background:var(--bg-c)}
 .g-meas-add .ph{font-size:16px}
-.g-meas-add .add-lbl{display:none}
 
 /* ─── MAIN ─── */
 .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 140px;overflow:auto;min-width:0}
@@ -158,25 +157,25 @@ body.view-mode .grid-outer{display:none}
 .notation-wrap svg{display:block;margin:0 auto;height:auto;max-width:100%}
 #notArea .abcr.highlighted{fill:rgba(45,140,90,.22)!important;transition:fill .04s}
 
-/* grid — one .g-seg per grid line (desktop: a single line; phone: a few beats per line) */
+/* grid — always one line (.g-seg); scrolls sideways in .grid-wrap when too wide */
 .grid-wrap{display:inline-flex;flex-direction:column;max-width:100%;overflow-x:auto;padding:18px 20px 4px 0}
-.g-seg{display:flex;flex-direction:column;gap:3px}
+.g-seg{display:flex;flex-direction:column;gap:3px;width:max-content} /* full width of the cells, so the sticky row labels stay pinned all the way along */
 .g-labels{display:flex;align-items:flex-end;margin-bottom:4px}
-.g-spacer{width:44px;flex-shrink:0}
+.g-spacer{width:44px;flex-shrink:0;position:sticky;left:0;z-index:2;background:var(--bg);box-shadow:-4px 0 0 var(--bg);align-self:stretch}
 .g-lbl-c{display:flex;gap:12px}
 .g-lbl-g{display:flex;gap:3px}
-.g-lbl-g span{width:var(--cell-w,36px);text-align:center;font-size:9px;font-weight:500;line-height:1}
+.g-lbl-g span{width:36px;text-align:center;font-size:9px;font-weight:500;line-height:1}
 .g-bn{color:var(--mut)!important;font-size:10px!important;font-weight:500!important}
 .g-sd{color:var(--fnt)!important}
 
 .g-row{display:flex;align-items:center}
-.g-row-lbl{width:44px;flex-shrink:0;font-size:10px;font-weight:500;color:var(--mut);text-align:right;padding-right:10px;letter-spacing:.02em;cursor:pointer;position:relative}
+.g-row-lbl{width:44px;flex-shrink:0;font-size:10px;font-weight:500;color:var(--mut);text-align:right;padding-right:10px;letter-spacing:.02em;cursor:pointer;position:sticky;left:0;z-index:2;background:var(--bg);box-shadow:-4px 0 0 var(--bg);align-self:stretch;display:flex;align-items:center;justify-content:flex-end} /* stays put while the grid scrolls sideways */
 .g-row-lbl:hover{color:var(--sec)}
 .g-cells{display:flex;gap:12px}
 .g-beat{display:flex;gap:3px}
 .g-mbar{width:2px;background:var(--brd);align-self:stretch;margin:0 3px;border-radius:1px;flex-shrink:0}
 
-.cell{width:var(--cell-w,36px);height:34px;border-radius:5px;cursor:pointer;background:var(--bg-c);transition:background .08s,transform .08s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;flex-shrink:0}
+.cell{width:36px;height:34px;border-radius:5px;cursor:pointer;background:var(--bg-c);transition:background .08s,transform .08s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;flex-shrink:0}
 .cell:hover{background:var(--bg-ch)}
 .cell.on{background:#888}
 .cell.on:hover{background:#7a7a7a}
@@ -200,18 +199,6 @@ body.view-mode .grid-outer{display:none}
 .row-menu{position:fixed;background:#fff;border:1px solid var(--brd);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.1);padding:4px;z-index:500;min-width:130px;display:none;white-space:nowrap}
 .row-menu.open{display:block}
 
-/* compact grid: set by JS when one measure doesn't fit the screen width.
-   Each measure is split into lines of a few beats, stacked vertically, so
-   every cell is on screen and reachable without sideways scrolling. */
-.grid-outer.compact{display:flex;flex-direction:column;align-items:stretch;gap:14px;width:100%}
-.grid-outer.compact .grid-wrap{display:flex;gap:16px;overflow:visible;padding:4px 0 0;width:100%}
-.grid-outer.compact .g-seg{overflow-x:auto;-webkit-overflow-scrolling:touch} /* last-resort fallback on very narrow screens */
-.g-meas{display:flex;flex-direction:column;gap:16px}
-.g-meas-hdr{display:flex;align-items:center;justify-content:space-between;padding-left:44px;margin-bottom:2px;font-size:11px;color:var(--mut)}
-.g-meas-hdr .g-meas-x{position:static;width:28px;height:28px}
-.g-meas-hdr .g-meas-x .ph{font-size:15px}
-.grid-outer.compact .g-meas-add{width:auto;height:40px;margin-left:44px;gap:6px;font-family:inherit;font-weight:500;font-size:12px}
-.grid-outer.compact .g-meas-add .add-lbl{display:inline}
 
 /* mobile */
 
@@ -295,7 +282,7 @@ body.view-mode .grid-outer{display:none}
   <div class="notation-wrap" id="notWrap"><div id="notArea"></div></div>
   <div class="grid-outer" id="gridOuter">
     <div class="grid-wrap" id="gridWrap"></div>
-    <button class="g-meas-add" id="addMeasBtn" type="button" title="Add measure"><i class="ph ph-plus"></i><span class="add-lbl">Add measure</span></button>
+    <button class="g-meas-add" id="addMeasBtn" type="button" title="Add measure"><i class="ph ph-plus"></i></button>
   </div>
 </main>
 </div>
@@ -489,14 +476,18 @@ function stateToGrooveUrl(){
 const MEASURE_PX=600;
 function notationAvail(){return Math.min(1200,mainInnerWidth())||MEASURE_PX+40} // .notation-wrap max-width
 // Where the grid's cells sit: left edge of the first cell, width of one
-// measure of cells, gap between measures. null when the grid isn't a single
-// line on screen (phone layout, View mode), so there's nothing to line up with.
+// measure of cells, gap between measures. null when there's nothing to line
+// up with: View mode (no grid), or a phone, where one measure of cells is
+// wider than the screen — the notation then fills the screen width instead.
 function gridGeom(){
-  if(document.body.classList.contains('view-mode')||document.getElementById('gridOuter').classList.contains('compact')) return null;
+  if(document.body.classList.contains('view-mode')) return null;
   const row=document.querySelector('#gridWrap .g-row');if(!row) return null;
   const bt=row.querySelectorAll('.g-beat'),n=S.tsNum;if(bt.length<n) return null;
+  const gw=document.getElementById('gridWrap'),sl=gw.scrollLeft;
   const a=bt[0].getBoundingClientRect(),b=bt[n-1].getBoundingClientRect();
-  return {left:a.left+document.getElementById('gridWrap').scrollLeft,measW:b.right-a.left,
+  const m=document.querySelector('.main'),right=m.getBoundingClientRect().right-parseFloat(getComputedStyle(m).paddingRight);
+  if(b.right+sl>right+1) return null; // first measure doesn't fit on screen
+  return {left:a.left+sl,measW:b.right-a.left,
     sep:bt.length>n?bt[n].getBoundingClientRect().left-b.right:32};
 }
 function gridLineWidth(g,k){return k*g.measW+(k-1)*g.sep}
@@ -883,78 +874,40 @@ const PERM_KK_ID={[constant_ABC_KI_Normal]:'o',[constant_ABC_KI_Splash]:'f',[con
 
 
 /* ═══ GRID ═══ */
-// Cell geometry — keep in sync with .cell / .g-beat / .g-cells / .g-row-lbl CSS
-const CELL_W=36,CELL_GAP=3,BEAT_GAP=12,ROW_LBL_W=44;
 function mainInnerWidth(){
   const m=document.querySelector('.main'),cs=getComputedStyle(m);
   return m.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
 }
-// Beats per grid line. 0 = everything on one line (desktop). When a single
-// measure doesn't fit the screen (phones), split each measure into lines of
-// as many whole beats as fit, so every cell is reachable without sideways scrolling.
-function gridChunkBeats(){
-  const s2=spb(),beatW=s2*CELL_W+(s2-1)*CELL_GAP,beats=S.tsNum,avail=mainInnerWidth();
-  if(ROW_LBL_W+beats*beatW+(beats-1)*BEAT_GAP+20<=avail) return 0;
-  return Math.max(1,Math.floor((avail-ROW_LBL_W+BEAT_GAP)/(beatW+BEAT_GAP)));
-}
+// The grid is always ONE line — all measures side by side. When it's wider
+// than the screen it scrolls sideways inside .grid-wrap (it never stacks).
 function buildGrid(){
   const wrap=document.getElementById('gridWrap');
   wrap.innerHTML='';
-  const beats=S.tsNum,chunk=gridChunkBeats(),outer=document.getElementById('gridOuter');
-  outer.classList.toggle('compact',chunk>0);
-  // If even one beat is wider than the screen (1/32 triplets on a phone), slim the cells to fit
-  const s2=spb(),fitW=Math.floor((mainInnerWidth()-ROW_LBL_W-(s2-1)*CELL_GAP)/s2);
-  outer.style.setProperty('--cell-w',(chunk&&fitW<CELL_W?Math.max(22,fitW):CELL_W)+'px');
-  if(!chunk){
-    wrap.appendChild(buildSegment(Array.from({length:S.measures},(_,m)=>({m,b0:0,b1:beats})),false));
-    return;
-  }
-  for(let m=0;m<S.measures;m++){
-    // phone: a small "Measure N  ✕" header above each measure (when there's more than one)
-    if(S.measures>1){
-      const hdr=document.createElement('div');hdr.className='g-meas-hdr';
-      hdr.innerHTML='<span>Measure '+(m+1)+'</span>';
-      const x=document.createElement('button');x.className='g-meas-x';x.type='button';
-      x.innerHTML='<i class="ph ph-x"></i>';x.title='Remove measure '+(m+1);
-      x.addEventListener('click',()=>removeMeasure(m));
-      hdr.appendChild(x);
-      const grp=document.createElement('div');grp.className='g-meas';grp.appendChild(hdr);
-      for(let b0=0;b0<beats;b0+=chunk) grp.appendChild(buildSegment([{m,b0,b1:Math.min(beats,b0+chunk)}],true));
-      wrap.appendChild(grp);
-    } else {
-      for(let b0=0;b0<beats;b0+=chunk) wrap.appendChild(buildSegment([{m,b0,b1:Math.min(beats,b0+chunk)}],true));
-    }
-  }
-}
-// One grid line: a beat-label row + one row per voice, covering the given
-// measure ranges [{m, b0, b1}] (beats b0..b1-1 of measure m).
-function buildSegment(parts,compact){
   const seg=document.createElement('div');seg.className='g-seg';
-  const s2=spb(),subdivLabels=subLabelsFor(s2);
+  const beats=S.tsNum,s2=spb(),subdivLabels=subLabelsFor(s2);
 
   const lr=document.createElement('div');
   lr.className='g-labels';lr.innerHTML='<div class="g-spacer"></div>';
   const lc=document.createElement('div');lc.className='g-lbl-c';
-  parts.forEach(({m,b0,b1},pi)=>{
-    if(pi>0){const sep=document.createElement('div');sep.className='g-mbar';sep.style.visibility='hidden';lc.appendChild(sep)}
+  for(let m=0;m<S.measures;m++){
+    if(m>0){const sep=document.createElement('div');sep.className='g-mbar';sep.style.visibility='hidden';lc.appendChild(sep)}
     const mg=document.createElement('div');mg.className='g-lbl-m';
-    for(let b=b0;b<b1;b++){
+    for(let b=0;b<beats;b++){
       const g=document.createElement('div');g.className='g-lbl-g';
       for(let sub=0;sub<s2;sub++){const sp=document.createElement('span');sp.className=sub===0?'g-bn':'g-sd';sp.textContent=sub===0?''+(b+1):subdivLabels[sub];g.appendChild(sp)}
       mg.appendChild(g);
     }
     // boundary ✕ — sits in the gap before measure m and removes THAT measure,
     // so the control always belongs to the measure it visually precedes
-    // (measure 1 has none; a lone measure can't be removed). Desktop only;
-    // the phone layout puts ✕ in each measure's header instead.
-    if(!compact&&m>0){
+    // (measure 1 has none; a lone measure can't be removed)
+    if(m>0){
       const x=document.createElement('button');x.className='g-meas-x';x.type='button';
       x.innerHTML='<i class="ph ph-x"></i>';x.title='Remove measure '+(m+1);
       x.addEventListener('click',()=>removeMeasure(m));
       mg.appendChild(x);
     }
     lc.appendChild(mg);
-  });
+  }
   lr.appendChild(lc);seg.appendChild(lr);
 
   INSTS.forEach(inst=>{
@@ -966,17 +919,17 @@ function buildSegment(parts,compact){
     lbl.addEventListener('click',e=>showRowMenu(e,inst.id,lbl));
     row.appendChild(lbl);
     const cells=document.createElement('div');cells.className='g-cells';
-    parts.forEach(({m,b0,b1},pi)=>{
-      if(pi>0){const sep=document.createElement('div');sep.className='g-mbar';cells.appendChild(sep)}
-      for(let b=b0;b<b1;b++){
+    for(let m=0;m<S.measures;m++){
+      if(m>0){const sep=document.createElement('div');sep.className='g-mbar';cells.appendChild(sep)}
+      for(let b=0;b<beats;b++){
         const bg=document.createElement('div');bg.className='g-beat';
         for(let sub=0;sub<s2;sub++) bg.appendChild(buildCell(inst.id,m*spm()+b*s2+sub));
         cells.appendChild(bg);
       }
-    });
+    }
     row.appendChild(cells);seg.appendChild(row);
   });
-  return seg;
+  wrap.appendChild(seg);
 }
 function buildCell(inst,step){
   const cell=document.createElement('div');const v=S.pattern[inst][step];
