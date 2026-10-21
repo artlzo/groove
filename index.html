@@ -86,6 +86,7 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .tb-txt b{color:var(--pri);font-weight:500}
 .tb-txt:hover,.tb-txt.on{background:var(--bg-c)}
 .tb-btn.lit{color:var(--pri);background:var(--bg-c)}
+.tb-btn:disabled{opacity:.35;cursor:not-allowed}
 .pop{position:absolute;bottom:calc(100% + 12px);left:50%;transform:translateX(-50%);min-width:190px;background:#fff;border:1px solid var(--brd);border-radius:12px;box-shadow:0 10px 34px rgba(0,0,0,.14);padding:14px;display:none;z-index:60}
 .pop.open{display:block}
 .pop-cap{display:block;font-size:10px;font-weight:500;color:var(--mut);margin-bottom:8px}
@@ -114,6 +115,19 @@ body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,s
 .pop-act{width:100%;text-align:left;padding:6px 8px;border:none;background:transparent;border-radius:6px;font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);cursor:pointer;transition:background .1s}
 .pop-act:hover{background:var(--bg-c);color:var(--pri)}
 .pop-div{height:1px;background:var(--brd-lt);margin:10px 0 2px}
+/* permutations popover */
+.pop-perm{min-width:288px}
+.pop-note{font-size:11px;line-height:1.45;color:var(--mut);margin:-2px 0 12px}
+.perm-body.off{opacity:.38;pointer-events:none}
+.perm-grp{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:3px 0}
+.perm-chip{border:none;background:var(--bg-c);font-family:inherit;font-weight:500;font-size:11px;color:var(--sec);padding:6px 10px;border-radius:6px;cursor:pointer;white-space:nowrap;transition:all .1s}
+.perm-chip:hover:not(.on){background:var(--bg-ch)}
+.perm-chip.on{background:var(--pri);color:#fff}
+.perm-subs{display:flex;gap:3px}
+.perm-subs .perm-chip{min-width:30px;padding:6px 7px}
+.perm-subs.off .perm-chip{opacity:.38;pointer-events:none}
+.perm-opt{display:flex;align-items:center;justify-content:space-between;font-size:11px;color:var(--sec);margin-top:10px}
+body.perm-on .g-meas-add,body.perm-on .g-meas-x{display:none}
 
 /* ─── VIEW / EDIT MODE SWITCH (floating, top-center) ─── */
 .mode-switch{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);display:flex;gap:3px;background:var(--bg-sb);border:1px solid var(--brd);border-radius:10px;padding:3px;z-index:1}
@@ -219,6 +233,7 @@ body.view-mode .grid-outer{display:none}
   .tb-txt{padding:0 6px}
   /* toolbar popovers: centered over the screen instead of over their button,
      so the ones near the edges don't get cut off */
+  @media(max-width:389px){.tb-btn{min-width:32px;padding:0 3px}.tb-txt{padding:0 4px}}
   .toolbar .pop{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(62px + env(safe-area-inset-bottom));width:min(320px,calc(100vw - 24px));min-width:0}
 }
 
@@ -366,6 +381,35 @@ body.view-mode .grid-outer{display:none}
       </div>
     </div>
   </div>
+  <!-- Permutations (practice-sheet generator, 4/4 only) -->
+  <div class="tb-ctrl">
+    <button class="tb-btn" data-pop="perm" id="permBtn" title="Permutations">
+      <i class="ph ph-shuffle"></i>
+    </button>
+    <div class="pop pop-perm" id="pop-perm">
+      <div class="pop-row-between"><span class="pop-cap">Permutations</span>
+        <label class="tog"><input type="checkbox" id="permTog"><span class="tog-s"></span></label></div>
+      <p class="pop-note" id="permNote">Turns measure 1 into a practice sheet: the hi-hat stays, and the kick or snare moves through every variation.</p>
+      <div class="perm-body" id="permBody">
+        <span class="pop-cap">Move</span>
+        <div class="seg" id="segPermVoice">
+          <button class="seg-b" type="button" data-voice="kick">Kick</button>
+          <button class="seg-b" type="button" data-voice="snare">Snare</button>
+        </div>
+        <div id="permGroups" style="margin-top:10px"></div>
+        <label class="perm-opt" id="permSimplifyRow"><span>Simplify multiple kicks</span>
+          <span class="tog"><input type="checkbox" id="permSimplify"><span class="tog-s"></span></span></label>
+        <div id="permSnareRow" style="margin-top:10px">
+          <span class="pop-cap">Snare</span>
+          <div class="seg" id="segPermSnare">
+            <button class="seg-b" type="button" data-style="plain">Plain</button>
+            <button class="seg-b" type="button" data-style="accent">Accents</button>
+            <button class="seg-b" type="button" data-style="diddle">Accents + diddles</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
   <!-- Toms (direct show/hide toggle) -->
   <button class="tb-btn lit" id="tomsBtn" title="Show / hide toms"><i class="ph ph-circles-three"></i></button>
   <!-- Clear -->
@@ -405,8 +449,12 @@ const ROW_OPS={
   kick:[{lb:'All Off',fn:()=>0},{lb:'All On',fn:()=>'o'},{lb:'HH Foot On Beats',fn:(i,s)=>i%s===0?'f':0}]
 };
 
-let S={tsNum:4,tsDen:4,div:16,bpm:80,swing:0,met:'off',measures:1,showStick:false,showToms:true,pattern:{}};
-let hist=[],histIdx=-1;
+let S={tsNum:4,tsDen:4,div:16,bpm:80,swing:0,met:'off',measures:1,showStick:false,showToms:true,pattern:{},
+  // permutations: which voice moves, which sections are on (defaults match the legacy app)
+  perm:{on:false,voice:'kick',simplify:false,snareStyle:'plain',
+    groups:{ostinato:false,singles:true,doubles:true,updown:false,triples:true,quads:false},
+    subs:{singles:[1,1,1,1],doubles:[1,1,1,1],updown:[1,1],triples:[1,1,1,1]}}};
+let undoStack=[],redoStack=[];
 
 /* ═══ ENGINE ADAPTER — render notation via GrooveScribe (groove_utils) ═══ */
 const GU=new GrooveUtils();
@@ -470,9 +518,12 @@ function initPattern(){
   }
 }
 function clonePat(){return JSON.parse(JSON.stringify(S.pattern))}
-function pushUndo(){hist.splice(histIdx+1);hist.push(clonePat());if(hist.length>80)hist.shift();histIdx=hist.length-1}
-function undo(){if(histIdx>0){histIdx--;S.pattern=JSON.parse(JSON.stringify(hist[histIdx]));syncAll()}}
-function redo(){if(histIdx<hist.length-1){histIdx++;S.pattern=JSON.parse(JSON.stringify(hist[histIdx]));syncAll()}}
+// pushUndo() is called just BEFORE a change, so the stack holds the states to go back to
+function pushUndo(){undoStack.push(clonePat());if(undoStack.length>80)undoStack.shift();redoStack=[]}
+// history stores patterns only — re-derive the measure count from the restored length
+function restoreHist(p){S.pattern=p;S.measures=Math.max(1,Math.round(S.pattern.hihat.length/spm()));syncAll()}
+function undo(){if(undoStack.length){redoStack.push(clonePat());restoreHist(undoStack.pop())}}
+function redo(){if(redoStack.length){undoStack.push(clonePat());restoreHist(redoStack.pop())}}
 function resizePattern(){
   const n=numSteps(),s=spm();
   INSTS.forEach(inst=>{
@@ -545,44 +596,74 @@ function trig(inst,type,time){
   if(!type) return;
   if(inst==='hihat') play('hh_'+type,time);
   else if(inst==='snare') play('sn_'+type,time);
-  else if(inst==='kick') play('kk_'+type,time);
+  else if(inst==='kick'){ if(type==='of'){play('kk_o',time);play('kk_f',time);} else play('kk_'+type,time); } // 'of' = kick + hi-hat foot (permutations)
   else if(inst==='tom1') play('t1_o',time);
   else if(inst==='tom2') play('t2_o',time);
 }
 
 function trigMet(step,time){
   if(S.met==='off') return;
-  const s2=spb(),isBeat=step%s2===0,is8=step%(s2/2||1)===0;
+  const s2=PM.spb,isBeat=step%s2===0,is8=step%(s2/2||1)===0;
   const click=accent=>play(accent?'met_hi':'met_lo',time);
   if(S.met==='4'&&isBeat) click(true);
   else if(S.met==='8'&&is8) click(isBeat);
   else if(S.met==='16') click(isBeat);
 }
 
+// What the sequencer plays. Normally the grid itself (S.pattern, live — cell
+// clicks mutate those arrays in place). With permutations on, the whole sheet
+// at the engine's full resolution (32nds / 32nd triplets), one bar per section.
+// grid(i) maps a play step back to a grid cell for the playhead (null = none).
+let PM=null;
+function buildPlayModel(){
+  if(!permActive()){
+    const v={};INSTS.forEach(i=>v[i.id]=S.pattern[i.id]);
+    return {len:numSteps(),spb:spb(),sub:TONE_SUB[S.div]||'16n',v,grid:i=>i};
+  }
+  const sheet=permSheet(),N=sheet[0].hh.length,sc=N/spm(),moving=S.perm.voice;
+  const v={};INSTS.forEach(i=>v[i.id]=[]);
+  sheet.forEach(s=>INSTS.forEach(inst=>{
+    if(inst.id===moving){
+      const src=moving==='kick'?s.kk:s.sn,ids=moving==='kick'?PERM_KK_ID:PERM_SN_ID;
+      src.forEach(x=>v[inst.id].push(x?(ids[x]||'o'):0));
+    } else {
+      // the user's measure 1, spread onto the full-size grid
+      for(let i=0;i<N;i++) v[inst.id].push(i%sc?0:(S.pattern[inst.id][i/sc]||0));
+    }
+  }));
+  return {len:N*sheet.length,spb:N/4,sub:N===48?'32t':'32n',v,grid:i=>{const l=i%N;return l%sc?null:l/sc}};
+}
+function refreshPlayModel(){ if(PM) PM=buildPlayModel(); } // same length -> the running sequence picks it up
+
 function recreateSeq(){
   if(!audioReady) return;
   const was=isPlaying;
   if(isPlaying){Tone.getTransport().stop();if(seq)seq.stop();isPlaying=false}
   if(seq)seq.dispose();
-  const ns=numSteps(),steps=Array.from({length:ns},(_,i)=>i);
+  PM=buildPlayModel();
+  const steps=Array.from({length:PM.len},(_,i)=>i);
   seq=new Tone.Sequence((time,step)=>{
-    INSTS.forEach(inst=>{if(inst.id==='sticking')return;if(!S.showToms&&(inst.id==='tom1'||inst.id==='tom2'))return;trig(inst.id,S.pattern[inst.id][step],time)});
+    INSTS.forEach(inst=>{if(inst.id==='sticking')return;if(!S.showToms&&(inst.id==='tom1'||inst.id==='tom2'))return;trig(inst.id,PM.v[inst.id][step],time)});
     trigMet(step,time);
     if(Tone.Draw&&Tone.Draw.schedule) Tone.Draw.schedule(()=>onStep(step),time);
     else requestAnimationFrame(()=>onStep(step));
-  },steps,TONE_SUB[S.div]||'16n');
+  },steps,PM.sub);
   seq.loop=true;
   if(was){seq.start(0);Tone.getTransport().start('+0.05');isPlaying=true}
 }
 
 function soundsAt(j){
-  const p=S.pattern;
+  const p=PM.v;
   return !!(p.hihat[j]||p.snare[j]||p.kick[j]||(S.showToms&&(p.tom1[j]||p.tom2[j])));
 }
 function onStep(step){
   currentStep=step;
-  document.querySelectorAll('.cell.phead').forEach(c=>c.classList.remove('phead'));
-  document.querySelectorAll(`.cell[data-step="${step}"]`).forEach(c=>c.classList.add('phead'));
+  // grid playhead (permutation steps between grid cells keep the last cell lit)
+  const g=PM.grid(step);
+  if(g!==null){
+    document.querySelectorAll('.cell.phead').forEach(c=>c.classList.remove('phead'));
+    document.querySelectorAll(`.cell[data-step="${g}"]`).forEach(c=>c.classList.add('phead'));
+  }
   // highlight the playing note in the engine notation (abc index = # of sounding steps so far).
   // on rest steps we leave the previous highlight, so the note "rings" until the next one.
   if(soundsAt(step)){
@@ -640,11 +721,133 @@ function joinMeasureLines(abc,mpl){
 }
 function renderNotation(){
   try{
-    let abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
-    abc=joinMeasureLines(abc,measuresPerLine());
+    let abc;
+    if(permActive()) abc=permutationABC();
+    else{
+      abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
+      abc=joinMeasureLines(abc,measuresPerLine());
+    }
     document.getElementById('notArea').innerHTML=GU.renderABCtoSVG(abc).svg;
   }catch(e){document.getElementById('notArea').innerHTML='<div style="color:#b00;padding:8px;font-size:12px">notation error: '+(e&&e.message||e)+'</div>';}
 }
+
+/* ═══ PERMUTATIONS — practice-sheet generator ═══
+   Port of the legacy app's generator (groove_writer.js:1631–2330, which Ritmo
+   doesn't load). Measure 1's hi-hat (+ toms/stickings, + the voice that isn't
+   moving) is repeated once per section while the kick or snare moves through
+   singles / doubles / down-upbeats / triples / quads on each 16th. Arrays are
+   in the engine's full-size grid: 32 per 4/4 bar, 48 for triplet divisions.
+   Notation, MIDI and playback all come from the same section arrays. */
+const PERM_GROUPS=[
+  {id:'ostinato',nm:'Ostinato',subs:[],tsubs:[],secs:[0]},
+  {id:'singles',nm:'Singles',subs:['1','e','&','a'],tsubs:['1','&','a'],secs:[1,2,3,4]},
+  {id:'doubles',nm:'Doubles',subs:['1','e','&','a'],tsubs:['1','&','a'],secs:[5,6,7,8]},
+  {id:'updown',nm:'Downbeats & upbeats',subs:['Downs','Ups'],tsubs:null,secs:[9,10]},
+  {id:'triples',nm:'Triples',subs:['1','e','&','a'],tsubs:[],secs:[11,12,13,14]},
+  {id:'quads',nm:'Quads',subs:[],tsubs:null,secs:[15]}  // tsubs null = not available with triplets
+];
+function is44(){return S.tsNum===4&&S.tsDen===4}
+function permActive(){return S.perm.on&&is44()}
+function permTriplets(){return isTriplet()}
+function permSectionOn(sec){
+  const g=S.perm.groups,sb=S.perm.subs,trip=permTriplets();
+  if(sec===0) return g.ostinato;
+  if(sec<=4) return g.singles&&!!sb.singles[sec-1]&&!(trip&&sec===4);
+  if(sec<=8) return g.doubles&&!!sb.doubles[sec-5]&&!(trip&&sec===8);
+  if(sec<=10) return !trip&&g.updown&&!!sb.updown[sec-9];
+  if(sec===11) return g.triples&&(trip||!!sb.triples[0]);
+  if(sec<=14) return !trip&&g.triples&&!!sb.triples[sec-11];
+  return !trip&&g.quads;
+}
+function permActiveSections(){
+  const out=[];for(let i=0;i<16;i++) if(permSectionOn(i)) out.push(i);
+  return out.length?out:[0]; // nothing ticked -> just the ostinato
+}
+// Kick hits for one section. Straight: offsets within each beat (8 x 32nds per beat).
+const PERM_BEAT={0:[],1:[0],2:[2],3:[4],4:[6],5:[0,2],6:[2,4],7:[4,6],8:[0,6],9:[0,4],10:[2,6],11:[0,2,4],12:[2,4,6],13:[0,4,6],14:[0,2,6],15:[0,2,4,6]};
+// "Simplify multiple kicks": groups that wrap round the beat skip their
+// leading hit on beat 1 (legacy get_kick16th_minus_some_strait_permutation_array)
+const PERM_SIMPLIFY_DROP={8:[0],13:[0],14:[0,2]};
+function permKickArray(sec){
+  const a=[];
+  if(permTriplets()){ // 48ths, 12 per beat; triplet partials at 0/4/8
+    const T={0:[],1:[0],2:[4],3:[8],5:[0,4],6:[4,8],7:[0,8]};
+    const offs=T[sec]||[0,4,8]; // 11 (triples) = every partial
+    for(let i=0;i<48;i++) a.push(offs.includes(i%12)?'F':false);
+    return a;
+  }
+  const drop=S.perm.simplify?(PERM_SIMPLIFY_DROP[sec]||[]):[];
+  for(let i=0;i<32;i++){
+    const o=i%8,beat=Math.floor(i/8);
+    a.push(PERM_BEAT[sec].includes(o)&&!(beat===0&&drop.includes(o))?'F':false);
+  }
+  return a;
+}
+function permSnareArray(sec){
+  const k=permKickArray(sec),st=S.perm.snareStyle;
+  if(st==='plain') return k.map(v=>v?constant_ABC_SN_Normal:false);
+  if(sec===0) return k.map(()=>false); // ostinato: snare tacet
+  if(st==='accent') return k.map((v,i)=>v?constant_ABC_SN_Accent:(i%2===0?constant_ABC_SN_Ghost:false));
+  // accents + diddles: accents are singles, everything else is diddled (32nd ghosts)
+  const a=k.slice();
+  for(let i=0;i<a.length;i++){ if(a[i]){a[i]=constant_ABC_SN_Buzz;i++;} else a[i]=constant_ABC_SN_Ghost; }
+  return a;
+}
+// keep the user's hi-hat-foot (splash) notes under a moving kick
+function permMergeKick(perm,user){
+  return perm.map((p,i)=>{
+    const foot=user[i]===constant_ABC_KI_Splash||user[i]===constant_ABC_KI_SandK;
+    if(!p) return foot?constant_ABC_KI_Splash:false;
+    return foot?constant_ABC_KI_SandK:p;
+  });
+}
+// Measure 1 of the user's groove as full-size engine arrays
+function permBase(){
+  const gd=GU.getGrooveDataFromUrlString(stateToGrooveUrl()),npm=gd.notesPerMeasure;
+  const full=a=>GU.scaleNoteArrayToFullSize(a.slice(0,npm),1,npm,4,4);
+  return {gd,hh:full(gd.hh_array),sn:full(gd.snare_array),kk:full(gd.kick_array),
+    stk:full(gd.sticking_array),toms:gd.toms_array.map(full)};
+}
+// The sheet, one entry per active section: {sec, group, hh, sn, kk, toms, stk}
+function permSheet(){
+  const b=permBase();
+  return permActiveSections().map(sec=>{
+    const g=PERM_GROUPS.find(x=>x.secs.includes(sec));
+    const moveKick=S.perm.voice==='kick';
+    return {sec,group:g,hh:b.hh,stk:b.stk,toms:b.toms,
+      sn:moveKick?b.sn:permSnareArray(sec),
+      kk:moveKick?permMergeKick(permKickArray(sec),b.kk):b.kk,gd:b.gd};
+  });
+}
+function permutationABC(){
+  const sheet=permSheet(),gd=sheet[0].gd,N=sheet[0].hh.length,trip=permTriplets();
+  const mpl=notationAvail()>=40+2*480?2:1;
+  const title=(document.getElementById('titleIn').value||'').trim();
+  const author=(document.getElementById('authorIn').value||'').trim();
+  const width=Math.min(notationAvail(),40+mpl*MEASURE_PX);
+  let abc=GU.get_top_ABC_BoilerPlate(true,title,author,'',false,trip,true,4,4,width);
+  sheet.forEach((s,i)=>{
+    const first=i===0||sheet[i-1].group!==s.group;
+    const k=sheet.slice(0,i+1).filter(x=>x.group===s.group).length-1; // index within its group
+    const last=i===sheet.length-1||sheet[i+1].group!==s.group;
+    // a heading per group; each group ends with a double bar, mpl sections per line
+    if(first) abc+=(i===0?'':'T: \n')+'P: '+s.group.nm+'\n';
+    const post=last?'|\n':((k+1)%mpl===0?'\n':'\\\n');
+    abc+=GU.create_ABC_from_snare_HH_kick_arrays(s.stk.slice(),s.hh,s.sn,s.kk,s.toms,post,N,S.div,N,true,4,4);
+  });
+  return abc;
+}
+// MIDI for the whole sheet (legacy createMidiUrlFromClickableUI, permutation branch)
+function permutationMIDI(){
+  const sheet=permSheet(),gd=sheet[0].gd,N=sheet[0].hh.length;
+  const midiFile=new Midi.File(),track=new Midi.Track();midiFile.addTrack(track);
+  track.setTempo(S.bpm);track.setInstrument(0,0x13);
+  sheet.forEach(s=>GU.MIDI_from_HH_Snare_Kick_Arrays(track,s.hh,s.sn,s.kk,s.toms,'general_MIDI',gd.metronomeFrequency,N,gd.timeDivision,S.swing/100,4,4));
+  return 'data:audio/midi;base64,'+btoa(midiFile.toBytes());
+}
+// Engine ABC note -> Ritmo note id, for playing the generated voice
+const PERM_SN_ID={[constant_ABC_SN_Normal]:'o',[constant_ABC_SN_Accent]:'O',[constant_ABC_SN_Ghost]:'g',[constant_ABC_SN_Buzz]:'z',[constant_ABC_SN_XStick]:'x'};
+const PERM_KK_ID={[constant_ABC_KI_Normal]:'o',[constant_ABC_KI_Splash]:'f',[constant_ABC_KI_SandK]:'of'};
 
 
 /* ═══ GRID ═══ */
@@ -725,6 +928,7 @@ function buildSegment(parts,compact){
   INSTS.forEach(inst=>{
     if(inst.id==='sticking'&&!S.showStick) return;
     if((inst.id==='tom1'||inst.id==='tom2')&&!S.showToms) return;
+    if(permActive()&&inst.id===S.perm.voice) return; // generated by the permutation sheet
     const row=document.createElement('div');row.className='g-row';row.dataset.inst=inst.id;
     const lbl=document.createElement('div');lbl.className='g-row-lbl';lbl.textContent=inst.lb;lbl.title=inst.nm+' — click for options';
     lbl.addEventListener('click',e=>showRowMenu(e,inst.id,lbl));
@@ -755,7 +959,7 @@ function buildCell(inst,step){
     else{nxt=cur?0:CYCLE[inst][1];}
     S.pattern[inst][step]=nxt;updateCell(cell,inst,nxt);
     cell.style.transform='scale(0.88)';setTimeout(()=>cell.style.transform='',100);
-    renderNotation();
+    renderNotation();refreshPlayModel();
   });
   cell.addEventListener('contextmenu',e=>{e.preventDefault();showCtx(e,inst,step)});
   // Phones have no right-click: long-press opens the articulation menu instead.
@@ -772,7 +976,7 @@ function buildCell(inst,step){
 
 function charFor(inst,v){if(!v)return'';const t=NT[inst].find(n=>n.id===v);return t?t.ch:''}
 function updateCell(cell,inst,v){cell.classList.toggle('on',!!v);cell.textContent=charFor(inst,v);if(v){cell.dataset.t=v;cell.dataset.inst=inst}else delete cell.dataset.t}
-function syncAll(){buildGrid();renderNotation();recreateSeq();syncControls()}
+function syncAll(){if(S.perm.on&&!is44())S.perm.on=false;buildGrid();renderNotation();recreateSeq();syncControls()}
 
 function showCtx(e,inst,step){
   const m=document.getElementById('ctx');m.innerHTML='';
@@ -828,6 +1032,11 @@ function wireControls(){
   // Stickings toolbar popover: toggle + presets (incl. reverse)
   document.getElementById('stickTog').addEventListener('change',function(){S.showStick=this.checked;syncAll()});
   document.querySelectorAll('#pop-stick .pop-act').forEach(b=>b.addEventListener('click',()=>applySticking(b.dataset.sk)));
+  // Permutations popover
+  document.getElementById('permTog').addEventListener('change',function(){setPermutations(this.checked)});
+  document.querySelectorAll('#segPermVoice .seg-b').forEach(b=>b.addEventListener('click',()=>{S.perm.voice=b.dataset.voice;syncAll()}));
+  document.querySelectorAll('#segPermSnare .seg-b').forEach(b=>b.addEventListener('click',()=>{S.perm.snareStyle=b.dataset.style;syncAll()}));
+  document.getElementById('permSimplify').addEventListener('change',function(){S.perm.simplify=this.checked;syncAll()});
   // Toms: direct show/hide toggle button
   document.getElementById('tomsBtn').addEventListener('click',()=>{S.showToms=!S.showToms;syncAll()});
   // Score details -> notation
@@ -895,7 +1104,58 @@ function syncControls(){
   set('stickTog',el=>el.checked=S.showStick);
   set('stickBtn',el=>el.classList.toggle('lit',S.showStick));
   set('tomsBtn',el=>el.classList.toggle('lit',S.showToms));
+  // permutations
+  const perm=permActive(),ok44=is44();
+  document.body.classList.toggle('perm-on',perm);
+  set('permBtn',el=>el.classList.toggle('lit',perm));
+  set('permTog',el=>{el.checked=perm;el.disabled=!ok44;});
+  set('permNote',el=>el.textContent=ok44
+    ?'Turns measure 1 into a practice sheet: the hi-hat stays, and the kick or snare moves through every variation.'
+    :'Permutations work in 4/4 only. Switch the time signature to 4/4 to use them.');
+  set('permBody',el=>el.classList.toggle('off',!perm));
+  document.querySelectorAll('#segPermVoice .seg-b').forEach(b=>b.classList.toggle('on',b.dataset.voice===S.perm.voice));
+  document.querySelectorAll('#segPermSnare .seg-b').forEach(b=>b.classList.toggle('on',b.dataset.style===S.perm.snareStyle));
+  set('permSimplify',el=>el.checked=S.perm.simplify);
+  set('permSimplifyRow',el=>el.style.display=S.perm.voice==='kick'&&!permTriplets()?'':'none');
+  set('permSnareRow',el=>el.style.display=S.perm.voice==='snare'?'':'none');
+  buildPermGroups();
   applySwing();
+}
+
+// Turning permutations on works from measure 1 only (like the legacy app):
+// extra measures are dropped — undo brings them back.
+function setPermutations(on){
+  if(on&&!is44()) return;
+  if(on&&S.measures>1){
+    pushUndo();
+    INSTS.forEach(inst=>{S.pattern[inst.id]=S.pattern[inst.id].slice(0,spm())});
+    S.measures=1;
+  }
+  S.perm.on=on;syncAll();
+}
+// Section rows: a chip per group, plus chips for where in the beat it starts
+function buildPermGroups(){
+  const box=document.getElementById('permGroups');box.innerHTML='';
+  const trip=permTriplets();
+  PERM_GROUPS.forEach(g=>{
+    if(trip&&g.tsubs===null) return; // down/upbeats & quads don't exist in triplets
+    const subs=trip?g.tsubs:g.subs,on=S.perm.groups[g.id];
+    const row=document.createElement('div');row.className='perm-grp';
+    const chip=document.createElement('button');chip.type='button';chip.className='perm-chip'+(on?' on':'');chip.textContent=g.nm;
+    chip.addEventListener('click',()=>{S.perm.groups[g.id]=!S.perm.groups[g.id];syncAll()});
+    row.appendChild(chip);
+    if(subs.length){
+      const sw=document.createElement('div');sw.className='perm-subs'+(on?'':' off');
+      subs.forEach((lb,i)=>{
+        const b=document.createElement('button');b.type='button';b.className='perm-chip'+(S.perm.subs[g.id][i]?' on':'');b.textContent=lb;
+        b.title=g.nm+' starting on the "'+lb+'"';
+        b.addEventListener('click',()=>{S.perm.subs[g.id][i]=S.perm.subs[g.id][i]?0:1;syncAll()});
+        sw.appendChild(b);
+      });
+      row.appendChild(sw);
+    }
+    box.appendChild(row);
+  });
 }
 
 let mode='edit';
@@ -987,8 +1247,7 @@ function downloadSVG(){
 // Standard MIDI file via the GrooveScribe engine (general MIDI drum map)
 function exportMIDI(){
   try{
-    const gd=GU.getGrooveDataFromUrlString(stateToGrooveUrl());
-    const url=GU.create_MIDIURLFromGrooveData(gd,'general_MIDI');
+    const url=permActive()?permutationMIDI():GU.create_MIDIURLFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),'general_MIDI');
     const a=document.createElement('a');a.href=url;
     a.download=(document.getElementById('titleIn').value||'groove')+'.mid';
     a.click();
@@ -1028,7 +1287,7 @@ window.addEventListener('resize',()=>{
   rzT=setTimeout(()=>{buildGrid();renderNotation();},150);
 });
 
-function init(){initPattern();pushUndo();buildLibrary();wireControls();syncAll();try{initAudio()}catch(e){}}
+function init(){initPattern();buildLibrary();wireControls();syncAll();try{initAudio()}catch(e){}}
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
 else init();
 

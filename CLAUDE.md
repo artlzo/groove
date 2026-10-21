@@ -35,6 +35,16 @@ the root `index.html`:
   time sigs accurate); toolbar Subdivision popover = note value × Straight/Triplets.
 - **Controls**: tempo/time-sig/subdivision/metronome live in **toolbar popovers**
   (`.tb-ctrl > [data-pop] + .pop`, `wirePopovers()/syncControls()`), not the sidebar.
+- **Permutations** (4/4 only): Ritmo's own port of the legacy generator
+  (`groove_writer.js:1631–2330`, not loaded). `permSheet()` builds one section
+  per ticked group from measure 1; notation via `GU.get_top_ABC_BoilerPlate` +
+  `GU.create_ABC_from_snare_HH_kick_arrays`, MIDI via `GU.MIDI_from_HH_Snare_Kick_Arrays`.
+  Playback goes through `buildPlayModel()` (`PM`): the grid normally, or the
+  whole sheet at full resolution (32nds / 32nd triplets) when permutations are on.
+- **Phone layout**: when one measure is wider than the screen, `buildGrid()`
+  splits measures into lines of whole beats (`.grid-outer.compact`); notation
+  renders at the container width (≥600px per measure on desktop) and both
+  re-render when the width changes. Long-press a cell = articulation menu.
 
 **Do not edit the engine JS** (`groove_utils.js`, `groove_writer.js`) — the whole
 premise is a new shell over the proven engine.
