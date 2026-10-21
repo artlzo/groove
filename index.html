@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Ritmo</title>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
@@ -14,7 +14,7 @@
 }
 html,body{height:100%;overflow:hidden}
 body{font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;font-weight:500;color:var(--sec);background:var(--bg)}
-.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+.app{display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden}
 
 /* ─── TOP BAR ─── */
 .topbar{position:relative;display:flex;align-items:center;height:56px;padding:0 20px;background:var(--bg);border-bottom:1px solid var(--brd);flex-shrink:0;z-index:40}
@@ -133,6 +133,7 @@ body.view-mode .grid-outer{display:none}
 .g-meas-add{width:32px;height:32px;flex-shrink:0;border:1px dashed var(--brd);border-radius:8px;background:transparent;color:var(--mut);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .12s}
 .g-meas-add:hover{border-color:#bbb;color:var(--pri);background:var(--bg-c)}
 .g-meas-add .ph{font-size:16px}
+.g-meas-add .add-lbl{display:none}
 
 /* ─── MAIN ─── */
 .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 140px;overflow:auto;min-width:0}
@@ -143,13 +144,14 @@ body.view-mode .grid-outer{display:none}
 .notation-wrap svg{display:block;margin:0 auto;height:auto;max-width:100%}
 #notArea .abcr.highlighted{fill:rgba(45,140,90,.22)!important;transition:fill .04s}
 
-/* grid */
-.grid-wrap{display:inline-flex;flex-direction:column;gap:3px;max-width:100%;overflow-x:auto;padding:18px 20px 4px 0}
+/* grid — one .g-seg per grid line (desktop: a single line; phone: a few beats per line) */
+.grid-wrap{display:inline-flex;flex-direction:column;max-width:100%;overflow-x:auto;padding:18px 20px 4px 0}
+.g-seg{display:flex;flex-direction:column;gap:3px}
 .g-labels{display:flex;align-items:flex-end;margin-bottom:4px}
 .g-spacer{width:44px;flex-shrink:0}
 .g-lbl-c{display:flex;gap:12px}
 .g-lbl-g{display:flex;gap:3px}
-.g-lbl-g span{width:36px;text-align:center;font-size:9px;font-weight:500;line-height:1}
+.g-lbl-g span{width:var(--cell-w,36px);text-align:center;font-size:9px;font-weight:500;line-height:1}
 .g-bn{color:var(--mut)!important;font-size:10px!important;font-weight:500!important}
 .g-sd{color:var(--fnt)!important}
 
@@ -160,7 +162,7 @@ body.view-mode .grid-outer{display:none}
 .g-beat{display:flex;gap:3px}
 .g-mbar{width:2px;background:var(--brd);align-self:stretch;margin:0 3px;border-radius:1px;flex-shrink:0}
 
-.cell{width:36px;height:34px;border-radius:5px;cursor:pointer;background:var(--bg-c);transition:background .08s,transform .08s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;user-select:none;-webkit-user-select:none;flex-shrink:0}
+.cell{width:var(--cell-w,36px);height:34px;border-radius:5px;cursor:pointer;background:var(--bg-c);transition:background .08s,transform .08s;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;color:#fff;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;touch-action:manipulation;flex-shrink:0}
 .cell:hover{background:var(--bg-ch)}
 .cell.on{background:#888}
 .cell.on:hover{background:#7a7a7a}
@@ -184,21 +186,40 @@ body.view-mode .grid-outer{display:none}
 .row-menu{position:fixed;background:#fff;border:1px solid var(--brd);border-radius:var(--r);box-shadow:0 4px 20px rgba(0,0,0,.1);padding:4px;z-index:500;min-width:130px;display:none;white-space:nowrap}
 .row-menu.open{display:block}
 
+/* compact grid: set by JS when one measure doesn't fit the screen width.
+   Each measure is split into lines of a few beats, stacked vertically, so
+   every cell is on screen and reachable without sideways scrolling. */
+.grid-outer.compact{display:flex;flex-direction:column;align-items:stretch;gap:14px;width:100%}
+.grid-outer.compact .grid-wrap{display:flex;gap:16px;overflow:visible;padding:4px 0 0;width:100%}
+.grid-outer.compact .g-seg{overflow-x:auto;-webkit-overflow-scrolling:touch} /* last-resort fallback on very narrow screens */
+.g-meas{display:flex;flex-direction:column;gap:16px}
+.g-meas-hdr{display:flex;align-items:center;justify-content:space-between;padding-left:44px;margin-bottom:2px;font-size:11px;color:var(--mut)}
+.g-meas-hdr .g-meas-x{position:static;width:28px;height:28px}
+.g-meas-hdr .g-meas-x .ph{font-size:15px}
+.grid-outer.compact .g-meas-add{width:auto;height:40px;margin-left:44px;gap:6px;font-family:inherit;font-weight:500;font-size:12px}
+.grid-outer.compact .g-meas-add .add-lbl{display:inline}
+
 /* mobile */
 
 @media(max-width:900px){
   .topbar{padding:0 12px}
-  .main{padding:20px 14px 100px;overflow:auto;justify-content:flex-start;align-items:flex-start}
+  .main{padding:20px 14px calc(96px + env(safe-area-inset-bottom));overflow:auto;justify-content:flex-start;align-items:flex-start}
   .notation-wrap{width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
   .grid-wrap{overflow-x:auto;width:100%;padding-bottom:8px;-webkit-overflow-scrolling:touch}
   .toolbar{
     position:fixed;bottom:0;left:0;right:0;
     transform:none;border-radius:0;
     border:none;border-top:1px solid var(--brd);
-    padding:6px 12px;justify-content:center;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom));justify-content:space-between;
     box-shadow:0 -2px 12px rgba(0,0,0,.06);
-    gap:4px;
+    gap:0;
   }
+  .tb-btn{min-width:34px;padding:0 4px}
+  .tb-btn .ph{font-size:22px}
+  .tb-txt{padding:0 6px}
+  /* toolbar popovers: centered over the screen instead of over their button,
+     so the ones near the edges don't get cut off */
+  .toolbar .pop{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(62px + env(safe-area-inset-bottom));width:min(320px,calc(100vw - 24px));min-width:0}
 }
 
 @media print{
@@ -259,7 +280,7 @@ body.view-mode .grid-outer{display:none}
   <div class="notation-wrap" id="notWrap"><div id="notArea"></div></div>
   <div class="grid-outer" id="gridOuter">
     <div class="grid-wrap" id="gridWrap"></div>
-    <button class="g-meas-add" id="addMeasBtn" type="button" title="Add measure"><i class="ph ph-plus"></i></button>
+    <button class="g-meas-add" id="addMeasBtn" type="button" title="Add measure"><i class="ph ph-plus"></i><span class="add-lbl">Add measure</span></button>
   </div>
 </main>
 </div>
@@ -410,12 +431,17 @@ function stateToGrooveUrl(){
   return u;
 }
 // Size the page for ONE staff line: joinMeasureLines puts up to measuresPerLine()
-// measures per line, so the widest line has min(measures, mpl) measures. The
-// engine sets %%pagewidth = renderWidth*0.75; ~13px/note keeps spacing readable.
+// measures per line, so the widest line has min(measures, mpl) measures.
+// The engine's SVG comes out exactly renderWidth CSS px wide, so render at the
+// size we want to show (never wider than the container) — no browser rescaling,
+// which kept shrinking the music. A measure gets at least 600px (more for
+// 32nds), and on a phone the line is simply the screen width.
+const MEASURE_PX=600;
+function notationAvail(){return document.getElementById('notWrap').clientWidth||MEASURE_PX+40}
 function notationWidth(){
   const measuresOnLine=Math.min(S.measures,measuresPerLine());
-  const pageW=40+measuresOnLine*spm()*13;
-  return Math.max(400,Math.min(3000,pageW/0.75));
+  const perMeasure=Math.max(MEASURE_PX,spm()*24);
+  return Math.max(280,Math.min(notationAvail(),40+measuresOnLine*perMeasure));
 }
 // Tone.js subdivision per GrooveScribe division (straight + triplet)
 const TONE_SUB={8:'8n',16:'16n',32:'32n',12:'8t',24:'16t',48:'32t'};
@@ -591,7 +617,9 @@ function renderPlayBtn(){
 // measures with an ABC continuation ("\\\n") and only breaks every
 // numberOfMeasuresPerLine (2, or 1 for 32nds+). Mirror that here by rewriting
 // the measure-line endings inside each voice block. (groove_writer.js:2890)
-function measuresPerLine(){return spm()>=32?1:2}
+// 2 measures per line like the legacy app (1 for 32nds+), but only when two
+// measures still get a readable width — on a phone it's one per line.
+function measuresPerLine(){return spm()>=32||notationAvail()<40+2*480?1:2}
 function joinMeasureLines(abc,mpl){
   if(mpl<=1) return abc;
   const lines=abc.split('\n');
@@ -620,35 +648,79 @@ function renderNotation(){
 
 
 /* ═══ GRID ═══ */
+// Cell geometry — keep in sync with .cell / .g-beat / .g-cells / .g-row-lbl CSS
+const CELL_W=36,CELL_GAP=3,BEAT_GAP=12,ROW_LBL_W=44;
+function mainInnerWidth(){
+  const m=document.querySelector('.main'),cs=getComputedStyle(m);
+  return m.clientWidth-parseFloat(cs.paddingLeft)-parseFloat(cs.paddingRight);
+}
+// Beats per grid line. 0 = everything on one line (desktop). When a single
+// measure doesn't fit the screen (phones), split each measure into lines of
+// as many whole beats as fit, so every cell is reachable without sideways scrolling.
+function gridChunkBeats(){
+  const s2=spb(),beatW=s2*CELL_W+(s2-1)*CELL_GAP,beats=S.tsNum,avail=mainInnerWidth();
+  if(ROW_LBL_W+beats*beatW+(beats-1)*BEAT_GAP+20<=avail) return 0;
+  return Math.max(1,Math.floor((avail-ROW_LBL_W+BEAT_GAP)/(beatW+BEAT_GAP)));
+}
 function buildGrid(){
   const wrap=document.getElementById('gridWrap');
   wrap.innerHTML='';
-  const ns=numSteps(),beats=S.tsNum,s2=spb();
-  const subdivLabels=subLabelsFor(s2);
+  const beats=S.tsNum,chunk=gridChunkBeats(),outer=document.getElementById('gridOuter');
+  outer.classList.toggle('compact',chunk>0);
+  // If even one beat is wider than the screen (1/32 triplets on a phone), slim the cells to fit
+  const s2=spb(),fitW=Math.floor((mainInnerWidth()-ROW_LBL_W-(s2-1)*CELL_GAP)/s2);
+  outer.style.setProperty('--cell-w',(chunk&&fitW<CELL_W?Math.max(22,fitW):CELL_W)+'px');
+  if(!chunk){
+    wrap.appendChild(buildSegment(Array.from({length:S.measures},(_,m)=>({m,b0:0,b1:beats})),false));
+    return;
+  }
+  for(let m=0;m<S.measures;m++){
+    // phone: a small "Measure N  ✕" header above each measure (when there's more than one)
+    if(S.measures>1){
+      const hdr=document.createElement('div');hdr.className='g-meas-hdr';
+      hdr.innerHTML='<span>Measure '+(m+1)+'</span>';
+      const x=document.createElement('button');x.className='g-meas-x';x.type='button';
+      x.innerHTML='<i class="ph ph-x"></i>';x.title='Remove measure '+(m+1);
+      x.addEventListener('click',()=>removeMeasure(m));
+      hdr.appendChild(x);
+      const grp=document.createElement('div');grp.className='g-meas';grp.appendChild(hdr);
+      for(let b0=0;b0<beats;b0+=chunk) grp.appendChild(buildSegment([{m,b0,b1:Math.min(beats,b0+chunk)}],true));
+      wrap.appendChild(grp);
+    } else {
+      for(let b0=0;b0<beats;b0+=chunk) wrap.appendChild(buildSegment([{m,b0,b1:Math.min(beats,b0+chunk)}],true));
+    }
+  }
+}
+// One grid line: a beat-label row + one row per voice, covering the given
+// measure ranges [{m, b0, b1}] (beats b0..b1-1 of measure m).
+function buildSegment(parts,compact){
+  const seg=document.createElement('div');seg.className='g-seg';
+  const s2=spb(),subdivLabels=subLabelsFor(s2);
 
   const lr=document.createElement('div');
   lr.className='g-labels';lr.innerHTML='<div class="g-spacer"></div>';
   const lc=document.createElement('div');lc.className='g-lbl-c';
-  for(let m=0;m<S.measures;m++){
-    if(m>0){const sep=document.createElement('div');sep.className='g-mbar';sep.style.visibility='hidden';lc.appendChild(sep)}
+  parts.forEach(({m,b0,b1},pi)=>{
+    if(pi>0){const sep=document.createElement('div');sep.className='g-mbar';sep.style.visibility='hidden';lc.appendChild(sep)}
     const mg=document.createElement('div');mg.className='g-lbl-m';
-    for(let b=0;b<beats;b++){
+    for(let b=b0;b<b1;b++){
       const g=document.createElement('div');g.className='g-lbl-g';
       for(let sub=0;sub<s2;sub++){const sp=document.createElement('span');sp.className=sub===0?'g-bn':'g-sd';sp.textContent=sub===0?''+(b+1):subdivLabels[sub];g.appendChild(sp)}
       mg.appendChild(g);
     }
     // boundary ✕ — sits in the gap before measure m and removes THAT measure,
     // so the control always belongs to the measure it visually precedes
-    // (measure 1 has none; a lone measure can't be removed)
-    if(m>0){
+    // (measure 1 has none; a lone measure can't be removed). Desktop only;
+    // the phone layout puts ✕ in each measure's header instead.
+    if(!compact&&m>0){
       const x=document.createElement('button');x.className='g-meas-x';x.type='button';
       x.innerHTML='<i class="ph ph-x"></i>';x.title='Remove measure '+(m+1);
       x.addEventListener('click',()=>removeMeasure(m));
       mg.appendChild(x);
     }
     lc.appendChild(mg);
-  }
-  lr.appendChild(lc);wrap.appendChild(lr);
+  });
+  lr.appendChild(lc);seg.appendChild(lr);
 
   INSTS.forEach(inst=>{
     if(inst.id==='sticking'&&!S.showStick) return;
@@ -658,34 +730,44 @@ function buildGrid(){
     lbl.addEventListener('click',e=>showRowMenu(e,inst.id,lbl));
     row.appendChild(lbl);
     const cells=document.createElement('div');cells.className='g-cells';
-    for(let m=0;m<S.measures;m++){
-      if(m>0){const sep=document.createElement('div');sep.className='g-mbar';cells.appendChild(sep)}
-      for(let b=0;b<beats;b++){
+    parts.forEach(({m,b0,b1},pi)=>{
+      if(pi>0){const sep=document.createElement('div');sep.className='g-mbar';cells.appendChild(sep)}
+      for(let b=b0;b<b1;b++){
         const bg=document.createElement('div');bg.className='g-beat';
-        for(let sub=0;sub<s2;sub++){
-          const step=m*spm()+b*s2+sub;
-          const cell=document.createElement('div');const v=S.pattern[inst.id][step];
-          cell.className='cell'+(v?' on':'');cell.dataset.step=step;cell.dataset.inst=inst.id;
-          if(v){cell.dataset.t=v;cell.textContent=charFor(inst.id,v)}
-          cell.addEventListener('click',()=>{
-            pushUndo();const cur=S.pattern[inst.id][step];
-            // Only the snare cycles through articulations on click (GrooveScribe behavior);
-            // every other voice just toggles on/off. Right-click still offers all articulations.
-            let nxt;
-            if(inst.id==='snare'){const cyc=CYCLE.snare,idx=cyc.indexOf(cur);nxt=cyc[(idx+1)%cyc.length];}
-            else{nxt=cur?0:CYCLE[inst.id][1];}
-            S.pattern[inst.id][step]=nxt;updateCell(cell,inst.id,nxt);
-            cell.style.transform='scale(0.88)';setTimeout(()=>cell.style.transform='',100);
-            renderNotation();
-          });
-          cell.addEventListener('contextmenu',e=>{e.preventDefault();showCtx(e,inst.id,step)});
-          bg.appendChild(cell);
-        }
+        for(let sub=0;sub<s2;sub++) bg.appendChild(buildCell(inst.id,m*spm()+b*s2+sub));
         cells.appendChild(bg);
       }
-    }
-    row.appendChild(cells);wrap.appendChild(row);
+    });
+    row.appendChild(cells);seg.appendChild(row);
   });
+  return seg;
+}
+function buildCell(inst,step){
+  const cell=document.createElement('div');const v=S.pattern[inst][step];
+  cell.className='cell'+(v?' on':'');cell.dataset.step=step;cell.dataset.inst=inst;
+  if(v){cell.dataset.t=v;cell.textContent=charFor(inst,v)}
+  cell.addEventListener('click',()=>{
+    pushUndo();const cur=S.pattern[inst][step];
+    // Only the snare cycles through articulations on click (GrooveScribe behavior);
+    // every other voice just toggles on/off. Right-click / long-press offers all articulations.
+    let nxt;
+    if(inst==='snare'){const cyc=CYCLE.snare,idx=cyc.indexOf(cur);nxt=cyc[(idx+1)%cyc.length];}
+    else{nxt=cur?0:CYCLE[inst][1];}
+    S.pattern[inst][step]=nxt;updateCell(cell,inst,nxt);
+    cell.style.transform='scale(0.88)';setTimeout(()=>cell.style.transform='',100);
+    renderNotation();
+  });
+  cell.addEventListener('contextmenu',e=>{e.preventDefault();showCtx(e,inst,step)});
+  // Phones have no right-click: long-press opens the articulation menu instead.
+  let lpT=null;
+  cell.addEventListener('touchstart',e=>{
+    const t=e.touches[0],pt={clientX:t.clientX,clientY:t.clientY};
+    lpT=setTimeout(()=>{lpT='fired';showCtx(pt,inst,step)},450);
+  },{passive:true});
+  const cancel=()=>{if(lpT&&lpT!=='fired')clearTimeout(lpT);};
+  cell.addEventListener('touchmove',cancel,{passive:true});
+  cell.addEventListener('touchend',e=>{if(lpT==='fired')e.preventDefault();else cancel();lpT=null;}); // no toggle after a long-press
+  return cell;
 }
 
 function charFor(inst,v){if(!v)return'';const t=NT[inst].find(n=>n.id===v);return t?t.ch:''}
@@ -935,6 +1017,16 @@ function copyPNG(){
   };
   img.src='data:image/svg+xml;base64,'+btoa(unescape(encodeURIComponent(data)));
 }
+
+// Grid line-splitting and notation width both depend on the screen width:
+// rebuild when it changes (rotation, window resize). iOS also fires resize when
+// Safari's bars show/hide on scroll — that only changes height, so ignore it.
+let lastW=window.innerWidth,rzT=null;
+window.addEventListener('resize',()=>{
+  if(window.innerWidth===lastW) return;
+  lastW=window.innerWidth;clearTimeout(rzT);
+  rzT=setTimeout(()=>{buildGrid();renderNotation();},150);
+});
 
 function init(){initPattern();pushUndo();buildLibrary();wireControls();syncAll();try{initAudio()}catch(e){}}
 if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',init);
