@@ -6,3 +6,7 @@ cordova/platforms/
 mikeLessons.html
 cordova/plugins/
 .idea/
+
+# Local-only Claude skills (installed with `npx skills add`), kept off GitHub
+.claude/skills/
+skills-lock.json
