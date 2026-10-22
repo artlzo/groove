@@ -169,7 +169,7 @@ body.view-mode .grid-outer{display:none}
 .g-sd{color:var(--fnt)!important}
 
 .g-row{display:flex;align-items:center}
-.g-row-lbl{width:44px;flex-shrink:0;font-size:10px;font-weight:500;color:var(--mut);text-align:right;padding-right:10px;letter-spacing:.02em;cursor:pointer;position:sticky;left:0;z-index:2;background:var(--bg);box-shadow:-4px 0 0 var(--bg);align-self:stretch;display:flex;align-items:center;justify-content:flex-end} /* stays put while the grid scrolls sideways */
+.g-row-lbl{width:44px;flex-shrink:0;font-size:10px;font-weight:500;color:var(--mut);text-align:left;padding-right:10px;letter-spacing:.02em;cursor:pointer;position:sticky;left:0;z-index:2;background:var(--bg);box-shadow:-4px 0 0 var(--bg);align-self:stretch;display:flex;align-items:center;justify-content:flex-start} /* stays put while the grid scrolls sideways */
 .g-row-lbl:hover{color:var(--sec)}
 .g-cells{display:flex;gap:12px}
 .g-beat{display:flex;gap:3px}
@@ -398,7 +398,7 @@ body.view-mode .grid-outer{display:none}
     </div>
   </div>
   <!-- Toms (direct show/hide toggle) -->
-  <button class="tb-btn lit" id="tomsBtn" title="Show / hide toms"><i class="ph ph-circles-three"></i></button>
+  <button class="tb-btn" id="tomsBtn" title="Show / hide toms"><i class="ph ph-circles-three"></i></button>
   <!-- Clear -->
   <button class="tb-btn" id="clearBtn" title="Clear All">
     <i class="ph ph-trash"></i>
@@ -436,7 +436,7 @@ const ROW_OPS={
   kick:[{lb:'All Off',fn:()=>0},{lb:'All On',fn:()=>'o'},{lb:'HH Foot On Beats',fn:(i,s)=>i%s===0?'f':0}]
 };
 
-let S={tsNum:4,tsDen:4,div:16,bpm:80,swing:0,met:'off',measures:1,showStick:false,showToms:true,pattern:{},
+let S={tsNum:4,tsDen:4,div:16,bpm:80,swing:0,met:'off',measures:1,showStick:false,showToms:false,pattern:{},
   // permutations: which voice moves, which sections are on (defaults match the legacy app)
   perm:{on:false,voice:'kick',simplify:false,snareStyle:'plain',
     groups:{ostinato:false,singles:true,doubles:true,updown:false,triples:true,quads:false},
