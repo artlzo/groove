@@ -207,10 +207,14 @@ body.view-mode .grid-outer{display:none}
 .tl-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;padding:10px 8px}
 .tl-end{display:flex;align-items:center;gap:6px;color:var(--mut)}
 .tl-on{font-size:11px;color:var(--pri)}
+.pop-back{display:none;align-items:center;gap:4px;margin:-6px 0 10px -6px;padding:4px 6px;border:none;background:transparent;border-radius:6px;font-family:inherit;font-weight:500;font-size:12px;color:var(--sec);cursor:pointer}
+.pop-back:hover{background:var(--bg-c);color:var(--pri)}
 #tlClear{font-size:13px;padding:10px 8px}
 @media(max-width:600px){
   .m-only{display:flex}
+  #toolbar{gap:18px} /* 5 controls, centered, evenly spaced (id: outranks the later ≤900px .toolbar rule) */
   .m-hide{display:none!important}
+  .pop-back{display:flex}
   .m-ghost{position:absolute} /* takes no toolbar space; its popover is position:fixed on phones */
   .m-ghost>[data-pop]{display:none}
 }
@@ -226,9 +230,9 @@ body.view-mode .grid-outer{display:none}
     position:fixed;bottom:0;left:0;right:0;
     transform:none;border-radius:0;
     border:none;border-top:1px solid var(--brd);
-    padding:6px 8px calc(6px + env(safe-area-inset-bottom));justify-content:space-between;
+    padding:6px 8px calc(6px + env(safe-area-inset-bottom));justify-content:center;
     box-shadow:0 -2px 12px rgba(0,0,0,.06);
-    gap:0;
+    gap:4px;
   }
   .tb-btn{min-width:34px;padding:0 4px}
   .tb-btn .ph{font-size:22px}
@@ -380,6 +384,7 @@ body.view-mode .grid-outer{display:none}
       <i class="ph ph-hand-tap"></i>
     </button>
     <div class="pop" id="pop-stick">
+      <button class="pop-back" type="button" data-back="tools"><i class="ph ph-caret-left"></i>More</button>
       <div class="pop-row-between"><span class="pop-cap">Stickings</span>
         <label class="tog"><input type="checkbox" id="stickTog"><span class="tog-s"></span></label></div>
       <div class="pop-acts">
@@ -398,6 +403,7 @@ body.view-mode .grid-outer{display:none}
       <i class="ph ph-shuffle"></i>
     </button>
     <div class="pop pop-perm" id="pop-perm">
+      <button class="pop-back" type="button" data-back="tools"><i class="ph ph-caret-left"></i>More</button>
       <div class="pop-row-between"><span class="pop-cap">Permutations</span>
         <label class="tog"><input type="checkbox" id="permTog"><span class="tog-s"></span></label></div>
       <p class="pop-note" id="permNote">Turns measure 1 into a practice sheet: the hi-hat stays, and the kick or snare moves through every variation.</p>
@@ -489,10 +495,8 @@ const K_MAP={o:'o',f:'x'};                              // kick / hi-hat-foot ->
 const T_MAP={o:'o'};
 const STK_MAP={R:'R',L:'L'};
 function encVoice(arr,map){return '|'+arr.map(v=>(v&&map[v])?map[v]:'-').join('')+'|';}
-// opts.omit: a voice to leave out (Edit with permutations on shows the ostinato)
-function stateToGrooveUrl(opts){
-  const omit=opts&&opts.omit,p={};
-  INSTS.forEach(i=>p[i.id]=i.id===omit?S.pattern[i.id].map(()=>0):S.pattern[i.id]);
+function stateToGrooveUrl(){
+  const p=S.pattern;
   let u='?TimeSig='+S.tsNum+'/'+S.tsDen+'&Div='+S.div+'&measures='+S.measures+'&tempo='+S.bpm+'&swing='+S.swing;
   u+='&H='+encVoice(p.hihat,H_MAP)+'&S='+encVoice(p.snare,S_MAP)+'&K='+encVoice(p.kick,K_MAP);
   if(S.showToms) u+='&T1='+encVoice(p.tom1,T_MAP)+'&T4='+encVoice(p.tom2,T_MAP);
@@ -770,19 +774,16 @@ function followNotation(){
   if(top<w.scrollTop||top+lr.height>w.scrollTop+w.clientHeight) w.scrollTo({top:first?0:Math.max(0,top-12),behavior:'smooth'});
 }
 
-// Play = View: playing switches to View (notation only, follows along, no
-// editing mid-play); stopping returns to Edit if that's where you were.
-let modeBeforePlay='edit';
+// Playback stays in whatever mode you're in — you can keep editing while it
+// loops. The notation follows along (followNotation) and resets to the top.
 async function togglePlay(){
   initAudio();await Tone.start();
   if(isPlaying){
     Tone.getTransport().stop();seq.stop();isPlaying=false;currentStep=-1;followLine=null;
     document.querySelectorAll('.cell.phead').forEach(c=>c.classList.remove('phead'));
-    if(modeBeforePlay==='edit'&&mode!=='edit') setMode('edit'); else renderNotation();
+    renderNotation();
     document.getElementById('notWrap').scrollTop=0;
   } else {
-    modeBeforePlay=mode;
-    if(mode!=='view') setMode('view');
     document.getElementById('notWrap').scrollTop=0;
     if(!seq) recreateSeq();
     seq.start(0);Tone.getTransport().start('+0.05');isPlaying=true;
@@ -831,9 +832,9 @@ function joinMeasureLines(abc,mpl){
 function renderNotation(){
   try{
     let abc;
-    if(permActive()&&mode==='view') abc=permutationABC(); // the practice sheet lives in View
+    if(permActive()) abc=permutationABC();
     else{
-      abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl(permActive()?{omit:S.perm.voice}:null)),notationWidth());
+      abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
       abc=joinMeasureLines(abc,measuresPerLine());
     }
     document.getElementById('notArea').innerHTML=GU.renderABCtoSVG(abc).svg;
@@ -1107,6 +1108,8 @@ function wireControls(){
   document.querySelectorAll('#pop-stick .pop-act').forEach(b=>b.addEventListener('click',()=>applySticking(b.dataset.sk)));
   // Phone toolbar: ⋯ menu rows open the (hidden-button) Stickings / Permutations popovers
   document.querySelectorAll('#pop-tools [data-open]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();document.querySelector(`[data-pop="${b.dataset.open}"]`).click()}));
+  // ‹ More: back from Stickings / Permutations to the ⋯ menu
+  document.querySelectorAll('.pop-back').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();document.querySelector(`[data-pop="${b.dataset.back}"]`).click()}));
   document.getElementById('tlToms').addEventListener('change',function(){S.showToms=this.checked;syncAll()});
   document.getElementById('tlClear').addEventListener('click',()=>{closePops(null);document.getElementById('clearBtn').click()});
   wireGrooveControls();
@@ -1123,11 +1126,7 @@ function wireControls(){
   // Add-measure ghost button (right of the last measure)
   document.getElementById('addMeasBtn').addEventListener('click',addMeasure);
   // View / Edit mode switch
-  // tapping Edit while playing stops playback and goes to Edit
-  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.addEventListener('click',()=>{
-    if(isPlaying&&b.dataset.mode==='edit'){modeBeforePlay='edit';togglePlay();return}
-    setMode(b.dataset.mode);
-  }));
+  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
   document.getElementById('clearBtn').addEventListener('click',()=>{pushUndo();S.pattern=makeEmpty();syncAll()});
   document.getElementById('shareBtn').addEventListener('click',copyLink);
   document.getElementById('printBtn').addEventListener('click',()=>window.print());

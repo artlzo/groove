@@ -41,13 +41,12 @@ the root `index.html`:
   `GU.create_ABC_from_snare_HH_kick_arrays`, MIDI via `GU.MIDI_from_HH_Snare_Kick_Arrays`.
   Playback goes through `buildPlayModel()` (`PM`): the grid normally, or the
   whole sheet at full resolution (32nds / 32nd triplets) when permutations are on.
-- **Play = View**: `togglePlay()` switches to View on start (grid hidden,
-  notation follows the playing line via `followNotation()` inside the
-  scrollable `#notWrap`) and back to Edit on stop if it started there. The
-  permutation sheet only renders in View; Edit shows the ostinato.
+- **Playback never changes mode** — Arturo edits while it loops (he rejected
+  auto-switching to View). The notation is its own scroll area (`#notWrap`)
+  and follows the playing line via `followNotation()`; the grid never auto-scrolls.
 - **Phone toolbar (≤600px)**: Play · BPM · "4/4 · 1/16" (`#pop-groove`, which
   re-hosts the `#pb-ts/#pb-subdiv/#pb-met` bodies via `placeGrooveControls()`)
-  · Copy · ⋯ (`#pop-tools`: stickings/permutations/toms/clear).
+  · Copy · ⋯ (`#pop-tools`: stickings/permutations/toms/clear; those popovers get a ‹ More back button).
 - **Layout**: the grid is ALWAYS one line (all measures side by side) and
   scrolls sideways inside `.grid-wrap`, with sticky row labels — never stack
   it (Arturo rejected a stacked phone grid). The notation DOES stack (1–2
