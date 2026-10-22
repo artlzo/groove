@@ -384,7 +384,7 @@ body.view-mode .grid-outer{display:none}
       <i class="ph ph-hand-tap"></i>
     </button>
     <div class="pop" id="pop-stick">
-      <button class="pop-back" type="button" data-back="tools"><i class="ph ph-caret-left"></i>More</button>
+      <button class="pop-back" type="button" data-back="tools"><i class="ph ph-caret-left"></i>Back</button>
       <div class="pop-row-between"><span class="pop-cap">Stickings</span>
         <label class="tog"><input type="checkbox" id="stickTog"><span class="tog-s"></span></label></div>
       <div class="pop-acts">
@@ -403,7 +403,7 @@ body.view-mode .grid-outer{display:none}
       <i class="ph ph-shuffle"></i>
     </button>
     <div class="pop pop-perm" id="pop-perm">
-      <button class="pop-back" type="button" data-back="tools"><i class="ph ph-caret-left"></i>More</button>
+      <button class="pop-back" type="button" data-back="tools"><i class="ph ph-caret-left"></i>Back</button>
       <div class="pop-row-between"><span class="pop-cap">Permutations</span>
         <label class="tog"><input type="checkbox" id="permTog"><span class="tog-s"></span></label></div>
       <p class="pop-note" id="permNote">Turns measure 1 into a practice sheet: the hi-hat stays, and the kick or snare moves through every variation.</p>
@@ -1108,7 +1108,7 @@ function wireControls(){
   document.querySelectorAll('#pop-stick .pop-act').forEach(b=>b.addEventListener('click',()=>applySticking(b.dataset.sk)));
   // Phone toolbar: ⋯ menu rows open the (hidden-button) Stickings / Permutations popovers
   document.querySelectorAll('#pop-tools [data-open]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();document.querySelector(`[data-pop="${b.dataset.open}"]`).click()}));
-  // ‹ More: back from Stickings / Permutations to the ⋯ menu
+  // ‹ Back: from Stickings / Permutations to the ⋯ menu
   document.querySelectorAll('.pop-back').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();document.querySelector(`[data-pop="${b.dataset.back}"]`).click()}));
   document.getElementById('tlToms').addEventListener('change',function(){S.showToms=this.checked;syncAll()});
   document.getElementById('tlClear').addEventListener('click',()=>{closePops(null);document.getElementById('clearBtn').click()});

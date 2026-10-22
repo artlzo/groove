@@ -46,7 +46,7 @@ the root `index.html`:
   and follows the playing line via `followNotation()`; the grid never auto-scrolls.
 - **Phone toolbar (≤600px)**: Play · BPM · "4/4 · 1/16" (`#pop-groove`, which
   re-hosts the `#pb-ts/#pb-subdiv/#pb-met` bodies via `placeGrooveControls()`)
-  · Copy · ⋯ (`#pop-tools`: stickings/permutations/toms/clear; those popovers get a ‹ More back button).
+  · Copy · ⋯ (`#pop-tools`: stickings/permutations/toms/clear; those popovers get a ‹ Back button).
 - **Layout**: the grid is ALWAYS one line (all measures side by side) and
   scrolls sideways inside `.grid-wrap`, with sticky row labels — never stack
   it (Arturo rejected a stacked phone grid). The notation DOES stack (1–2
