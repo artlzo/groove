@@ -152,7 +152,7 @@ body.view-mode .grid-outer{display:none}
 .main{flex:1;display:flex;flex-direction:column;align-items:center;padding:28px 24px 140px;overflow:auto;min-width:0}
 
 /* notation */
-.notation-wrap{position:relative;width:100%;max-width:1200px;margin-bottom:16px;overflow-x:auto;overflow-y:hidden}
+.notation-wrap{position:relative;width:100%;max-width:1200px;margin-bottom:16px;overflow-x:auto;overflow-y:auto;flex:1 1 auto;min-height:0;-webkit-overflow-scrolling:touch} /* its own scroll area between the top bar and the grid */
 /* abc2svg emits one <svg> per staff line — stack them (side by side puts a clef mid-line) */
 .notation-wrap svg{display:block;margin:0 auto;height:auto;max-width:100%}
 #notArea .abcr.highlighted{fill:rgba(45,140,90,.22)!important;transition:fill .04s}
@@ -200,6 +200,21 @@ body.view-mode .grid-outer{display:none}
 .row-menu.open{display:block}
 
 
+/* phone toolbar: 5 controls (Play · BPM · "4/4 · 1/16" · Copy · ⋯) */
+.m-only{display:none}
+.grv-sec+.grv-sec{margin-top:14px;padding-top:12px;border-top:1px solid var(--brd-lt)}
+.tl-list{margin-top:0}
+.tl-row{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:13px;padding:10px 8px}
+.tl-end{display:flex;align-items:center;gap:6px;color:var(--mut)}
+.tl-on{font-size:11px;color:var(--pri)}
+#tlClear{font-size:13px;padding:10px 8px}
+@media(max-width:600px){
+  .m-only{display:flex}
+  .m-hide{display:none!important}
+  .m-ghost{position:absolute} /* takes no toolbar space; its popover is position:fixed on phones */
+  .m-ghost>[data-pop]{display:none}
+}
+
 /* mobile */
 
 @media(max-width:900px){
@@ -220,7 +235,6 @@ body.view-mode .grid-outer{display:none}
   .tb-txt{padding:0 6px}
   /* toolbar popovers: centered over the screen instead of over their button,
      so the ones near the edges don't get cut off */
-  @media(max-width:389px){.tb-btn{min-width:32px;padding:0 3px}.tb-txt{padding:0 4px}}
   .toolbar .pop{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(62px + env(safe-area-inset-bottom));width:min(320px,calc(100vw - 24px));min-width:0}
 }
 
@@ -228,7 +242,7 @@ body.view-mode .grid-outer{display:none}
   .topbar,.grid-outer,.toolbar{display:none!important}
   .app{display:block}
   .main{padding:20px;justify-content:flex-start;height:auto;overflow:visible}
-  .notation-wrap{max-width:100%;overflow:visible;margin-left:0!important;width:auto!important}
+  .notation-wrap{max-width:100%;overflow:visible;flex:none;margin-left:0!important;width:auto!important}
   .notation-wrap svg{width:100%!important}
 }
 </style>
@@ -306,8 +320,18 @@ body.view-mode .grid-outer{display:none}
       <input type="range" class="rng" id="swingR" min="0" max="100" value="0">
     </div>
   </div>
+  <!-- Phone only: time signature + subdivision + metronome in one popover.
+       placeGrooveControls() moves the three popovers' contents in here. -->
+  <div class="tb-ctrl m-only">
+    <button class="tb-txt" data-pop="groove" title="Time signature, subdivision &amp; metronome"><b id="grooveDisp">4/4 · 1/16</b></button>
+    <div class="pop" id="pop-groove">
+      <div class="grv-sec" data-from="ts"><span class="pop-cap">Time signature</span></div>
+      <div class="grv-sec" data-from="subdiv"></div>
+      <div class="grv-sec" data-from="met"></div>
+    </div>
+  </div>
   <!-- Time signature -->
-  <div class="tb-ctrl">
+  <div class="tb-ctrl m-hide">
     <button class="tb-txt" data-pop="ts" title="Time Signature"><b id="tsDisp">4/4</b></button>
     <div class="pop" id="pop-ts">
       <div class="pop-ts-row">
@@ -320,7 +344,7 @@ body.view-mode .grid-outer{display:none}
     </div>
   </div>
   <!-- Subdivision -->
-  <div class="tb-ctrl">
+  <div class="tb-ctrl m-hide">
     <button class="tb-txt" data-pop="subdiv" title="Subdivision"><b id="subdivDisp">1/16</b></button>
     <div class="pop" id="pop-subdiv">
       <span class="pop-cap">Subdivision</span>
@@ -336,7 +360,7 @@ body.view-mode .grid-outer{display:none}
     </div>
   </div>
   <!-- Metronome -->
-  <div class="tb-ctrl">
+  <div class="tb-ctrl m-hide">
     <button class="tb-btn" data-pop="met" id="metBtn" title="Metronome">
       <i class="ph ph-metronome"></i>
     </button>
@@ -350,8 +374,8 @@ body.view-mode .grid-outer{display:none}
       </div>
     </div>
   </div>
-  <!-- Stickings -->
-  <div class="tb-ctrl">
+  <!-- Stickings (on phones: button hidden, popover opened from the ⋯ menu) -->
+  <div class="tb-ctrl m-ghost">
     <button class="tb-btn" data-pop="stick" id="stickBtn" title="Stickings">
       <i class="ph ph-hand-tap"></i>
     </button>
@@ -368,8 +392,8 @@ body.view-mode .grid-outer{display:none}
       </div>
     </div>
   </div>
-  <!-- Permutations (practice-sheet generator, 4/4 only) -->
-  <div class="tb-ctrl">
+  <!-- Permutations (practice-sheet generator, 4/4 only; on phones opened from ⋯) -->
+  <div class="tb-ctrl m-ghost">
     <button class="tb-btn" data-pop="perm" id="permBtn" title="Permutations">
       <i class="ph ph-shuffle"></i>
     </button>
@@ -398,15 +422,28 @@ body.view-mode .grid-outer{display:none}
     </div>
   </div>
   <!-- Toms (direct show/hide toggle) -->
-  <button class="tb-btn" id="tomsBtn" title="Show / hide toms"><i class="ph ph-circles-three"></i></button>
+  <button class="tb-btn m-hide" id="tomsBtn" title="Show / hide toms"><i class="ph ph-circles-three"></i></button>
   <!-- Clear -->
-  <button class="tb-btn" id="clearBtn" title="Clear All">
+  <button class="tb-btn m-hide" id="clearBtn" title="Clear All">
     <i class="ph ph-trash"></i>
   </button>
   <!-- Copy PNG -->
   <button class="tb-btn" id="copyPngBtn" title="Copy as PNG">
     <i class="ph ph-image"></i>
   </button>
+  <!-- Phone only: everything else -->
+  <div class="tb-ctrl m-only">
+    <button class="tb-btn" data-pop="tools" id="toolsBtn" title="More"><i class="ph ph-dots-three"></i></button>
+    <div class="pop" id="pop-tools">
+      <div class="pop-acts tl-list">
+        <button class="pop-act tl-row" type="button" data-open="stick"><span>Stickings</span><span class="tl-end"><span class="tl-on" id="tlStickOn">On</span><i class="ph ph-caret-right"></i></span></button>
+        <button class="pop-act tl-row" type="button" data-open="perm"><span>Permutations</span><span class="tl-end"><span class="tl-on" id="tlPermOn">On</span><i class="ph ph-caret-right"></i></span></button>
+        <label class="pop-act tl-row"><span>Toms</span><span class="tog"><input type="checkbox" id="tlToms"><span class="tog-s"></span></span></label>
+        <div class="pop-div"></div>
+        <button class="pop-act" type="button" id="tlClear">Clear all</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <!-- GrooveScribe engine: notation rendering (abc2svg + groove_utils) -->
@@ -452,8 +489,10 @@ const K_MAP={o:'o',f:'x'};                              // kick / hi-hat-foot ->
 const T_MAP={o:'o'};
 const STK_MAP={R:'R',L:'L'};
 function encVoice(arr,map){return '|'+arr.map(v=>(v&&map[v])?map[v]:'-').join('')+'|';}
-function stateToGrooveUrl(){
-  const p=S.pattern;
+// opts.omit: a voice to leave out (Edit with permutations on shows the ostinato)
+function stateToGrooveUrl(opts){
+  const omit=opts&&opts.omit,p={};
+  INSTS.forEach(i=>p[i.id]=i.id===omit?S.pattern[i.id].map(()=>0):S.pattern[i.id]);
   let u='?TimeSig='+S.tsNum+'/'+S.tsDen+'&Div='+S.div+'&measures='+S.measures+'&tempo='+S.bpm+'&swing='+S.swing;
   u+='&H='+encVoice(p.hihat,H_MAP)+'&S='+encVoice(p.snare,S_MAP)+'&K='+encVoice(p.kick,K_MAP);
   if(S.showToms) u+='&T1='+encVoice(p.tom1,T_MAP)+'&T4='+encVoice(p.tom2,T_MAP);
@@ -686,16 +725,38 @@ function onStep(step){
   if(soundsAt(step)){
     let idx=-1; for(let j=0;j<=step;j++){ if(soundsAt(j)) idx++; }
     try{ GU.highlightNoteInABCSVGByIndex(idx); }catch(e){}
+    followNotation();
   }
 }
+// While playing, keep the staff line with the playing note in view inside the
+// notation area (it scrolls on its own; the grid never moves). Only acts when
+// the line changes and isn't fully visible. Stopped = manual scrolling only.
+let followLine=null;
+function followNotation(){
+  if(!isPlaying) return;
+  const h=document.querySelector('#notArea .highlighted'),line=h&&h.closest('svg');
+  if(!line||line===followLine) return;
+  followLine=line;
+  const w=document.getElementById('notWrap'),lr=line.getBoundingClientRect(),wr=w.getBoundingClientRect();
+  const top=lr.top-wr.top+w.scrollTop;
+  const first=line===document.querySelector('#notArea svg'); // back to the top on loop, title/heading included
+  if(top<w.scrollTop||top+lr.height>w.scrollTop+w.clientHeight) w.scrollTo({top:first?0:Math.max(0,top-12),behavior:'smooth'});
+}
 
+// Play = View: playing switches to View (notation only, follows along, no
+// editing mid-play); stopping returns to Edit if that's where you were.
+let modeBeforePlay='edit';
 async function togglePlay(){
   initAudio();await Tone.start();
   if(isPlaying){
-    Tone.getTransport().stop();seq.stop();isPlaying=false;currentStep=-1;
+    Tone.getTransport().stop();seq.stop();isPlaying=false;currentStep=-1;followLine=null;
     document.querySelectorAll('.cell.phead').forEach(c=>c.classList.remove('phead'));
-    renderNotation();
+    if(modeBeforePlay==='edit'&&mode!=='edit') setMode('edit'); else renderNotation();
+    document.getElementById('notWrap').scrollTop=0;
   } else {
+    modeBeforePlay=mode;
+    if(mode!=='view') setMode('view');
+    document.getElementById('notWrap').scrollTop=0;
     if(!seq) recreateSeq();
     seq.start(0);Tone.getTransport().start('+0.05');isPlaying=true;
   }
@@ -743,9 +804,9 @@ function joinMeasureLines(abc,mpl){
 function renderNotation(){
   try{
     let abc;
-    if(permActive()) abc=permutationABC();
+    if(permActive()&&mode==='view') abc=permutationABC(); // the practice sheet lives in View
     else{
-      abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl()),notationWidth());
+      abc=GU.createABCFromGrooveData(GU.getGrooveDataFromUrlString(stateToGrooveUrl(permActive()?{omit:S.perm.voice}:null)),notationWidth());
       abc=joinMeasureLines(abc,measuresPerLine());
     }
     document.getElementById('notArea').innerHTML=GU.renderABCtoSVG(abc).svg;
@@ -1017,6 +1078,11 @@ function wireControls(){
   // Stickings toolbar popover: toggle + presets (incl. reverse)
   document.getElementById('stickTog').addEventListener('change',function(){S.showStick=this.checked;syncAll()});
   document.querySelectorAll('#pop-stick .pop-act').forEach(b=>b.addEventListener('click',()=>applySticking(b.dataset.sk)));
+  // Phone toolbar: ⋯ menu rows open the (hidden-button) Stickings / Permutations popovers
+  document.querySelectorAll('#pop-tools [data-open]').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();document.querySelector(`[data-pop="${b.dataset.open}"]`).click()}));
+  document.getElementById('tlToms').addEventListener('change',function(){S.showToms=this.checked;syncAll()});
+  document.getElementById('tlClear').addEventListener('click',()=>{closePops(null);document.getElementById('clearBtn').click()});
+  wireGrooveControls();
   // Permutations popover
   document.getElementById('permTog').addEventListener('change',function(){setPermutations(this.checked)});
   document.querySelectorAll('#segPermVoice .seg-b').forEach(b=>b.addEventListener('click',()=>{S.perm.voice=b.dataset.voice;syncAll()}));
@@ -1030,7 +1096,11 @@ function wireControls(){
   // Add-measure ghost button (right of the last measure)
   document.getElementById('addMeasBtn').addEventListener('click',addMeasure);
   // View / Edit mode switch
-  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.addEventListener('click',()=>setMode(b.dataset.mode)));
+  // tapping Edit while playing stops playback and goes to Edit
+  document.querySelectorAll('#modeSwitch .mode-b').forEach(b=>b.addEventListener('click',()=>{
+    if(isPlaying&&b.dataset.mode==='edit'){modeBeforePlay='edit';togglePlay();return}
+    setMode(b.dataset.mode);
+  }));
   document.getElementById('clearBtn').addEventListener('click',()=>{pushUndo();S.pattern=makeEmpty();syncAll()});
   document.getElementById('shareBtn').addEventListener('click',copyLink);
   document.getElementById('printBtn').addEventListener('click',()=>window.print());
@@ -1101,6 +1171,12 @@ function syncControls(){
   document.querySelectorAll('#segPermVoice .seg-b').forEach(b=>b.classList.toggle('on',b.dataset.voice===S.perm.voice));
   document.querySelectorAll('#segPermSnare .seg-b').forEach(b=>b.classList.toggle('on',b.dataset.style===S.perm.snareStyle));
   set('permSimplify',el=>el.checked=S.perm.simplify);
+  // phone toolbar
+  set('grooveDisp',el=>el.innerHTML=S.tsNum+'/'+S.tsDen+' · '+subdivLabel()+(on?' <i class="ph ph-metronome" style="font-size:13px;vertical-align:-2px"></i>':''));
+  set('tlToms',el=>el.checked=S.showToms);
+  set('tlStickOn',el=>el.style.display=S.showStick?'':'none');
+  set('tlPermOn',el=>el.style.display=perm?'':'none');
+  set('toolsBtn',el=>el.classList.toggle('lit',S.showStick||perm));
   set('permSimplifyRow',el=>el.style.display=S.perm.voice==='kick'&&!permTriplets()?'':'none');
   set('permSnareRow',el=>el.style.display=S.perm.voice==='snare'?'':'none');
   buildPermGroups();
@@ -1141,6 +1217,27 @@ function buildPermGroups(){
     }
     box.appendChild(row);
   });
+}
+
+// Phone toolbar: the "4/4 · 1/16" popover reuses the real Time signature,
+// Subdivision and Metronome controls — their contents move into it on phones
+// and back to their own popovers on wider screens (listeners/IDs travel along).
+const PHONE_MQ=window.matchMedia('(max-width:600px)');
+function wireGrooveControls(){
+  ['ts','subdiv','met'].forEach(id=>{
+    const pop=document.getElementById('pop-'+id),body=document.createElement('div');body.id='pb-'+id;
+    while(pop.firstChild) body.appendChild(pop.firstChild);
+    pop.appendChild(body);
+  });
+  placeGrooveControls();
+  PHONE_MQ.addEventListener('change',placeGrooveControls);
+}
+function placeGrooveControls(){
+  ['ts','subdiv','met'].forEach(id=>{
+    const dest=PHONE_MQ.matches?document.querySelector(`#pop-groove [data-from="${id}"]`):document.getElementById('pop-'+id);
+    dest.appendChild(document.getElementById('pb-'+id));
+  });
+  closePops(null);
 }
 
 let mode='edit';
