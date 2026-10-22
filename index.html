@@ -518,6 +518,10 @@ function stateToGrooveUrl(){
 // gets at least 600px (more for 32nds), capped at the container width.
 const MEASURE_PX=600;
 function notationAvail(){return Math.min(1200,mainInnerWidth())||MEASURE_PX+40} // .notation-wrap max-width
+// Two measures per line? When lined up with the grid: if two grid measures fit
+// on screen (the staff then matches the grid's first two measures). Otherwise
+// the usual readable-width rule.
+function twoPerLine(g){return g?g.left+gridLineWidth(g,2)<=g.right+1:40+2*480<=notationAvail()}
 // Where the grid's cells sit: left edge of the first cell, width of one
 // measure of cells, gap between measures. null when there's nothing to line
 // up with: View mode (no grid), or a phone, where one measure of cells is
@@ -531,7 +535,9 @@ function gridGeom(){
   const m=document.querySelector('.main'),right=m.getBoundingClientRect().right-parseFloat(getComputedStyle(m).paddingRight);
   if(b.right+sl>right+1) return null; // first measure doesn't fit on screen
   return {left:a.left+sl,measW:b.right-a.left,
-    sep:bt.length>n?bt[n].getBoundingClientRect().left-b.right:32};
+    sep:bt.length>n?bt[n].getBoundingClientRect().left-b.right:32,
+    right,                                        // right edge of the page content
+    scrolls:gw.scrollWidth>gw.clientWidth+1}; // grid wider than the screen (several measures)
 }
 function gridLineWidth(g,k){return k*g.measW+(k-1)*g.sep}
 function notationWidth(){
@@ -540,16 +546,21 @@ function notationWidth(){
   const perMeasure=Math.max(MEASURE_PX,spm()*24);
   return Math.max(280,Math.min(notationAvail(),40+measuresOnLine*perMeasure));
 }
-// Pin the notation's left edge to the grid's first cell (or re-center it)
+// Pin the notation's left edge to the grid's first cell, so its measures sit
+// over the grid's. Exception: when the grid scrolls (several measures) and the
+// notation is one measure per line, center it on the page instead.
 function alignNotation(){
   const w=document.getElementById('notWrap'),g=gridGeom();
-  if(!g){w.style.width=w.style.marginLeft=w.style.alignSelf='';return}
-  const m=document.querySelector('.main'),ml=m.getBoundingClientRect().left+parseFloat(getComputedStyle(m).paddingLeft);
-  w.style.alignSelf='flex-start';
-  w.style.marginLeft=Math.round(g.left-ml)+'px';
+  if(!g){w.style.width=w.style.marginLeft=w.style.alignSelf=w.style.maxWidth='';return}
+  w.style.maxWidth='none'; // two grid measures can be wider than the default 1200px cap
   // as wide as what was rendered (normal score or permutation sheet)
   const svgW=[...w.querySelectorAll('svg')].reduce((mx,sv)=>Math.max(mx,sv.width.baseVal.value),0);
   w.style.width=Math.round(svgW)+'px';
+  // one measure per line under a scrolling grid: center it (pinned left it looks shifted)
+  if(g.scrolls&&!(spm()<32&&twoPerLine(g))){w.style.alignSelf='center';w.style.marginLeft='';return}
+  const m=document.querySelector('.main'),ml=m.getBoundingClientRect().left+parseFloat(getComputedStyle(m).paddingLeft);
+  w.style.alignSelf='flex-start';
+  w.style.marginLeft=Math.round(g.left-ml)+'px';
 }
 // Tone.js subdivision per GrooveScribe division (straight + triplet)
 const TONE_SUB={8:'8n',16:'16n',32:'32n',12:'8t',24:'16t',48:'32t'};
@@ -809,7 +820,7 @@ function renderPlayBtn(){
 function measuresPerLine(){
   if(spm()>=32) return 1;
   const g=gridGeom();
-  return (g?gridLineWidth(g,2):40+2*480)<=notationAvail()?2:1;
+  return twoPerLine(g)?2:1;
 }
 function joinMeasureLines(abc,mpl){
   if(mpl<=1) return abc;
@@ -933,7 +944,7 @@ function permSheet(){
 function permutationABC(){
   const sheet=permSheet(),gd=sheet[0].gd,N=sheet[0].hh.length,trip=permTriplets();
   // two sections per line when they fit; on desktop each bar is as wide as the grid's measure
-  const g=gridGeom(),mpl=(g?gridLineWidth(g,2):40+2*480)<=notationAvail()?2:1;
+  const g=gridGeom(),mpl=twoPerLine(g)?2:1;
   const title=(document.getElementById('titleIn').value||'').trim();
   const author=(document.getElementById('authorIn').value||'').trim();
   const width=g?Math.round(gridLineWidth(g,mpl)):Math.min(notationAvail(),40+mpl*MEASURE_PX);
