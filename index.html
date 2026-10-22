@@ -574,12 +574,39 @@ function initPattern(){
   }
 }
 function clonePat(){return JSON.parse(JSON.stringify(S.pattern))}
+// History snapshots hold the grid settings too, so undoing a subdivision or
+// time-signature change restores the notes AND the grid they were written on.
+function snap(){return {p:clonePat(),div:S.div,tsNum:S.tsNum,tsDen:S.tsDen,measures:S.measures}}
 // pushUndo() is called just BEFORE a change, so the stack holds the states to go back to
-function pushUndo(){undoStack.push(clonePat());if(undoStack.length>80)undoStack.shift();redoStack=[]}
-// history stores patterns only — re-derive the measure count from the restored length
-function restoreHist(p){S.pattern=p;S.measures=Math.max(1,Math.round(S.pattern.hihat.length/spm()));syncAll()}
-function undo(){if(undoStack.length){redoStack.push(clonePat());restoreHist(undoStack.pop())}}
-function redo(){if(redoStack.length){undoStack.push(clonePat());restoreHist(redoStack.pop())}}
+let editRev=0; // bumps on every change; tells changeGrid() whether the groove was edited since
+function pushUndo(){undoStack.push(snap());if(undoStack.length>80)undoStack.shift();redoStack=[];editRev++}
+function restoreHist(h){S.pattern=h.p;S.div=h.div;S.tsNum=h.tsNum;S.tsDen=h.tsDen;S.measures=h.measures;editRev++;syncAll()}
+function undo(){if(undoStack.length){redoStack.push(snap());restoreHist(undoStack.pop())}}
+function redo(){if(redoStack.length){undoStack.push(snap());restoreHist(redoStack.pop())}}
+
+// Changing subdivision or time signature re-places every note by its beat
+// position (beat 3's "&" stays on beat 3's "&"), measure by measure. Notes with
+// no slot on the new grid (16th "e"s on an 8th grid) are left out — but the
+// groove as you last edited it is kept as the source, so switching back (or
+// to any finer grid) brings them back, as long as you haven't edited since.
+let gridSrc=null; // {rev, div, tsNum, tsDen, p}
+function changeGrid(apply){
+  if(!gridSrc||gridSrc.rev!==editRev) gridSrc={div:S.div,tsNum:S.tsNum,tsDen:S.tsDen,p:clonePat()};
+  pushUndo();apply();
+  S.pattern=remapFrom(gridSrc);
+  gridSrc.rev=editRev; // this change itself doesn't count as an edit
+  syncAll();
+}
+function remapFrom(src){
+  const oSpm=GU.calc_notes_per_measure(src.div,src.tsNum,src.tsDen),oSpb=oSpm/src.tsNum;
+  const nSpm=spm(),nSpb=spb(),out=makeEmpty();
+  for(let m=0;m<S.measures;m++) for(let j=0;j<oSpm;j++){
+    const x=j/oSpb*nSpb,k=Math.round(x);
+    if(Math.abs(x-k)>1e-6||k>=nSpm) continue; // no slot on the new grid / beat no longer exists
+    INSTS.forEach(i=>{const v=src.p[i.id][m*oSpm+j];if(v)out[i.id][m*nSpm+k]=v});
+  }
+  return out;
+}
 function resizePattern(){
   const n=numSteps(),s=spm();
   INSTS.forEach(inst=>{
@@ -1066,8 +1093,8 @@ function wireControls(){
     applySwing();
   });
   // time signature popover
-  document.getElementById('tsNumSel').addEventListener('change',function(){pushUndo();S.tsNum=+this.value;resizePattern();syncAll()});
-  document.getElementById('tsDenSel').addEventListener('change',function(){pushUndo();S.tsDen=+this.value;resizePattern();syncAll()});
+  document.getElementById('tsNumSel').addEventListener('change',function(){const v=+this.value;changeGrid(()=>{S.tsNum=v})});
+  document.getElementById('tsDenSel').addEventListener('change',function(){const v=+this.value;changeGrid(()=>{S.tsDen=v})});
   // subdivision popover (note value × feel -> engine division)
   document.querySelectorAll('#segNote .seg-b').forEach(b=>b.addEventListener('click',()=>{applyDivision(divFor(+b.dataset.val,valFeelFor(S.div)[1]))}));
   document.querySelectorAll('#segFeel .seg-b').forEach(b=>b.addEventListener('click',()=>{applyDivision(divFor(valFeelFor(S.div)[0],b.dataset.feel))}));
@@ -1132,7 +1159,7 @@ function setBpm(v){
 let metLastRate='4';
 function divFor(val,feel){ return feel==='triplet' ? ({8:12,16:24,32:48})[val] : val; }
 function valFeelFor(div){ return ({8:[8,'straight'],16:[16,'straight'],32:[32,'straight'],12:[8,'triplet'],24:[16,'triplet'],48:[32,'triplet']})[div] || [16,'straight']; }
-function applyDivision(div){ if(!div||div===S.div) return; pushUndo();S.div=div;resizePattern();syncAll(); }
+function applyDivision(div){ if(!div||div===S.div) return; changeGrid(()=>{S.div=div}); }
 function subdivLabel(){ const vf=valFeelFor(S.div); return '1/'+vf[0]+(vf[1]==='triplet'?'T':''); }
 function isTriplet(){ return valFeelFor(S.div)[1]==='triplet'; }  // swing is a straight-feel shift; disabled for triplets (matches engine)
 function applySwing(){ if(audioReady){ Tone.getTransport().swing=isTriplet()?0:(S.swing/100); Tone.getTransport().swingSubdivision='8n'; } }
